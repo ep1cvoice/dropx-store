@@ -6,7 +6,7 @@ import { getNavLinkClassName, navIconClassName, navLinks } from './nav-links';
 
 export default function NavbarDesktop() {
 	return (
-		<div className='mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6 lg:px-10'>
+		<div className='flex h-[76px] mx-auto max-w-[1600px] items-center justify-between px-6 lg:px-10'>
 			<div className='flex items-center gap-10'>
 				<Logo />
 

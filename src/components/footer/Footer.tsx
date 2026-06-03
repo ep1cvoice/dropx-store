@@ -9,7 +9,7 @@ import { socialIcons } from "./social-icons";
 export default function Footer() {
   return (
     <footer className="bg-[#121212] text-white">
-      <div className="mx-auto max-w-7xl px-6 py-10 md:py-14 lg:px-10 lg:py-16">
+      <div className="mx-auto max-w-[1600px] px-6 py-10 md:py-14 lg:px-10 lg:py-16">
 
         {/* ── Mobile: logo + description + socials ── */}
         <div className="lg:hidden">

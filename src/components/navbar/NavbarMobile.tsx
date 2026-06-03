@@ -8,7 +8,10 @@ import Logo from "./Logo";
 import { getNavLinkClassName, navIconClassName, navLinks } from "./nav-links";
 
 const iconButtonClassName =
-  "text-white/90 transition-colors hover:text-white";
+  "cursor-pointer text-white/60 transition-colors duration-200 hover:text-white active:text-white/80";
+
+const navbarIconClassName =
+  "cursor-pointer text-white/90 transition-colors duration-200 hover:text-white active:text-white/70";
 
 export default function NavbarMobile() {
   const [open, setOpen] = useState(false);
@@ -34,7 +37,7 @@ export default function NavbarMobile() {
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => setOpen(true)}
-          className="justify-self-start text-white/90 transition-colors hover:text-white"
+          className={navbarIconClassName + " justify-self-start"}
         >
           <Menu className={navIconClassName} strokeWidth={1.75} />
         </button>
@@ -44,7 +47,7 @@ export default function NavbarMobile() {
         <Link
           href="/cart"
           aria-label="Cart"
-          className="justify-self-end text-white/90 transition-colors hover:text-white"
+          className={navbarIconClassName + " justify-self-end"}
         >
           <ShoppingBag className={navIconClassName} strokeWidth={1.75} />
         </Link>
@@ -55,7 +58,7 @@ export default function NavbarMobile() {
           <button
             type="button"
             aria-label="Close menu"
-            className="absolute inset-0 bg-black/60"
+            className="absolute inset-0 bg-black/60 transition-opacity duration-300"
             onClick={closeMenu}
           />
 
@@ -63,11 +66,8 @@ export default function NavbarMobile() {
             id={menuId}
             className="relative flex h-full w-full max-w-xs flex-col bg-[#121212] p-6 shadow-xl"
           >
-            
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-base font-bold tracking-[0.08em] uppercase text-white">
               <Logo />
-              </span>
               <button
                 type="button"
                 aria-label="Close menu"
@@ -78,13 +78,16 @@ export default function NavbarMobile() {
               </button>
             </div>
 
-            <ul className="flex flex-col gap-6">
+            <ul className="flex flex-col">
               {navLinks.map(({ href, label, accent }) => (
                 <li key={href}>
                   <Link
                     href={href}
                     onClick={closeMenu}
-                    className={getNavLinkClassName(accent)}
+                    className={
+                      getNavLinkClassName(accent) +
+                      " block cursor-pointer rounded-md px-3 py-3 transition-colors duration-150 hover:bg-white/5 active:bg-white/10"
+                    }
                   >
                     {label}
                   </Link>
@@ -92,13 +95,15 @@ export default function NavbarMobile() {
               ))}
             </ul>
 
-            <div className="mt-auto space-y-6 border-t border-white/10 pt-6">
-              <div className="flex items-center gap-10 center
-              justify-center">
+            <div className="mt-auto space-y-5 border-t border-white/10 pt-6">
+              <div className="flex items-center justify-center gap-10">
                 <button
                   type="button"
                   aria-label="Search"
-                  className={iconButtonClassName}
+                  className={
+                    iconButtonClassName +
+                    " rounded-lg p-2 hover:bg-white/5 active:bg-white/10"
+                  }
                 >
                   <Search className={navIconClassName} strokeWidth={1.75} />
                 </button>
@@ -106,7 +111,10 @@ export default function NavbarMobile() {
                   href="/wishlist"
                   aria-label="Wishlist"
                   onClick={closeMenu}
-                  className={iconButtonClassName}
+                  className={
+                    iconButtonClassName +
+                    " rounded-lg p-2 hover:bg-white/5 active:bg-white/10"
+                  }
                 >
                   <Heart className={navIconClassName} strokeWidth={1.75} />
                 </Link>
@@ -114,7 +122,10 @@ export default function NavbarMobile() {
                   href="/cart"
                   aria-label="Cart"
                   onClick={closeMenu}
-                  className={iconButtonClassName}
+                  className={
+                    iconButtonClassName +
+                    " rounded-lg p-2 hover:bg-white/5 active:bg-white/10"
+                  }
                 >
                   <ShoppingBag className={navIconClassName} strokeWidth={1.75} />
                 </Link>
