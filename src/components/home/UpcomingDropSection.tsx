@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { anton, inter } from "@/lib/fonts";
 import Button from "@/components/ui/Button";
-import { usePathname } from "next/navigation";
 
 const countdownItems = [
   { value: "10", label: "Days" },
@@ -36,7 +35,7 @@ export default function UpcomingDropSection() {
           <p
             className={`${inter.className} mt-4 text-[12px] font-medium uppercase tracking-[0.14em] text-black/40 md:mt-5 md:text-[13px]`}
           >
-            April 12, 2026 &mdash; 10:00 CET
+            August 12, 2026 &mdash; 10:00 CET
           </p>
 
           {/* Countdown */}
