@@ -1,6 +1,9 @@
+'use client';
+
 import Image from "next/image";
 import { anton, inter } from "@/lib/fonts";
 import Button from "@/components/ui/Button";
+import { usePathname } from "next/navigation";
 
 const countdownItems = [
   { value: "10", label: "Days" },

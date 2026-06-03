@@ -9,7 +9,7 @@ export type NavLink = {
 export const navLinks: NavLink[] = [
   { href: "/new-drops", label: "New Drops" },
   { href: "/brands", label: "Brands" },
-  { href: "/sale", label: "Sale", accent: true },
+  { href: "/sale", label: "Sale" },
   { href: "/about", label: "About" },
 ];
 
@@ -18,10 +18,11 @@ export const navLinkTextClassName =
 
 export const navIconClassName = "size-[22px] md:size-6 lg:size-[26px]";
 
-export function getNavLinkClassName(accent?: boolean) {
-  const color = accent
-    ? "text-[#c9664a] hover:text-[#db7a5e]"
-    : "text-white/90 hover:text-white";
+export function getNavLinkClassName(accent?: boolean, isActive?: boolean) {
+  const color =
+    isActive || accent
+      ? "text-[#e85d2a] hover:text-[#f06d3a]"
+      : "text-white/90 hover:text-white";
 
   return `${inter.className} ${navLinkTextClassName} font-medium transition-colors ${color}`;
 }

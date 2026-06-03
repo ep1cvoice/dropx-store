@@ -1,10 +1,17 @@
+'use client';
+
 import Link from 'next/link';
 import { Heart, Search, ShoppingBag } from 'lucide-react';
 import Logo from './Logo';
 import Button from '../ui/Button';
 import { getNavLinkClassName, navIconClassName, navLinks } from './nav-links';
+import { usePathname } from 'next/navigation';
 
 export default function NavbarDesktop() {
+
+	const pathname = usePathname();
+	const isActive = (href: string) => pathname.startsWith(href);
+
 	return (
 		<div className='flex h-[76px] mx-auto max-w-[1600px] items-center justify-between px-6 lg:px-10'>
 			<div className='flex items-center gap-10'>
@@ -12,7 +19,7 @@ export default function NavbarDesktop() {
 
 				<nav className='flex items-center gap-8'>
 					{navLinks.map(({ href, label, accent }) => (
-						<Link key={href} href={href} className={getNavLinkClassName(accent)}>
+						<Link key={href} href={href} className={getNavLinkClassName(accent, isActive(href))}>
 							{label}
 						</Link>
 					))}
