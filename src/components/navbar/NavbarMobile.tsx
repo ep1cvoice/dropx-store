@@ -3,8 +3,12 @@
 import Link from "next/link";
 import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
+import Button from "@/components/ui/Button";
 import Logo from "./Logo";
 import { getNavLinkClassName, navIconClassName, navLinks } from "./nav-links";
+
+const iconButtonClassName =
+  "text-white/90 transition-colors hover:text-white";
 
 export default function NavbarMobile() {
   const [open, setOpen] = useState(false);
@@ -59,15 +63,16 @@ export default function NavbarMobile() {
             id={menuId}
             className="relative flex h-full w-full max-w-xs flex-col bg-[#121212] p-6 shadow-xl"
           >
+            
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-base font-bold tracking-[0.08em] uppercase">
-                Menu
+              <span className="text-base font-bold tracking-[0.08em] uppercase text-white">
+              <Logo />
               </span>
               <button
                 type="button"
                 aria-label="Close menu"
                 onClick={closeMenu}
-                className="text-white/90 transition-colors hover:text-white"
+                className={iconButtonClassName}
               >
                 <X className={navIconClassName} strokeWidth={1.75} />
               </button>
@@ -87,21 +92,38 @@ export default function NavbarMobile() {
               ))}
             </ul>
 
-            <div className="mt-auto flex items-center gap-6 border-t border-white/10 pt-6">
-              <button
-                type="button"
-                aria-label="Search"
-                className="text-white/90 transition-colors hover:text-white"
-              >
-                <Search className={navIconClassName} strokeWidth={1.75} />
-              </button>
-              <Link
-                href="/wishlist"
-                aria-label="Wishlist"
-                onClick={closeMenu}
-                className="text-white/90 transition-colors hover:text-white"
-              >
-                <Heart className={navIconClassName} strokeWidth={1.75} />
+            <div className="mt-auto space-y-6 border-t border-white/10 pt-6">
+              <div className="flex items-center gap-10 center
+              justify-center">
+                <button
+                  type="button"
+                  aria-label="Search"
+                  className={iconButtonClassName}
+                >
+                  <Search className={navIconClassName} strokeWidth={1.75} />
+                </button>
+                <Link
+                  href="/wishlist"
+                  aria-label="Wishlist"
+                  onClick={closeMenu}
+                  className={iconButtonClassName}
+                >
+                  <Heart className={navIconClassName} strokeWidth={1.75} />
+                </Link>
+                <Link
+                  href="/cart"
+                  aria-label="Cart"
+                  onClick={closeMenu}
+                  className={iconButtonClassName}
+                >
+                  <ShoppingBag className={navIconClassName} strokeWidth={1.75} />
+                </Link>
+              </div>
+
+              <Link href="/login" onClick={closeMenu} className="block">
+                <Button variant="accent" className="w-full cursor-pointer">
+                  Sign in
+                </Button>
               </Link>
             </div>
           </nav>
