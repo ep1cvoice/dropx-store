@@ -1,3 +1,9 @@
+import DropListSection from "@/components/home/DropListSection";
+
 export default function Home() {
-  return <h1>Main Page</h1>;
+  return (
+    <>
+      <DropListSection />
+    </>
+  );
 }
