@@ -97,4 +97,6 @@ export type ProductCardData = {
   imageUrl: string | null;
   /** Lowest price across all variants — used for "From €X" display */
   priceFrom: number;
+  /** Short low-stock message shown beside price, e.g. "Only 3 left" */
+  stockText?: string | null;
 };

@@ -6,7 +6,7 @@ import { Heart } from "lucide-react";
 import { useState } from "react";
 
 import Badge from "@/components/ui/Badge";
-import { inter, anton } from "@/lib/fonts";
+import { inter } from "@/lib/fonts";
 import type { ProductCardData } from "@/types/product";
 
 type ProductCardProps = {
@@ -28,14 +28,12 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [wishlisted, setWishlisted] = useState(false);
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md">
+    <article className="group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md">
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Image area                                                           */}
-      {/* ------------------------------------------------------------------ */}
+      {/* Image area */}
       <Link
         href={`/products/${product.slug}`}
-        className="relative block aspect-square w-full overflow-hidden bg-[#f5f5f5]"
+        className="relative block aspect-square w-full overflow-hidden rounded-lg bg-[#f5f5f5]"
         tabIndex={-1}
         aria-hidden="true"
       >
@@ -69,9 +67,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="absolute left-3 top-3">
             {product.badge === "discount" && product.discountValue != null ? (
               <Badge variant="discount" discountValue={product.discountValue} />
-            ) : (
+            ) : product.badge !== "discount" ? (
               <Badge variant={product.badge} />
-            )}
+            ) : null}
           </div>
         )}
       </Link>
@@ -81,46 +79,48 @@ export default function ProductCard({ product }: ProductCardProps) {
         type="button"
         onClick={() => setWishlisted((prev) => !prev)}
         aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
-        className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
+        className="absolute right-3 top-3 transition-opacity"
       >
         <Heart
-          size={16}
+          size={20}
           className={
             wishlisted
-              ? "fill-[#e85d2a] stroke-[#e85d2a]"
-              : "stroke-gray-500 fill-none"
+              ? "fill-[#FF4D00] stroke-[#FF4D00]"
+              : "fill-[#1A1A1A] stroke-[#1A1A1A] fill-none"
           }
         />
       </button>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Info area                                                            */}
-      {/* Color picker and size selector live on the product details page.    */}
-      {/* ------------------------------------------------------------------ */}
+      {/* Info area */}
       <Link
         href={`/products/${product.slug}`}
-        className="flex flex-col gap-1 px-3 pb-3 pt-2.5"
+        className="flex flex-col gap-1 px-3 pb-3 pt-3"
       >
         {/* Brand */}
         <span
-          className={`${inter.className} text-[10px] font-semibold uppercase tracking-widest text-gray-400`}
+          className={`${inter.className} text-[11px] font-semibold uppercase tracking-[1.5px] text-[#666666]`}
         >
           {product.brand}
         </span>
 
         {/* Product name */}
         <span
-          className={`${anton.className} text-base leading-tight tracking-wide text-[#121212]`}
+          className={`${inter.className} text-[15px] font-medium leading-tight text-[#1A1A1A]`}
         >
           {product.name}
         </span>
 
-        {/* Price */}
-        <span
-          className={`${inter.className} mt-1 text-sm font-semibold text-[#121212]`}
-        >
-          {formatPrice(product.priceFrom, product.currency)}
-        </span>
+        {/* Price row */}
+        <div className="mt-1 flex items-center justify-between">
+          <span className={`${inter.className} text-base font-bold text-[#1A1A1A]`}>
+            {formatPrice(product.priceFrom, product.currency)}
+          </span>
+          {product.stockText && (
+            <span className={`${inter.className} text-[11px] font-medium text-[#FF4D00]`}>
+              {product.stockText}
+            </span>
+          )}
+        </div>
       </Link>
     </article>
   );

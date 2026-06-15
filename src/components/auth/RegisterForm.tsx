@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { anton, inter } from '@/lib/fonts';
 import { registerSchema, type RegisterFormValues } from '@/lib/validation';
+import { register as registerAction } from '@/actions/register';
 
 type RegisterFormProps = {
   showSubtitle?: boolean;
@@ -30,14 +31,18 @@ export default function RegisterForm({
     resolver: zodResolver(registerSchema),
   });
 
+  const [serverError, setServerError] = useState<string | null>(null);
+
   useEffect(() => {
     if (Object.keys(errors).length === 0) return;
     const timer = setTimeout(() => clearErrors(), 5000);
     return () => clearTimeout(timer);
   }, [errors, clearErrors]);
 
-  function onSubmit(data: RegisterFormValues) {
-    console.log('Register:', data);
+  async function onSubmit(data: RegisterFormValues) {
+    setServerError(null);
+    const result = await registerAction(data);
+    if (result?.error) setServerError(result.error);
   }
 
   return (
@@ -124,6 +129,12 @@ export default function RegisterForm({
             </p>
           )}
         </div>
+
+        {serverError && (
+          <p role='alert' className={`${inter.className} text-sm text-red-500`}>
+            {serverError}
+          </p>
+        )}
 
         <Button
           type='submit'
