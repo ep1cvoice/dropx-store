@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GoogleIcon } from '@/components/footer/social-icons';
@@ -9,6 +11,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { anton, inter } from '@/lib/fonts';
 import { loginSchema, type LoginFormValues } from '@/lib/validation';
+import { useState } from 'react';
 
 type LoginFormProps = {
   showSubtitle?: boolean;
@@ -23,6 +26,7 @@ export default function LoginForm({
   compact = false,
   className = '',
 }: LoginFormProps) {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -31,6 +35,7 @@ export default function LoginForm({
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
+  const [serverError, setServerError] = useState<string | null>(null);
 
   useEffect(() => {
     if (Object.keys(errors).length === 0) return;
@@ -38,8 +43,23 @@ export default function LoginForm({
     return () => clearTimeout(timer);
   }, [errors, clearErrors]);
 
-  function onSubmit(data: LoginFormValues) {
-    console.log('Login:', data);
+  async function onSubmit(data: LoginFormValues) {
+    setServerError(null);
+    const result = await signIn('credentials', {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+      callbackUrl: '/',
+    });
+
+    if (!result || result.error) {
+      setServerError('Invalid email or password.');
+      return;
+    }
+
+    if (result.url) {
+      router.push(result.url);
+    }
   }
 
   return (
@@ -104,6 +124,11 @@ export default function LoginForm({
         >
           {isSubmitting ? 'Signing in…' : 'Sign in'}
         </Button>
+        {serverError && (
+          <p role='alert' className={`${inter.className} text-sm text-red-500`}>
+            {serverError}
+          </p>
+        )}
       </form>
 
       <div className={`relative ${compact ? 'my-5 lg:my-4' : 'my-8'}`}>
