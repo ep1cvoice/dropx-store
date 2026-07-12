@@ -1,7 +1,14 @@
+import { redirect } from "next/navigation";
+import { isAuth } from "@/auth/auth";
 import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
 import LoginForm from "@/components/auth/LoginForm";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const authenticated = await isAuth();
+  if (authenticated) {
+    redirect("/");
+  }
+
   return (
     <AuthSplitLayout
       heroSrc="/loginHero.jpg"

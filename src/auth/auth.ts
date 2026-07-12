@@ -1,14 +1,14 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { verifyPassword } from "@/utils/password";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   secret: process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET,
   session: {
-    strategy: "database",
+    strategy: "jwt",
   },
   providers: [
     Credentials({
@@ -34,7 +34,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const isValid = await bcrypt.compare(password, user.password);
+        const isValid = await verifyPassword(password, user.password);
         if (!isValid) {
           return null;
         }
@@ -48,3 +48,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
 });
+
+export async function isAuth(): Promise<boolean> {
+  const session = await auth();
+  return Boolean(session?.user);
+}

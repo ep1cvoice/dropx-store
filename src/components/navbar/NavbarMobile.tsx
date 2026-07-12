@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import Button from "@/components/ui/Button";
+import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
 import { getNavLinkClassName, navIconClassName, navLinks } from "./nav-links";
 
@@ -16,6 +17,7 @@ const navbarIconClassName =
 export default function NavbarMobile() {
   const [open, setOpen] = useState(false);
   const menuId = useId();
+  const { status } = useSession();
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -131,11 +133,24 @@ export default function NavbarMobile() {
                 </Link>
               </div>
 
-              <Link href="/login" onClick={closeMenu} className="block">
-                <Button variant="accent" className="w-full cursor-pointer">
-                  Sign in
+              {status === "authenticated" ? (
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    closeMenu();
+                    await signOut({ callbackUrl: "/" });
+                  }}
+                  className="w-full cursor-pointer border border-white bg-transparent text-white hover:bg-white/10 active:bg-white/20"
+                >
+                  Log out
                 </Button>
-              </Link>
+              ) : (
+                <Link href="/login" onClick={closeMenu} className="block">
+                  <Button variant="accent" className="w-full cursor-pointer">
+                    Sign in
+                  </Button>
+                </Link>
+              )}
             </div>
           </nav>
         </div>

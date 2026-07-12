@@ -1,9 +1,9 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { registerSchema, type RegisterFormValues } from '@/lib/validation';
+import { saltAndHashPassword } from '@/utils/password';
 
 export async function register(data: RegisterFormValues): Promise<{ error: string } | never> {
 	const parsed = registerSchema.safeParse(data);
@@ -18,7 +18,7 @@ export async function register(data: RegisterFormValues): Promise<{ error: strin
 		return { error: 'An account with that email already exists.' };
 	}
 
-	const hashedPassword = await bcrypt.hash(password, 12);
+	const hashedPassword = await saltAndHashPassword(password);
 
 	try {
 		await prisma.user.create({

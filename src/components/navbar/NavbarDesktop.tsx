@@ -6,10 +6,12 @@ import Logo from './Logo';
 import Button from '../ui/Button';
 import { getNavLinkClassName, navIconClassName, navLinks } from './nav-links';
 import { usePathname } from 'next/navigation';
+import { signOut, useSession } from 'next-auth/react';
 
 export default function NavbarDesktop() {
 
 	const pathname = usePathname();
+	const { status } = useSession();
 	const isActive = (href: string) => pathname.startsWith(href);
 
 	return (
@@ -37,11 +39,21 @@ export default function NavbarDesktop() {
 					<ShoppingBag className={navIconClassName} strokeWidth={1.75} />
 				</Link>
 
-				<Link href='/login'>
-					<Button variant='accent' className='text-white/90 transition-colors hover:text-white cursor-pointer'>
-						Sign Up
+				{status === 'authenticated' ? (
+					<Button
+						type='button'
+						onClick={() => signOut({ callbackUrl: '/' })}
+						className='cursor-pointer border border-white bg-transparent text-white hover:bg-white/10 active:bg-white/20'
+					>
+						Log out
 					</Button>
-				</Link>
+				) : (
+					<Link href='/login'>
+						<Button variant='accent' className='text-white/90 transition-colors hover:text-white cursor-pointer'>
+							Sign Up
+						</Button>
+					</Link>
+				)}
 			</div>
 		</div>
 	);

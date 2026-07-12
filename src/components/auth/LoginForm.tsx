@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GoogleIcon } from '@/components/footer/social-icons';
@@ -27,6 +27,7 @@ export default function LoginForm({
   className = '',
 }: LoginFormProps) {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const {
     register,
     handleSubmit,
@@ -57,9 +58,8 @@ export default function LoginForm({
       return;
     }
 
-    if (result.url) {
-      router.push(result.url);
-    }
+    router.push(result.url ?? '/');
+    router.refresh();
   }
 
   return (
@@ -72,6 +72,11 @@ export default function LoginForm({
       {showSubtitle && (
         <p className={`${inter.className} mt-2 hidden text-sm text-gray-500 md:block`}>
           Welcome back. Sign in to access your account.
+        </p>
+      )}
+      {status === 'authenticated' && (
+        <p className={`${inter.className} mt-2 text-sm text-green-700`}>
+          Signed in as {session?.user?.email ?? 'user'}.
         </p>
       )}
 
