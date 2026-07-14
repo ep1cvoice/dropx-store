@@ -41,12 +41,12 @@ export default function DropListSection() {
               type="email"
               autoComplete="email"
               placeholder="Enter your email"
-              className={`${inter.className} w-full flex-1 border border-transparent bg-[#222222] px-4 py-3.5 text-sm text-white outline-none placeholder:text-white/40 focus:border-white/20 sm:rounded-none sm:rounded-l-md sm:py-4 sm:text-base`}
+              className={`${inter.className} w-full flex-1 border border-transparent bg-[#222222] px-4 py-3.5 text-sm text-white outline-none placeholder:text-white/40 focus:border-white/20 rounded-none sm:py-4 sm:text-base`}
             />
             <Button
               type="submit"
               variant="accent"
-              className="w-full shrink-0 cursor-pointer rounded-md px-8 py-3.5 text-sm uppercase tracking-wide sm:w-auto sm:rounded-none sm:rounded-r-md sm:py-4"
+              className="w-full shrink-0 cursor-pointer rounded-none px-8 py-3.5 text-sm uppercase tracking-wide sm:w-auto sm:py-4"
             >
               Subscribe
             </Button>

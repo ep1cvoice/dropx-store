@@ -49,7 +49,7 @@ export default function NavbarDesktop() {
 					</Button>
 				) : (
 					<Link href='/login'>
-						<Button variant='accent' className='text-white/90 transition-colors hover:text-white cursor-pointer'>
+						<Button variant='accent' className='rounded-none text-white/90 transition-colors hover:text-white cursor-pointer'>
 							Sign Up
 						</Button>
 					</Link>

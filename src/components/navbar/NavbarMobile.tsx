@@ -146,7 +146,7 @@ export default function NavbarMobile() {
                 </Button>
               ) : (
                 <Link href="/login" onClick={closeMenu} className="block">
-                  <Button variant="accent" className="w-full cursor-pointer">
+                  <Button variant="accent" className="w-full cursor-pointer rounded-none">
                     Sign in
                   </Button>
                 </Link>

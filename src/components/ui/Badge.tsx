@@ -46,7 +46,7 @@ export default function Badge({
 
   return (
     <span
-      className={`${inter.className} inline-flex items-center justify-center rounded-md px-3 py-1 text-xs font-bold uppercase tracking-wider ${variantStyles[variant]} ${className}`}
+      className={`${inter.className} inline-flex items-center justify-center px-3 py-1 text-xs font-bold uppercase tracking-wider ${variantStyles[variant]} ${className}`}
     >
       {text}
     </span>
