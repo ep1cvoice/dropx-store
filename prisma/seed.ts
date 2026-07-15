@@ -1,17 +1,22 @@
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import bcrypt from "bcryptjs";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  const defaultPassword = await bcrypt.hash("DropxSeed123!", 12);
+
   const alice = await prisma.user.upsert({
     where: { email: "alice@dropx.store" },
     update: {},
     create: {
       email: "alice@dropx.store",
       name: "Alice",
+      lastName: "Doe",
+      password: defaultPassword,
       products: {
         create: [
           {
@@ -37,6 +42,8 @@ async function main() {
     create: {
       email: "bob@dropx.store",
       name: "Bob",
+      lastName: "Stone",
+      password: defaultPassword,
       products: {
         create: [
           {

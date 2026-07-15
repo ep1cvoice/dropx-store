@@ -7,6 +7,12 @@ import QuantitySelector from "@/components/ui/QuantitySelector";
 import { inter, anton } from "@/lib/fonts";
 import type { CartItem as CartItemType } from "@/types/cart";
 
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  EUR: "€",
+  USD: "$",
+  GBP: "£",
+};
+
 type CartItemProps = {
   item: CartItemType;
   onQuantityChange: (id: string, quantity: number) => void;
@@ -19,6 +25,7 @@ export default function CartItem({
   onRemove,
 }: CartItemProps) {
   const lineTotal = (item.price * item.quantity).toFixed(2);
+  const symbol = CURRENCY_SYMBOLS[item.currency] ?? item.currency;
 
   return (
     <li className="flex items-center gap-4 border-b border-white/8 py-4">

@@ -6,7 +6,7 @@ import { loginSchema, type LoginFormValues } from '@/lib/validation';
 
 export async function signInAction(
   data: LoginFormValues,
-): Promise<{ error: string } | never> {
+): Promise<{ error: string } | void> {
   const parsed = loginSchema.safeParse(data);
   if (!parsed.success) {
     return { error: 'Invalid form data.' };
