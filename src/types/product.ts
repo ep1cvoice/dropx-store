@@ -53,6 +53,7 @@ export type Product = {
   id: string;
   slug: string;        // e.g. "air-max-90" → /products/air-max-90
   name: string;
+  description: string | null;
   brand: string;
   category: ProductCategory;
   badge: BadgeVariant | null;
@@ -62,6 +63,15 @@ export type Product = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+// ---------------------------------------------------------------------------
+// ProductDetail
+// Full payload for the product details page (/products/[slug]).
+// Currently identical to Product, but kept as a distinct name so the detail
+// query and view can evolve (e.g. reviews, related media) without touching the
+// base catalog type.
+// ---------------------------------------------------------------------------
+export type ProductDetail = Product;
 
 // ---------------------------------------------------------------------------
 // ProductCardData

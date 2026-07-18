@@ -66,6 +66,8 @@ async function main() {
     data: {
       slug: "air-jordan-1-retro-high-og",
       name: "Air Jordan 1 Retro High OG",
+      description:
+        "The one that started it all. The Air Jordan 1 Retro High OG keeps the iconic silhouette, premium leather build, and Air-Sole cushioning that made it a legend — now in the original colour blocking collectors chase.",
       category: "basketball",
       badge: "limited",
       currency: "EUR",
@@ -95,6 +97,8 @@ async function main() {
     data: {
       slug: "nike-dunk-low-panda",
       name: "Dunk Low 'Panda'",
+      description:
+        "A wardrobe essential. The Dunk Low 'Panda' pairs crisp white leather with black overlays for a clean, everyday look that goes with everything. Durable, low-profile, and endlessly wearable.",
       category: "lifestyle",
       badge: "new",
       currency: "EUR",
@@ -117,6 +121,8 @@ async function main() {
     data: {
       slug: "nike-air-max-90",
       name: "Air Max 90",
+      description:
+        "The Nike Air Max 90 stays true to its OG roots with the iconic Waffle sole, stitched overlays, and classic TPU accents. Nothing as iconic, nothing as comfortable.",
       category: "lifestyle",
       badge: "discount",
       discountValue: 20,
@@ -147,6 +153,8 @@ async function main() {
     data: {
       slug: "yeezy-boost-350-v2-zebra",
       name: "Yeezy Boost 350 V2 'Zebra'",
+      description:
+        "Instantly recognisable. The Yeezy Boost 350 V2 'Zebra' wraps a full-length Boost midsole in a breathable Primeknit upper with its signature striped pattern and 'SPLY-350' side text.",
       category: "lifestyle",
       badge: "limited",
       currency: "EUR",
@@ -169,6 +177,8 @@ async function main() {
     data: {
       slug: "adidas-samba-og",
       name: "Samba OG",
+      description:
+        "A terrace classic reborn. The adidas Samba OG blends soft leather with a suede T-toe, gum sole, and gold foil branding — timeless style that moves effortlessly from pitch to pavement.",
       category: "lifestyle",
       badge: "new",
       currency: "EUR",
@@ -198,6 +208,8 @@ async function main() {
     data: {
       slug: "new-balance-550-white-green",
       name: "550 'White Green'",
+      description:
+        "Retro hoops heritage. The New Balance 550 revives a 1989 basketball silhouette with a clean leather upper, perforated details, and just the right amount of colour on the heel and toe.",
       category: "lifestyle",
       badge: "new",
       currency: "EUR",
@@ -220,6 +232,8 @@ async function main() {
     data: {
       slug: "new-balance-9060",
       name: "9060",
+      description:
+        "A bold evolution of the 99X lineage. The New Balance 9060 layers wavy overlays over chunky ABZORB and SBS cushioning for a distinctly Y2K look with all-day comfort.",
       category: "running",
       badge: "discount",
       discountValue: 15,
@@ -243,6 +257,8 @@ async function main() {
     data: {
       slug: "asics-gel-1130",
       name: "GEL-1130",
+      description:
+        "Early-2000s running DNA. The ASICS GEL-1130 combines a mesh-and-synthetic upper with rearfoot GEL cushioning for a versatile, understated sneaker that leans into quiet luxury tones.",
       category: "running",
       badge: null,
       currency: "EUR",

@@ -114,10 +114,11 @@ model Brand {
 }
 
 model Product {
-  id       String          @id @default(cuid())
-  slug     String          @unique
-  name     String
-  category ProductCategory
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  name        String
+  description String?
+  category    ProductCategory
 
   brandId String @map("brand_id")
   brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
