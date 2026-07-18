@@ -1,4 +1,7 @@
-// Starter models — replace with your own
+// DROPX Store — single-store sneaker catalog.
+// Domain mirrors src/types/product.ts:
+//   Brand → Product → ProductVariant (colorway) → VariantSize (per-size stock)
+// plus user Cart / Wishlist. Auth tables are managed by the NextAuth PrismaAdapter.
 
 generator client {
   provider = "prisma-client"
@@ -9,71 +12,211 @@ datasource db {
   provider = "postgresql"
 }
 
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum ProductCategory {
+  running
+  basketball
+  lifestyle
+  skateboarding
+}
+
+// Mirrors BadgeVariant in src/components/ui/Badge.tsx.
+// `soldOut` is usually derived from stock, but kept here so a product can be
+// force-flagged (e.g. an ended drop) without touching inventory.
+enum ProductBadge {
+  new
+  limited
+  discount
+  soldOut
+}
+
+// ---------------------------------------------------------------------------
+// Auth (NextAuth) + User
+// ---------------------------------------------------------------------------
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String  @map("user_id")
-  type               String
-  provider           String
-  providerAccountId  String  @map("provider_account_id")
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
- 
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@unique([provider, providerAccountId])
   @@map("accounts")
 }
- 
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique @map("session_token")
   userId       String   @map("user_id")
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@map("sessions")
 }
- 
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  password  String
-  
-  name      String
-  lastName  String 
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  products  Product[]
-  accounts      Account[]
-  sessions      Session[]
+  name     String
+  lastName String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  cart     Cart?
+  wishlist WishlistItem[]
+
   @@map("users")
 }
- 
+
 model VerificationToken {
   identifier String
   token      String
   expires    DateTime
- 
+
   @@unique([identifier, token])
   @@map("verification_tokens")
 }
 
+// ---------------------------------------------------------------------------
+// Catalog
+// ---------------------------------------------------------------------------
+
+model Brand {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  slug     String  @unique
+  logoUrl  String?
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("brands")
+}
+
 model Product {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  price       Float
-  imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  sellerId    String
-  seller      User     @relation(fields: [sellerId], references: [id])
+  id       String          @id @default(cuid())
+  slug     String          @unique
+  name     String
+  category ProductCategory
+
+  brandId String @map("brand_id")
+  brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  // Product-level presentation (applies to the whole model, not a colorway).
+  badge         ProductBadge?
+  discountValue Int? // percentage, e.g. 20 → "-20%"
+  currency      String        @default("EUR")
+
+  variants ProductVariant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([brandId])
+  @@index([category])
+  @@map("products")
+}
+
+model ProductVariant {
+  id       String @id @default(cuid())
+  color    String // e.g. "Triple White"
+  colorHex String // e.g. "#F5F5F5" — swatch dot
+  imageUrl String?
+  price    Float
+
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  sizes         VariantSize[]
+  wishlistItems WishlistItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+model VariantSize {
+  id    String @id @default(cuid())
+  size  String // EU sizing — e.g. "EU 42"
+  stock Int    @default(0)
+
+  variantId String         @map("variant_id")
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  cartItems CartItem[]
+
+  @@unique([variantId, size])
+  @@map("variant_sizes")
+}
+
+// ---------------------------------------------------------------------------
+// Cart & Wishlist
+// ---------------------------------------------------------------------------
+
+model Cart {
+  id     String @id @default(cuid())
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("carts")
+}
+
+model CartItem {
+  id       String @id @default(cuid())
+  quantity Int    @default(1)
+
+  cartId String @map("cart_id")
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  // A cart line references a specific size (which also carries current stock).
+  sizeId String      @map("size_id")
+  size   VariantSize @relation(fields: [sizeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, sizeId])
+  @@map("cart_items")
+}
+
+model WishlistItem {
+  id String @id @default(cuid())
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  variantId String         @map("variant_id")
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, variantId])
+  @@map("wishlist_items")
 }

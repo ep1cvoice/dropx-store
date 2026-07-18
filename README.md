@@ -14,10 +14,11 @@ E-commerce storefront for **limited-release sneakers** — exclusive drops, sale
 | Language | TypeScript | ✅ In use |
 | Styling | Tailwind CSS v4 | ✅ In use |
 | UI icons | Lucide React | ✅ In use |
-| Fonts | `next/font` — Anton (logo), Inter (UI) | ✅ In use |
-| ORM | [Prisma](https://www.prisma.io) | 🔜 Planned |
-| Database | [Supabase](https://supabase.com) (PostgreSQL) | 🔜 Planned |
-| Auth | [NextAuth.js](https://next-auth.js.org) | 🔜 Planned |
+| Fonts | `next/font` — Anton (logo/headings), Inter (UI) | ✅ In use |
+| ORM | [Prisma 7](https://www.prisma.io) (`pg` driver adapter) | ✅ In use |
+| Database | [Supabase](https://supabase.com) (PostgreSQL) | ✅ In use |
+| Auth | [NextAuth.js v5](https://authjs.dev) (Credentials) | ✅ Credentials done · OAuth planned |
+| Validation | Zod + React Hook Form | ✅ In use |
 | Deployment | [Vercel](https://vercel.com) | 🔜 Planned |
 
 ---
@@ -28,17 +29,17 @@ E-commerce storefront for **limited-release sneakers** — exclusive drops, sale
 Next.js (App Router)
        │
        ▼
- Prisma ORM          ← schema definition, migrations, type-safe queries
+ Prisma ORM          ← schema, migrations, type-safe queries (pg driver adapter)
        │
        ▼
 Supabase PostgreSQL  ← hosted database (Postgres only; no Supabase client used)
 ```
 
-**Supabase** is used exclusively as a managed PostgreSQL host. The app never calls the Supabase client library directly — all database communication goes through **Prisma**, which translates TypeScript queries into SQL executed against the Supabase Postgres instance.
+**Supabase** is used exclusively as a managed PostgreSQL host. The app never calls the Supabase client library — all database communication goes through **Prisma**, which connects to Postgres via the `@prisma/adapter-pg` driver adapter using a single `DATABASE_URL`.
 
-**NextAuth.js** handles authentication (credentials + OAuth). Its session tables (`Account`, `Session`, `VerificationToken`) live in the same Supabase Postgres database and are managed by Prisma migrations.
+**NextAuth.js v5** handles authentication. A **Credentials** provider is fully wired (email + bcrypt-hashed password, JWT sessions). The `PrismaAdapter` and NextAuth tables (`accounts`, `sessions`, `verification_tokens`) live in the same Supabase Postgres database. Google/Apple OAuth buttons exist in the UI but the providers are **not wired yet**.
 
-**Vercel** serves the Next.js app. Prisma connects to Supabase over two connection strings: a direct URL for migrations and a pooled URL for serverless runtime queries.
+**Vercel** will serve the Next.js app (not yet deployed).
 
 ---
 
@@ -46,24 +47,14 @@ Supabase PostgreSQL  ← hosted database (Postgres only; no Supabase client used
 
 Prisma is the single source of truth for the database — schema, migrations, and queries all go through it.
 
-### Connection strings
+### Configuration
 
-Supabase provides two URLs; both are needed for serverless deployments:
+This project uses **Prisma 7** with:
+- The new `prisma-client` generator, output to **`src/generated/prisma`** (import the client from there, not `@prisma/client`).
+- A **driver adapter** (`@prisma/adapter-pg`) — see `src/lib/prisma.ts`. The runtime connects with a single `DATABASE_URL`.
+- A **`prisma.config.ts`** file (instead of a `datasource` URL in the schema) that defines the schema path, migrations directory, seed command, and datasource URL.
 
-| Variable | Port | Purpose |
-|----------|------|---------|
-| `DATABASE_URL` | `6543` | Pooled (PgBouncer) — used by the app at runtime |
-| `DATABASE_DIRECT_URL` | `5432` | Direct — used by Prisma for migrations |
-
-In `prisma/schema.prisma`:
-
-```prisma
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_DIRECT_URL")
-}
-```
+> Note: the current runtime uses one pooled `DATABASE_URL`. There is no separate `DATABASE_DIRECT_URL` wired up — add one only if migrations against the pooler become an issue.
 
 ### Common Prisma commands
 
@@ -72,68 +63,80 @@ datasource db {
 | `npx prisma migrate dev` | Create and apply a new migration (development) |
 | `npx prisma migrate deploy` | Apply pending migrations (production / CI) |
 | `npx prisma db push` | Push schema changes without a migration file (prototyping) |
-| `npx prisma generate` | Regenerate the Prisma Client after schema changes |
+| `npx prisma generate` | Regenerate the Prisma Client into `src/generated/prisma` |
+| `npx prisma db seed` | Run the seed script (`tsx prisma/seed.ts`) |
 | `npx prisma studio` | Open the visual database browser |
 
 ---
 
 ## What's implemented
 
+### Auth (working end-to-end)
+- **NextAuth.js v5** with a **Credentials** provider — JWT session strategy, `PrismaAdapter`.
+- **`/register`** — server action (`src/actions/register.tsx`) validates with Zod, checks for duplicate emails, hashes the password with **bcrypt**, creates the user, and redirects to `/login`.
+- **`/login`** — credentials sign-in via `signIn` server action; session-aware navbar (sign in / sign out).
+- **Route protection** (`src/middleware.ts`):
+  - Guest-only: `/login`, `/register` (redirect to `/` when logged in)
+  - Protected: `/account`, `/checkout`, `/orders` (redirect to `/login` when logged out)
+- **Note:** Google/Apple social buttons render on the login UI but the OAuth providers are not configured yet.
+
+### Homepage (`/`)
+Fully composed from modular sections in `src/components/home/`:
+`HomeHero`, `UpcomingDropSection`, `BrandPartnersSection`, `NewDropsSection`, `FeaturedPicksSection` (Trending), `ShopByCategorySection`, `BrowseAllSneakersSection`, `DropListSection`.
+
+> These sections currently render **hardcoded placeholder data**, not live DB queries.
+
 ### Layout & navigation
-- **Responsive navbar** — separate mobile (hamburger + centered logo) and desktop layouts
-- **Desktop footer** — brand block, Shop / Help / Company columns, social icons (tablet/mobile footer TBD)
-- **Route groups** — `(site)` for pages with navbar + footer; auth pages live outside the group
+- **Responsive navbar** — separate mobile (hamburger + centered logo) and desktop layouts, active-link highlighting.
+- **Footer** across devices — brand block, Shop / Help / Company columns, social icons, newsletter UI.
+- **Route groups** — `(site)` for pages with navbar + footer; auth pages live outside the group.
+- **Not-found** — custom catch-all inside `(site)`.
 
 ### UI components (`src/components/ui/`)
 - **Button** — variants: `normal`, `accent`, `secondary`, `outline`
-- **Input** — labeled text field (Inter), used on auth forms
+- **Input** — labeled text field (used on auth forms)
+- **Badge** — `new`, `limited`, `discount`
+- **SizeButton** and **QuantitySelector** — for product/cart UIs
+- **ProductCard** (`src/components/product/`) and **CartItem** (`src/components/cart/`) — built, awaiting real data/pages
 
-### Auth (UI only — no backend yet)
-- **`/login`** — full responsive layout:
-  - **Mobile:** dark hero + form, full-width "Sign in with Google"
-  - **Tablet:** split view (~38% hero image, form on the right)
-  - **Desktop:** 50/50 split, centered hero copy, Google + Apple social buttons
-- **`BackToHomeLink`** — arrow + link to `/` on hero (larger on desktop)
-- **`/register`** — route scaffolded (placeholder page; layout to be built)
+### Domain types (designed, not yet in the DB)
+`src/types/product.ts` and `src/types/cart.ts` define the intended sneaker domain:
+`Product → ProductVariant (colorway) → VariantSize (per-size stock)`, plus brand, badges, discounts, and cart line items. **The Prisma schema does not yet reflect these types** (see below).
 
 ### Pages
 | Route | Layout | Status |
 |-------|--------|--------|
-| `/` | Site (nav + footer) | Placeholder |
-| `/login` | Standalone (no nav/footer) | UI complete |
-| `/register` | Standalone | Placeholder |
-| `/new-drops`, `/brands`, `/sale`, `/about` | — | Linked in nav, not created |
-| `/wishlist`, `/cart` | — | Linked in nav, not created |
+| `/` | Site (nav + footer) | ✅ Built (placeholder data) |
+| `/login` | Standalone | ✅ Working |
+| `/register` | Standalone | ✅ Working |
+| `/forgot-password` | Standalone | ⚠️ Bare placeholder |
+| `/new-drops`, `/brands`, `/sale` | Site | ⚠️ "Coming Soon" stubs |
+| `/about` | Site | ⚠️ Stub |
+| `/products/[slug]`, `/cart`, `/wishlist`, `/account`, `/checkout`, `/orders` | — | ❌ Not created (some linked in nav) |
 
-### Assets (`public/`)
-- `loginHero.jpg` — login split-screen hero
-- `registerHero.jpg` — reserved for register page
+---
+
+## Known gap: schema vs. domain
+
+The Prisma schema (`prisma/schema.prisma`) is still close to the **starter model**:
+
+- `User`, plus NextAuth `Account` / `Session` / `VerificationToken` tables.
+- A flat `Product { title, description, price, imageUrl, sellerId }` tied to `User` as a *seller* — a leftover marketplace shape.
+- `prisma/seed.ts` seeds **generic electronics**, not sneakers.
+
+DROPX is a **single-store** catalog, so the next major step is to redesign the schema to match `src/types/product.ts` (Brand, Product, ProductVariant, VariantSize, Cart/CartItem, WishlistItem) and drop the `sellerId` relation.
 
 ---
 
 ## What's building next
 
-### Authentication & users
-- **NextAuth.js** — credentials + OAuth (Google); sessions stored in Supabase Postgres via Prisma
-- **Register flow** — mirror login layouts (mobile / tablet / desktop)
-- Protected routes (profile, checkout, wishlist)
-
-### Catalog & product model (Prisma schema)
-- **Sneakers** with brand, description, images
-- **Sizes** — per-product size availability and stock
-- **Colors** — variants (e.g. same model, different colorways)
-- **Limited editions** — drop windows, stock caps, "sold out" states
-- **Sales** — discounted pricing, sale badges (nav already highlights **Sale**)
-
-### Shopping experience
-- **Basket (cart)** — line items with size/color, quantities, persist for logged-in users
-- **Wishlist** — save favorites, sync with account
-- **Product listing & detail** — New Drops, Brands, Sale filters
-- **Search** — navbar search (UI icon present)
-
-### Content & ops
-- Static/help pages (FAQ, Shipping, Returns, About, Privacy)
-- Order history & tracking (post-auth)
+1. **Redesign the Prisma schema** to match the sneaker domain (Brand, Product, ProductVariant, VariantSize, Cart, WishlistItem); remove the marketplace `sellerId`.
+2. **Rewrite the seed** with real sneaker data (brands, colorways, EU sizes + stock).
+3. **Catalog data layer** — wire homepage sections and listing pages to live Prisma queries via the `ProductCardData` projection.
+4. **Product detail page** — `/products/[slug]` with color + size selection.
+5. **Listing pages** — `/new-drops`, `/brands`, `/sale` with filtering.
+6. **Cart & Wishlist** — routes, DB-backed persistence for logged-in users, add-to-cart flow.
+7. **Checkout & orders**, then **Google OAuth**.
 
 ---
 
@@ -141,27 +144,35 @@ datasource db {
 
 ```
 dropx-store/
-├── prisma/                 # schema.prisma, migrations/
-├── public/                 # Static images (heroes, product media)
+├── prisma/
+│   ├── schema.prisma       # starter model (User + Product) — pending redesign
+│   ├── seed.ts             # placeholder seed data
+│   └── migrations/
+├── prisma.config.ts        # schema path, migrations, seed command, datasource URL
+├── public/                 # static images (heroes, product media)
 └── src/
     ├── app/
-    │   ├── layout.tsx          # Root: fonts, html/body
+    │   ├── layout.tsx          # root: fonts, html/body, SessionProvider
     │   ├── globals.css
-    │   ├── (site)/             # Route group — URL unchanged
-    │   │   ├── layout.tsx      # Navbar + Footer
-    │   │   └── page.tsx        # → /
-    │   ├── login/
-    │   │   └── page.tsx        # → /login
-    │   └── register/
-    │       └── page.tsx        # → /register
-    ├── components/
-    │   ├── auth/               # LoginForm, BackToHomeLink, social icons
-    │   ├── footer/
-    │   ├── navbar/
-    │   └── ui/                 # Button, Input
-    └── lib/
-        ├── fonts.ts            # Anton + Inter (next/font)
-        └── prisma.ts           # Prisma Client singleton (to be added)
+    │   ├── (site)/             # route group — URL unchanged
+    │   │   ├── layout.tsx      # navbar + footer
+    │   │   ├── page.tsx        # → /
+    │   │   ├── new-drops/, brands/, sale/, about/
+    │   │   └── [...not-found]/
+    │   ├── login/, register/, forgot-password/
+    │   └── api/auth/[...nextauth]/route.ts
+    ├── actions/            # sign-in, sign-out, register server actions
+    ├── auth/auth.ts        # NextAuth config + isAuth() helper
+    ├── middleware.ts       # guest-only / protected route guards
+    ├── components/         # auth, home, navbar, footer, product, cart, ui, providers
+    ├── lib/
+    │   ├── fonts.ts        # Anton + Inter (next/font)
+    │   ├── prisma.ts       # Prisma Client singleton (pg driver adapter)
+    │   └── validation.ts   # Zod schemas
+    ├── schema/zod.ts
+    ├── types/              # product.ts, cart.ts (intended domain model)
+    ├── utils/password.ts   # bcrypt hash/verify
+    └── generated/prisma/   # generated Prisma Client (do not edit)
 ```
 
 **Routing note:** Folders in **parentheses** like `(site)` are [route groups](https://nextjs.org/docs/app/building-your-application/routing/route-groups) — they organize layouts without affecting the URL.
@@ -180,6 +191,7 @@ dropx-store/
 ```bash
 cd dropx-store
 npm install
+npx prisma generate
 npm run dev
 ```
 
@@ -187,56 +199,51 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Environment variables
 
-Copy `.env.example` to `.env.local` and fill in your values:
+Create a `.env` in the project root:
 
 ```env
-# Supabase PostgreSQL — pooled URL (runtime, port 6543)
+# Supabase PostgreSQL connection string (used by the pg driver adapter + Prisma CLI)
 DATABASE_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true"
 
-# Supabase PostgreSQL — direct URL (migrations, port 5432)
-DATABASE_DIRECT_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+# NextAuth v5 session secret (BETTER_AUTH_SECRET is accepted as a fallback)
+AUTH_SECRET="your-secret-here"
 
-# NextAuth
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-here"
-
-# OAuth providers (optional)
-GOOGLE_CLIENT_ID="..."
-GOOGLE_CLIENT_SECRET="..."
+# OAuth providers — buttons exist in the UI but are not wired yet (planned)
+# GOOGLE_CLIENT_ID="..."
+# GOOGLE_CLIENT_SECRET="..."
 ```
 
 ### Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Development server (Turbopack) |
+| `npm run dev` | Development server |
 | `npm run build` | Production build |
 | `npm run start` | Serve production build |
 | `npm run lint` | ESLint |
 
-### Vercel deployment
+### Vercel deployment (planned)
 
 1. Push to GitHub and connect the repo in the Vercel dashboard.
-2. Add all environment variables from the table above.
-3. Set the build command to `prisma generate && next build` (or add it to `package.json`).
+2. Add the environment variables above.
+3. Set the build command to `prisma generate && next build`.
 4. Run `npx prisma migrate deploy` once to apply migrations to the production database.
 
 ---
 
-## Planned data model (sketch)
+## Data model (target)
 
-High-level entities for Prisma — subject to change during implementation:
+Target entities for the schema redesign — replacing the current starter model:
 
 ```
 User ──┬── Account (NextAuth)
        ├── Session
-       ├── Cart ── CartItem ── ProductVariant
+       ├── Cart ── CartItem ── VariantSize
        └── WishlistItem ── ProductVariant
 
-Product ── ProductVariant (size + color + sku + stock + price)
-        ── Brand
-        ── Drop / limited-edition flags
-        ── SalePrice (optional)
+Brand ── Product ── ProductVariant (color + price + image)
+                         └── VariantSize (size + stock)
+Product: slug, name, category, badge, discountValue, currency
 ```
 
 ---
