@@ -7,7 +7,7 @@ export default async function BrowseAllSneakersSection() {
   return (
     <SneakerGridSection
       title="Browse All Sneakers"
-      viewAllHref="/new-drops"
+      viewAllHref="/browse-all"
       products={products}
       showBottomCta
       bottomCtaLabel="Browse all"

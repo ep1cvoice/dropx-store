@@ -127,6 +127,7 @@ model Product {
   badge         ProductBadge?
   discountValue Int? // percentage, e.g. 20 → "-20%"
   currency      String        @default("EUR")
+  featured      Boolean       @default(false) // "Featured Picks" collection
 
   variants ProductVariant[]
 
@@ -139,11 +140,12 @@ model Product {
 }
 
 model ProductVariant {
-  id       String @id @default(cuid())
-  color    String // e.g. "Triple White"
-  colorHex String // e.g. "#F5F5F5" — swatch dot
-  imageUrl String?
-  price    Float
+  id          String @id @default(cuid())
+  color       String // e.g. "Triple White"
+  colorHex    String // e.g. "#F5F5F5" — swatch dot
+  colorFamily String @default("multi") // normalized filter bucket — e.g. "white", "black", "red"
+  imageUrl    String?
+  price       Float
 
   productId String  @map("product_id")
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)

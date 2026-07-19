@@ -1,9 +1,24 @@
-export default function SalePage() {
+import type { Metadata } from "next";
+
+import ProductListingPage from "@/components/listing/ProductListingPage";
+
+export const metadata: Metadata = {
+  title: "Sale — DROPX",
+  description: "Discounted sneakers and limited-time deals at DROPX.",
+};
+
+type SalePageProps = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function SalePage({ searchParams }: SalePageProps) {
+  const resolved = await searchParams;
+
   return (
-    <section className="flex min-h-[70vh] items-center justify-center bg-[#07090c]">
-      <p className="text-2xl font-semibold uppercase tracking-widest text-white/20">
-        Sale — Coming Soon
-      </p>
-    </section>
+    <ProductListingPage
+      title="Sale"
+      searchParams={resolved}
+      lockedCollection="sale"
+    />
   );
 }

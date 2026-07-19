@@ -6,6 +6,12 @@ import type {
   ProductDetail,
 } from "@/types/product";
 import type { BadgeVariant } from "@/components/ui/Badge";
+import type {
+  BrandFacet,
+  CollectionSlug,
+  ProductListingResult,
+  SortOption,
+} from "@/lib/listing";
 
 /** At or below this remaining stock, cards show a "Only N left" nudge. */
 const LOW_STOCK_THRESHOLD = 5;
@@ -228,4 +234,187 @@ export async function getRelatedProducts(
   }
 
   return rows.map(toProductCardData);
+}
+
+// ---------------------------------------------------------------------------
+// Brands
+// ---------------------------------------------------------------------------
+
+export type BrandCard = {
+  slug: string;
+  name: string;
+  productCount: number;
+  imageUrl: string | null;
+};
+
+/** All brands with product counts and a representative image (for /brands grid). */
+export async function getBrands(): Promise<BrandCard[]> {
+  const brands = await prisma.brand.findMany({
+    orderBy: { name: "asc" },
+    select: {
+      name: true,
+      slug: true,
+      _count: { select: { products: true } },
+      products: {
+        take: 1,
+        orderBy: { createdAt: "desc" },
+        select: {
+          variants: {
+            take: 1,
+            orderBy: { createdAt: "asc" },
+            select: { imageUrl: true },
+          },
+        },
+      },
+    },
+  });
+
+  return brands.map((brand) => ({
+    slug: brand.slug,
+    name: brand.name,
+    productCount: brand._count.products,
+    imageUrl: brand.products[0]?.variants[0]?.imageUrl ?? null,
+  }));
+}
+
+export async function getBrandBySlug(
+  slug: string,
+): Promise<{ name: string; slug: string } | null> {
+  return prisma.brand.findUnique({
+    where: { slug },
+    select: { name: true, slug: true },
+  });
+}
+
+export async function getAllBrandSlugs(): Promise<string[]> {
+  const brands = await prisma.brand.findMany({ select: { slug: true } });
+  return brands.map((b) => b.slug);
+}
+
+// ---------------------------------------------------------------------------
+// Listing page — collections, filters, facets
+// ---------------------------------------------------------------------------
+
+const DEFAULT_PAGE_SIZE = 9;
+
+function collectionWhere(collection: CollectionSlug): Prisma.ProductWhereInput {
+  switch (collection) {
+    case "new-drops":
+      return { badge: "new" };
+    case "featured":
+      return { featured: true };
+    case "sale":
+      return { discountValue: { not: null } };
+    default:
+      return {};
+  }
+}
+
+export type ProductListingOptions = {
+  collection: CollectionSlug;
+  brands?: string[]; // brand slugs
+  sizes?: string[]; // bare EU numbers, e.g. ["40", "41"]
+  colors?: string[]; // color families
+  priceMin?: number;
+  priceMax?: number;
+  sort?: SortOption;
+  page?: number;
+  pageSize?: number;
+};
+
+export async function getProductListing(
+  options: ProductListingOptions,
+): Promise<ProductListingResult> {
+  const {
+    collection,
+    brands = [],
+    sizes: sizeFilters = [],
+    colors = [],
+    priceMin,
+    priceMax,
+    sort = "newest",
+    page = 1,
+    pageSize = DEFAULT_PAGE_SIZE,
+  } = options;
+
+  const base = collectionWhere(collection);
+  const and: Prisma.ProductWhereInput[] = [];
+
+  if (brands.length > 0) {
+    and.push({ brand: { slug: { in: brands } } });
+  }
+  if (sizeFilters.length > 0) {
+    const euSizes = sizeFilters.map((s) => `EU ${s}`);
+    and.push({
+      variants: { some: { sizes: { some: { size: { in: euSizes }, stock: { gt: 0 } } } } },
+    });
+  }
+  if (colors.length > 0) {
+    and.push({ variants: { some: { colorFamily: { in: colors } } } });
+  }
+  if (priceMin != null || priceMax != null) {
+    and.push({
+      variants: {
+        some: {
+          price: {
+            gte: priceMin ?? undefined,
+            lte: priceMax ?? undefined,
+          },
+        },
+      },
+    });
+  }
+
+  const where: Prisma.ProductWhereInput =
+    and.length > 0 ? { ...base, AND: and } : base;
+
+  // Fetch all matching rows, then sort/paginate in memory. The catalog is
+  // small, and priceFrom is derived from variants (not directly sortable in SQL).
+  const rows = await prisma.product.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    select: productCardSelect,
+  });
+
+  let products = rows.map(toProductCardData);
+
+  if (sort === "price-asc") {
+    products = products.sort((a, b) => a.priceFrom - b.priceFrom);
+  } else if (sort === "price-desc") {
+    products = products.sort((a, b) => b.priceFrom - a.priceFrom);
+  }
+
+  const total = products.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const start = (safePage - 1) * pageSize;
+  const paged = products.slice(start, start + pageSize);
+
+  // Brand facets are scoped to the collection only (not narrowed by the other
+  // active filters), so counts stay stable as the user toggles brands.
+  const [allBrands, grouped] = await Promise.all([
+    prisma.brand.findMany({
+      select: { id: true, name: true, slug: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.product.groupBy({
+      by: ["brandId"],
+      where: base,
+      _count: { _all: true },
+    }),
+  ]);
+
+  const countByBrand = new Map(grouped.map((g) => [g.brandId, g._count._all]));
+  const brandFacets: BrandFacet[] = allBrands
+    .map((b) => ({ slug: b.slug, name: b.name, count: countByBrand.get(b.id) ?? 0 }))
+    .filter((b) => b.count > 0);
+
+  return {
+    products: paged,
+    total,
+    page: safePage,
+    pageSize,
+    totalPages,
+    brandFacets,
+  };
 }
