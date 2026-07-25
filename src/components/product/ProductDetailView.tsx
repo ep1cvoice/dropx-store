@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Check, Heart, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 
+import { addToCart } from "@/actions/cart";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import SizeButton from "@/components/ui/SizeButton";
@@ -40,6 +41,8 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
   const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
   const [wishlisted, setWishlisted] = useState(false);
   const [added, setAdded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const selectedVariant =
     product.variants.find((v) => v.id === selectedVariantId) ??
@@ -67,13 +70,21 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
     setSelectedVariantId(id);
     setSelectedSizeId(null);
     setAdded(false);
+    setError(null);
   }
 
   function handleAddToCart() {
-    if (!canAddToCart) return;
-    // TODO(cart): persist via server action once the cart backend lands.
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 2000);
+    if (!canAddToCart || !selectedSize) return;
+    setError(null);
+    startTransition(async () => {
+      const result = await addToCart(selectedSize.id, 1);
+      if (result.ok) {
+        setAdded(true);
+        window.setTimeout(() => setAdded(false), 2000);
+      } else {
+        setError(result.error);
+      }
+    });
   }
 
   return (
@@ -251,13 +262,15 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           <Button
             variant="accent"
             onClick={handleAddToCart}
-            disabled={!canAddToCart}
+            disabled={!canAddToCart || isPending}
             className="h-14 flex-1 cursor-pointer rounded-md text-sm font-semibold uppercase tracking-[0.14em]"
           >
             {added ? (
               <>
                 <Check size={18} /> Added to cart
               </>
+            ) : isPending ? (
+              "Adding…"
             ) : selectedSize ? (
               "Add to cart"
             ) : (
@@ -282,6 +295,14 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             />
           </button>
         </div>
+
+        {error && (
+          <p
+            className={`${inter.className} mt-3 text-sm font-medium text-[#e85d2a]`}
+          >
+            {error}
+          </p>
+        )}
 
         {/* Trust points */}
         <ul className="mt-8 space-y-3 border-t border-black/10 pt-6">

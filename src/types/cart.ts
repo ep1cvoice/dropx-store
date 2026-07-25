@@ -22,6 +22,8 @@
 export type CartItem = {
   id: string;
   productId: string;
+  /** Product slug — used to link back to the product detail page. */
+  slug: string;
   variantId: string;
   sizeId: string;
   name: string;

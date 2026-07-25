@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 const guestOnlyRoutes = ["/login", "/register"];
-const protectedRoutes = ["/account", "/checkout", "/orders"];
+const protectedRoutes = ["/account", "/cart", "/checkout", "/orders"];
 
 function matchesRoute(pathname: string, route: string): boolean {
   return pathname === route || pathname.startsWith(`${route}/`);
