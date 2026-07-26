@@ -22,3 +22,11 @@ export function shippingFor(subtotal: number): number {
   if (subtotal <= 0 || subtotal >= FREE_SHIPPING_THRESHOLD) return 0;
   return STANDARD_SHIPPING_FEE;
 }
+
+/** VAT rate baked into displayed prices (EU-style tax-inclusive pricing). */
+export const VAT_RATE = 0.21;
+
+/** The VAT portion already included in a gross (tax-inclusive) amount. */
+export function includedVat(grossAmount: number, rate = VAT_RATE): number {
+  return grossAmount - grossAmount / (1 + rate);
+}
