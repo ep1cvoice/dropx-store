@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Check, Heart, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 
@@ -8,6 +9,7 @@ import { addToCart } from "@/actions/cart";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import SizeButton from "@/components/ui/SizeButton";
+import { useStoreBag } from "@/components/providers/StoreBagProvider";
 import { anton, inter } from "@/lib/fonts";
 import type { ProductDetail } from "@/types/product";
 
@@ -35,11 +37,12 @@ type ProductDetailViewProps = {
 };
 
 export default function ProductDetailView({ product }: ProductDetailViewProps) {
+  const router = useRouter();
+  const { isWishlisted, toggleWishlistItem, bumpCartCount } = useStoreBag();
   const [selectedVariantId, setSelectedVariantId] = useState(
     product.variants[0]?.id ?? "",
   );
   const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
-  const [wishlisted, setWishlisted] = useState(false);
   const [added, setAdded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -66,6 +69,18 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
 
   const canAddToCart = Boolean(selectedSize && selectedSize.stock > 0);
 
+  const wishlisted = selectedVariant
+    ? isWishlisted(selectedVariant.id)
+    : false;
+
+  function handleWishlist() {
+    if (!selectedVariant) return;
+    const variantId = selectedVariant.id;
+    startTransition(async () => {
+      await toggleWishlistItem(variantId);
+    });
+  }
+
   function selectVariant(id: string) {
     setSelectedVariantId(id);
     setSelectedSizeId(null);
@@ -79,8 +94,10 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
     startTransition(async () => {
       const result = await addToCart(selectedSize.id, 1);
       if (result.ok) {
+        bumpCartCount(1);
         setAdded(true);
         window.setTimeout(() => setAdded(false), 2000);
+        router.refresh();
       } else {
         setError(result.error);
       }
@@ -280,10 +297,11 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
 
           <button
             type="button"
-            onClick={() => setWishlisted((prev) => !prev)}
+            onClick={handleWishlist}
+            disabled={isPending}
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
             aria-pressed={wishlisted}
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md border border-gray-200 transition-colors hover:border-gray-400"
+            className="flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-200 transition-colors hover:border-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Heart
               size={20}

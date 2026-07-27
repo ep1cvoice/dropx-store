@@ -3,9 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Heart } from "lucide-react";
-import { useState } from "react";
+import { useTransition } from "react";
 
 import Badge from "@/components/ui/Badge";
+import { useStoreBag } from "@/components/providers/StoreBagProvider";
+import { formatPrice } from "@/lib/currency";
 import { inter } from "@/lib/fonts";
 import type { ProductCardData } from "@/types/product";
 
@@ -13,24 +15,24 @@ type ProductCardProps = {
   product: ProductCardData;
 };
 
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  EUR: "€",
-  USD: "$",
-  GBP: "£",
-};
-
-function formatPrice(price: number, currency: string): string {
-  const symbol = CURRENCY_SYMBOLS[currency] ?? currency;
-  return `${symbol}${price.toFixed(2)}`;
-}
-
 export default function ProductCard({ product }: ProductCardProps) {
-  const [wishlisted, setWishlisted] = useState(false);
+  const { isWishlisted, toggleWishlistItem } = useStoreBag();
+  const [isPending, startTransition] = useTransition();
+  const wishlisted = Boolean(
+    product.variantId && isWishlisted(product.variantId),
+  );
+
+  function handleWishlist(event: React.MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!product.variantId) return;
+    startTransition(async () => {
+      await toggleWishlistItem(product.variantId);
+    });
+  }
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md">
-
-      {/* Image area */}
       <Link
         href={`/products/${product.slug}`}
         className="relative block aspect-square w-full overflow-hidden rounded-lg bg-[#f5f5f5]"
@@ -62,7 +64,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Badge — top-left */}
         {product.badge && (
           <div className="absolute left-3 top-3">
             {product.badge === "discount" && product.discountValue != null ? (
@@ -74,43 +75,40 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
       </Link>
 
-      {/* Wishlist button — top-right, overlaid on image */}
       <button
         type="button"
-        onClick={() => setWishlisted((prev) => !prev)}
+        onClick={handleWishlist}
+        disabled={isPending || !product.variantId}
         aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
-        className="absolute right-3 top-3 transition-opacity"
+        aria-pressed={wishlisted}
+        className="absolute right-3 top-3 z-10 cursor-pointer rounded-full p-1 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <Heart
           size={20}
           className={
             wishlisted
-              ? "fill-[#FF4D00] stroke-[#FF4D00]"
-              : "fill-[#1A1A1A] stroke-[#1A1A1A] fill-none"
+              ? "fill-[#e85d2a] stroke-[#e85d2a]"
+              : "fill-none stroke-[#1A1A1A]"
           }
         />
       </button>
 
-      {/* Info area */}
       <Link
         href={`/products/${product.slug}`}
         className="flex flex-col gap-1 px-3 pb-3 pt-3"
       >
-        {/* Brand */}
         <span
           className={`${inter.className} text-[11px] font-semibold uppercase tracking-[1.5px] text-[#666666]`}
         >
           {product.brand}
         </span>
 
-        {/* Product name */}
         <span
           className={`${inter.className} text-[15px] font-medium leading-tight text-[#1A1A1A]`}
         >
           {product.name}
         </span>
 
-        {/* Price row */}
         <div className="mt-1 flex items-center justify-between">
           <span className={`${inter.className} text-base font-bold text-[#1A1A1A]`}>
             {formatPrice(product.priceFrom, product.currency)}

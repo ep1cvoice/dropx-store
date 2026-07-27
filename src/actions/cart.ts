@@ -6,7 +6,9 @@ import { redirect } from "next/navigation";
 import { getCurrentUserId } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
 
-export type CartActionResult = { ok: true } | { ok: false; error: string };
+export type CartActionResult =
+  | { ok: true; previousQuantity?: number; quantity?: number; removedQuantity?: number }
+  | { ok: false; error: string };
 
 /**
  * Add `quantity` of a specific size to the current user's cart. Guests are sent
@@ -53,6 +55,7 @@ export async function addToCart(
   });
 
   revalidatePath("/cart");
+  revalidatePath("/", "layout");
   return { ok: true };
 }
 
@@ -66,7 +69,7 @@ export async function updateCartItemQuantity(
 
   const item = await prisma.cartItem.findFirst({
     where: { id: cartItemId, cart: { userId } },
-    select: { id: true, size: { select: { stock: true } } },
+    select: { id: true, quantity: true, size: { select: { stock: true } } },
   });
 
   if (!item) return { ok: false, error: "Item not found in your cart." };
@@ -79,7 +82,8 @@ export async function updateCartItemQuantity(
   });
 
   revalidatePath("/cart");
-  return { ok: true };
+  revalidatePath("/", "layout");
+  return { ok: true, previousQuantity: item.quantity, quantity: clamped };
 }
 
 /** Remove a line item from the current user's cart. */
@@ -89,10 +93,16 @@ export async function removeCartItem(
   const userId = await getCurrentUserId();
   if (!userId) redirect("/login");
 
+  const item = await prisma.cartItem.findFirst({
+    where: { id: cartItemId, cart: { userId } },
+    select: { quantity: true },
+  });
+
   await prisma.cartItem.deleteMany({
     where: { id: cartItemId, cart: { userId } },
   });
 
   revalidatePath("/cart");
-  return { ok: true };
+  revalidatePath("/", "layout");
+  return { ok: true, removedQuantity: item?.quantity ?? 0 };
 }

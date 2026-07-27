@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { X } from "lucide-react";
 
 import QuantitySelector from "@/components/ui/QuantitySelector";
 import { removeCartItem, updateCartItemQuantity } from "@/actions/cart";
+import { useStoreBag } from "@/components/providers/StoreBagProvider";
 import { formatPrice } from "@/lib/currency";
 import { anton, inter } from "@/lib/fonts";
 import type { CartItem } from "@/types/cart";
@@ -16,19 +18,30 @@ type CartLineItemProps = {
 };
 
 export default function CartLineItem({ item }: CartLineItemProps) {
+  const router = useRouter();
+  const { bumpCartCount } = useStoreBag();
   const [isPending, startTransition] = useTransition();
 
   const lineTotal = formatPrice(item.price * item.quantity, item.currency);
 
   function changeQuantity(quantity: number) {
+    const delta = quantity - item.quantity;
     startTransition(async () => {
-      await updateCartItemQuantity(item.id, quantity);
+      const result = await updateCartItemQuantity(item.id, quantity);
+      if (result.ok) {
+        bumpCartCount(delta);
+        router.refresh();
+      }
     });
   }
 
   function remove() {
     startTransition(async () => {
-      await removeCartItem(item.id);
+      const result = await removeCartItem(item.id);
+      if (result.ok) {
+        bumpCartCount(-(result.removedQuantity ?? item.quantity));
+        router.refresh();
+      }
     });
   }
 
@@ -80,7 +93,7 @@ export default function CartLineItem({ item }: CartLineItemProps) {
           type="button"
           onClick={remove}
           aria-label={`Remove ${item.name} from cart`}
-          className="flex h-7 w-7 items-center justify-center rounded-md text-[#bbbbbb] transition-colors hover:bg-black/5 hover:text-[#121212] md:order-3"
+          className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-[#bbbbbb] transition-colors hover:bg-black/5 hover:text-[#121212] md:order-3"
         >
           <X size={16} />
         </button>

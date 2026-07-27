@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import Button from "@/components/ui/Button";
 import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
+import NavCountBadge from "./NavCountBadge";
 import { getNavLinkClassName, navIconClassName, navLinks } from "./nav-links";
+import { useStoreBag } from "@/components/providers/StoreBagProvider";
 
 const iconButtonClassName =
   "cursor-pointer text-white/60 transition-colors duration-200 hover:text-white active:text-white/80";
@@ -18,6 +20,7 @@ export default function NavbarMobile() {
   const [open, setOpen] = useState(false);
   const menuId = useId();
   const { status } = useSession();
+  const { cartCount, wishlistCount } = useStoreBag();
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -48,10 +51,11 @@ export default function NavbarMobile() {
 
         <Link
           href="/cart"
-          aria-label="Cart"
-          className={navbarIconClassName + " justify-self-end"}
+          aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
+          className={navbarIconClassName + " relative justify-self-end"}
         >
           <ShoppingBag className={navIconClassName} strokeWidth={1.75} />
+          <NavCountBadge count={cartCount} />
         </Link>
       </div>
 
@@ -110,40 +114,57 @@ export default function NavbarMobile() {
                   <Search className={navIconClassName} strokeWidth={1.75} />
                 </button>
                 <Link
-                  href="/wishlist"
-                  aria-label="Wishlist"
+                  href="/account/wishlist"
+                  aria-label={
+                    wishlistCount > 0
+                      ? `Wishlist, ${wishlistCount} items`
+                      : "Wishlist"
+                  }
                   onClick={closeMenu}
                   className={
                     iconButtonClassName +
-                    " rounded-lg p-2 hover:bg-white/5 active:bg-white/10"
+                    " relative rounded-lg p-2 hover:bg-white/5 active:bg-white/10"
                   }
                 >
                   <Heart className={navIconClassName} strokeWidth={1.75} />
+                  <NavCountBadge count={wishlistCount} />
                 </Link>
                 <Link
                   href="/cart"
-                  aria-label="Cart"
+                  aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
                   onClick={closeMenu}
                   className={
                     iconButtonClassName +
-                    " rounded-lg p-2 hover:bg-white/5 active:bg-white/10"
+                    " relative rounded-lg p-2 hover:bg-white/5 active:bg-white/10"
                   }
                 >
                   <ShoppingBag className={navIconClassName} strokeWidth={1.75} />
+                  <NavCountBadge count={cartCount} />
                 </Link>
               </div>
 
               {status === "authenticated" ? (
-                <Button
-                  type="button"
-                  onClick={async () => {
-                    closeMenu();
-                    await signOut({ callbackUrl: "/" });
-                  }}
-                  className="w-full cursor-pointer border border-white bg-transparent text-white hover:bg-white/10 active:bg-white/20"
-                >
-                  Log out
-                </Button>
+                <div className="space-y-3">
+                  <Link href="/account" onClick={closeMenu} className="block">
+                    <Button
+                      type="button"
+                      className="flex w-full cursor-pointer items-center gap-2 border border-white/20 bg-transparent text-white hover:bg-white/10 active:bg-white/20"
+                    >
+                      <User size={18} strokeWidth={1.75} />
+                      My Account
+                    </Button>
+                  </Link>
+                  <Button
+                    type="button"
+                    onClick={async () => {
+                      closeMenu();
+                      await signOut({ callbackUrl: "/" });
+                    }}
+                    className="w-full cursor-pointer border border-white bg-transparent text-white hover:bg-white/10 active:bg-white/20"
+                  >
+                    Log out
+                  </Button>
+                </div>
               ) : (
                 <Link href="/login" onClick={closeMenu} className="block">
                   <Button variant="accent" className="w-full cursor-pointer rounded-none">

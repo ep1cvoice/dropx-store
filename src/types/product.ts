@@ -100,6 +100,8 @@ export type ProductCardData = {
   slug: string;
   name: string;
   brand: string;
+  /** Default (first) variant id — used to toggle the wishlist from a card. */
+  variantId: string;
   badge: BadgeVariant | null;
   discountValue: number | null;
   currency: string;

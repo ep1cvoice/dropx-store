@@ -29,6 +29,7 @@ const productCardSelect = {
   variants: {
     orderBy: { createdAt: "asc" },
     select: {
+      id: true,
       price: true,
       imageUrl: true,
       sizes: { select: { stock: true } },
@@ -68,6 +69,7 @@ function toProductCardData(product: ProductCardRow): ProductCardData {
     slug: product.slug,
     name: product.name,
     brand: product.brand.name,
+    variantId: variants[0]?.id ?? "",
     badge: product.badge,
     discountValue: product.discountValue,
     currency: product.currency,

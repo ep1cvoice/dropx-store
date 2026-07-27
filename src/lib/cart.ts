@@ -67,6 +67,20 @@ const cartItemSelect = {
   },
 } as const;
 
+/** Total quantity across all cart lines (0 for guests / empty carts). */
+export async function getCartItemCount(): Promise<number> {
+  const userId = await getCurrentUserId();
+  if (!userId) return 0;
+
+  const cart = await prisma.cart.findUnique({
+    where: { userId },
+    select: { items: { select: { quantity: true } } },
+  });
+
+  if (!cart) return 0;
+  return cart.items.reduce((sum, item) => sum + item.quantity, 0);
+}
+
 /** The current user's cart, shaped for the UI with totals derived. */
 export async function getCart(): Promise<CartData> {
   const userId = await getCurrentUserId();
