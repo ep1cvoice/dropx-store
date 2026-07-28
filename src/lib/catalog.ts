@@ -4,11 +4,13 @@ import type {
   ProductCardData,
   ProductCategory,
   ProductDetail,
+  ProductGender,
 } from "@/types/product";
 import type { BadgeVariant } from "@/components/ui/Badge";
 import type {
   BrandFacet,
   CollectionSlug,
+  GenderFilter,
   ProductListingResult,
   SortOption,
 } from "@/lib/listing";
@@ -127,6 +129,7 @@ const productDetailSelect = {
   name: true,
   description: true,
   category: true,
+  gender: true,
   badge: true,
   discountValue: true,
   currency: true,
@@ -164,6 +167,7 @@ function toProductDetail(product: ProductDetailRow): ProductDetail {
     description: product.description,
     brand: product.brand.name,
     category: product.category as ProductCategory,
+    gender: product.gender as ProductGender,
     badge: product.badge as BadgeVariant | null,
     discountValue: product.discountValue,
     currency: product.currency,
@@ -314,6 +318,7 @@ function collectionWhere(collection: CollectionSlug): Prisma.ProductWhereInput {
 
 export type ProductListingOptions = {
   collection: CollectionSlug;
+  gender?: GenderFilter;
   brands?: string[]; // brand slugs
   sizes?: string[]; // bare EU numbers, e.g. ["40", "41"]
   colors?: string[]; // color families
@@ -329,6 +334,7 @@ export async function getProductListing(
 ): Promise<ProductListingResult> {
   const {
     collection,
+    gender,
     brands = [],
     sizes: sizeFilters = [],
     colors = [],
@@ -341,6 +347,15 @@ export async function getProductListing(
 
   const base = collectionWhere(collection);
   const and: Prisma.ProductWhereInput[] = [];
+
+  // Men / women listings also include unisex; Unisex is exact-match only.
+  if (gender === "men") {
+    and.push({ gender: { in: ["men", "unisex"] } });
+  } else if (gender === "women") {
+    and.push({ gender: { in: ["women", "unisex"] } });
+  } else if (gender === "unisex") {
+    and.push({ gender: "unisex" });
+  }
 
   if (brands.length > 0) {
     and.push({ brand: { slug: { in: brands } } });

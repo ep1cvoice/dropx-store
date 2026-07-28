@@ -6,10 +6,14 @@ export type NavLink = {
   accent?: boolean;
 };
 
+/** All shop filters live on /browse-all — nav links just set query params. */
 export const navLinks: NavLink[] = [
-  { href: "/new-drops", label: "New Drops" },
+  { href: "/browse-all?collection=new-drops", label: "New Drops" },
+  { href: "/browse-all", label: "Shop" },
   { href: "/brands", label: "Brands" },
-  { href: "/sale", label: "Sale" },
+  { href: "/browse-all?collection=sale", label: "Sale" },
+  { href: "/browse-all?gender=men", label: "Male" },
+  { href: "/browse-all?gender=women", label: "Female" },
   { href: "/about", label: "About" },
 ];
 
@@ -25,4 +29,43 @@ export function getNavLinkClassName(accent?: boolean, isActive?: boolean) {
       : "text-white/90 hover:text-[#e85d2a]";
 
   return `${inter.className} ${navLinkTextClassName} font-medium transition-colors ${color}`;
+}
+
+/** Match pathname + query so Male/Sale/etc. highlight correctly on /browse-all. */
+export function isNavLinkActive(
+  href: string,
+  pathname: string,
+  search: string,
+): boolean {
+  const [path, query = ""] = href.split("?");
+  const hrefParams = new URLSearchParams(query);
+  const currentParams = new URLSearchParams(
+    search.startsWith("?") ? search.slice(1) : search,
+  );
+
+  if (path === "/browse-all") {
+    if (pathname !== "/browse-all") return false;
+
+    const hrefGender = hrefParams.get("gender");
+    const hrefCollection = hrefParams.get("collection");
+
+    if (hrefGender) {
+      return currentParams.get("gender") === hrefGender;
+    }
+    if (hrefCollection) {
+      return currentParams.get("collection") === hrefCollection;
+    }
+
+    // Bare Shop: active only when no gender / collection filter is set.
+    return (
+      currentParams.get("gender") == null &&
+      currentParams.get("collection") == null
+    );
+  }
+
+  if (path === "/brands") {
+    return pathname === "/brands" || pathname.startsWith("/brands/");
+  }
+
+  return pathname === path || pathname.startsWith(`${path}/`);
 }

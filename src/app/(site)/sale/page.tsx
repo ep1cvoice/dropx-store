@@ -1,24 +1,18 @@
-import type { Metadata } from "next";
-
-import ProductListingPage from "@/components/listing/ProductListingPage";
-
-export const metadata: Metadata = {
-  title: "Sale — DROPX",
-  description: "Discounted sneakers and limited-time deals at DROPX.",
-};
+import { redirect } from "next/navigation";
 
 type SalePageProps = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
+/** Legacy route — collection filter lives on /browse-all. */
 export default async function SalePage({ searchParams }: SalePageProps) {
   const resolved = await searchParams;
-
-  return (
-    <ProductListingPage
-      title="Sale"
-      searchParams={resolved}
-      lockedCollection="sale"
-    />
-  );
+  const params = new URLSearchParams();
+  params.set("collection", "sale");
+  for (const [key, value] of Object.entries(resolved)) {
+    if (key === "collection" || value == null) continue;
+    const v = Array.isArray(value) ? value[0] : value;
+    if (v) params.set(key, v);
+  }
+  redirect(`/browse-all?${params.toString()}`);
 }

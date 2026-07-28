@@ -61,7 +61,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </Link>
         <span aria-hidden="true">/</span>
         <Link
-          href="/new-drops"
+          href="/browse-all?collection=new-drops"
           className="transition-colors hover:text-[#121212]"
         >
           New Drops

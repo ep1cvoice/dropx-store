@@ -9,8 +9,10 @@ import { getProductListing } from "@/lib/catalog";
 import { anton, inter } from "@/lib/fonts";
 import {
   isCollectionSlug,
+  isGenderFilter,
   isSortOption,
   type CollectionSlug,
+  type GenderFilter,
   type SortOption,
 } from "@/lib/listing";
 
@@ -23,6 +25,8 @@ type ProductListingPageProps = {
   lockedCollection?: CollectionSlug;
   /** When set, results are fixed to this brand and the sidebar hides the brand group. */
   lockedBrandSlug?: string;
+  /** When set, results are fixed to this gender (plus unisex) and the sidebar hides gender. */
+  lockedGender?: GenderFilter;
 };
 
 function first(value: string | string[] | undefined): string | undefined {
@@ -40,6 +44,7 @@ export default async function ProductListingPage({
   searchParams,
   lockedCollection,
   lockedBrandSlug,
+  lockedGender,
 }: ProductListingPageProps) {
   const collectionParam = first(searchParams.collection);
   const collection: CollectionSlug =
@@ -49,6 +54,11 @@ export default async function ProductListingPage({
   const sortParam = first(searchParams.sort);
   const sort: SortOption = isSortOption(sortParam) ? sortParam : "newest";
 
+  const genderParam = first(searchParams.gender);
+  const gender: GenderFilter | undefined =
+    lockedGender ??
+    (isGenderFilter(genderParam) ? genderParam : undefined);
+
   const brands = lockedBrandSlug
     ? [lockedBrandSlug]
     : parseCsv(first(searchParams.brand));
@@ -56,6 +66,7 @@ export default async function ProductListingPage({
   const { products, total, page, totalPages, brandFacets } =
     await getProductListing({
       collection,
+      gender,
       brands,
       sizes: parseCsv(first(searchParams.size)),
       colors: parseCsv(first(searchParams.color)),
@@ -102,6 +113,7 @@ export default async function ProductListingPage({
               brandFacets={brandFacets}
               showCollections={!lockedCollection}
               showBrands={!lockedBrandSlug}
+              showGender={!lockedGender}
             />
           </div>
 

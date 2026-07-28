@@ -5,16 +5,16 @@ import { Heart, Search, ShoppingBag, User } from 'lucide-react';
 import Logo from './Logo';
 import Button from '../ui/Button';
 import NavCountBadge from './NavCountBadge';
-import { getNavLinkClassName, navIconClassName, navLinks } from './nav-links';
-import { usePathname } from 'next/navigation';
+import { getNavLinkClassName, navIconClassName, navLinks, isNavLinkActive } from './nav-links';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { useStoreBag } from '@/components/providers/StoreBagProvider';
 
 export default function NavbarDesktop() {
 	const pathname = usePathname();
+	const searchParams = useSearchParams();
 	const { status } = useSession();
 	const { cartCount, wishlistCount } = useStoreBag();
-	const isActive = (href: string) => pathname.startsWith(href);
 
 	return (
 		<div className='flex h-[76px] mx-auto max-w-[1600px] items-center justify-between px-6 lg:px-10'>
@@ -23,7 +23,11 @@ export default function NavbarDesktop() {
 
 				<nav className='flex items-center gap-8'>
 					{navLinks.map(({ href, label, accent }) => (
-						<Link key={href} href={href} className={getNavLinkClassName(accent, isActive(href))}>
+						<Link
+							key={href}
+							href={href}
+							className={getNavLinkClassName(accent, isNavLinkActive(href, pathname, searchParams.toString()))}
+						>
 							{label}
 						</Link>
 					))}

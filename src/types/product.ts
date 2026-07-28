@@ -10,6 +10,11 @@ export type ProductCategory =
   | "lifestyle"
   | "skateboarding";
 
+export type ProductGender = "men" | "women" | "unisex";
+
+/** Listing gender filter — men/women also include unisex products. */
+export type GenderFilter = ProductGender;
+
 // ---------------------------------------------------------------------------
 // VariantSize
 // One row per EU size within a colorway.
@@ -56,6 +61,7 @@ export type Product = {
   description: string | null;
   brand: string;
   category: ProductCategory;
+  gender: ProductGender;
   badge: BadgeVariant | null;
   discountValue: number | null;
   currency: string;

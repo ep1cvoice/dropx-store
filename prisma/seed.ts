@@ -38,6 +38,7 @@ function sizes(stockByEu: Record<number, number>) {
 
 type Category = "running" | "basketball" | "lifestyle" | "skateboarding";
 type Badge = "new" | "limited" | "discount" | null;
+type Gender = "men" | "women" | "unisex";
 
 type SeedVariant = {
   color: string;
@@ -54,6 +55,7 @@ type SeedProduct = {
   description: string;
   brand: string; // brand name
   category: Category;
+  gender: Gender;
   badge: Badge;
   discountValue?: number;
   featured?: boolean;
@@ -78,6 +80,7 @@ const PRODUCTS: SeedProduct[] = [
       "The one that started it all. Premium leather, Air-Sole cushioning, and the original colour blocking collectors chase.",
     brand: "Nike",
     category: "basketball",
+    gender: "men",
     badge: "limited",
     featured: true,
     variants: [
@@ -92,6 +95,7 @@ const PRODUCTS: SeedProduct[] = [
       "A wardrobe essential. Crisp white leather with black overlays for a clean look that goes with everything.",
     brand: "Nike",
     category: "lifestyle",
+    gender: "unisex",
     badge: "new",
     variants: [
       { color: "Black / White", colorHex: "#1A1A1A", colorFamily: "black", price: 119, image: 2, stock: { 39: 10, 40: 12, 41: 12, 42: 9, 43: 7, 44: 5 } },
@@ -104,6 +108,7 @@ const PRODUCTS: SeedProduct[] = [
       "The Nike Air Max 90 stays true to its OG roots with the iconic Waffle sole, stitched overlays, and classic TPU accents.",
     brand: "Nike",
     category: "lifestyle",
+    gender: "unisex",
     badge: "discount",
     discountValue: 20,
     variants: [
@@ -118,6 +123,7 @@ const PRODUCTS: SeedProduct[] = [
       "An icon of clean. Full-grain leather, crisp stitching, and the pivot-point outsole that defined a generation.",
     brand: "Nike",
     category: "lifestyle",
+    gender: "unisex",
     badge: "new",
     variants: [
       { color: "Triple White", colorHex: "#FFFFFF", colorFamily: "white", price: 119, image: 8, stock: { 38: 6, 39: 9, 40: 12, 41: 12, 42: 10, 43: 8, 44: 5 } },
@@ -130,6 +136,7 @@ const PRODUCTS: SeedProduct[] = [
       "Y2K running energy. A metallic, layered upper on a chunky retro runner sole for full early-2000s flavour.",
     brand: "Nike",
     category: "running",
+    gender: "unisex",
     badge: null,
     variants: [
       { color: "Metallic Silver", colorHex: "#B8BCC2", colorFamily: "grey", price: 139, image: 11, stock: { 40: 5, 41: 7, 42: 6, 43: 4 } },
@@ -142,6 +149,7 @@ const PRODUCTS: SeedProduct[] = [
       "Built for the board. Zoom Air insole, padded tongue, and a grippy outsole in a heritage green makeover.",
     brand: "Nike",
     category: "skateboarding",
+    gender: "men",
     badge: "limited",
     variants: [
       { color: "Pine Green", colorHex: "#2E7D46", colorFamily: "green", price: 129, image: 3, stock: { 41: 2, 42: 2, 43: 1, 44: 0 } },
@@ -156,6 +164,7 @@ const PRODUCTS: SeedProduct[] = [
       "Instantly recognisable. Full-length Boost under a breathable Primeknit upper with the signature striped pattern.",
     brand: "Adidas",
     category: "lifestyle",
+    gender: "men",
     badge: "limited",
     featured: true,
     variants: [
@@ -169,6 +178,7 @@ const PRODUCTS: SeedProduct[] = [
       "A terrace classic reborn. Soft leather, suede T-toe, gum sole, and gold foil branding — timeless from pitch to pavement.",
     brand: "Adidas",
     category: "lifestyle",
+    gender: "women",
     badge: "new",
     featured: true,
     variants: [
@@ -183,6 +193,7 @@ const PRODUCTS: SeedProduct[] = [
       "Retro indoor style with a plush suede upper, contrast three stripes, and a low, grippy gum outsole.",
     brand: "Adidas",
     category: "lifestyle",
+    gender: "women",
     badge: null,
     variants: [
       { color: "Blue Bird", colorHex: "#3B6FB5", colorFamily: "blue", price: 120, image: 1, stock: { 40: 4, 41: 6, 42: 6, 43: 5, 44: 3 } },
@@ -195,6 +206,7 @@ const PRODUCTS: SeedProduct[] = [
       "Bold, chunky, and unmistakably 2000s. Premium suede with oversized branding and a comfortable footbed.",
     brand: "Adidas",
     category: "lifestyle",
+    gender: "women",
     badge: "discount",
     discountValue: 15,
     variants: [
@@ -208,6 +220,7 @@ const PRODUCTS: SeedProduct[] = [
       "The lightest Ultraboost yet. Responsive Light Boost, a supportive cage, and a Primeknit+ upper for daily miles.",
     brand: "Adidas",
     category: "running",
+    gender: "men",
     badge: null,
     variants: [
       { color: "Core Black", colorHex: "#101010", colorFamily: "black", price: 189, image: 12, stock: { 41: 5, 42: 7, 43: 6, 44: 4, 45: 2 } },
@@ -222,6 +235,7 @@ const PRODUCTS: SeedProduct[] = [
       "Retro hoops heritage. A clean leather upper with perforated details and just the right amount of colour.",
     brand: "New Balance",
     category: "lifestyle",
+    gender: "unisex",
     badge: "new",
     variants: [
       { color: "White / Green", colorHex: "#2E7D46", colorFamily: "green", price: 139, image: 8, stock: { 40: 6, 41: 8, 42: 9, 43: 7, 44: 4, 45: 2 } },
@@ -234,6 +248,7 @@ const PRODUCTS: SeedProduct[] = [
       "A bold evolution of the 99X lineage. Wavy overlays over chunky ABZORB and SBS cushioning for a Y2K look.",
     brand: "New Balance",
     category: "running",
+    gender: "unisex",
     badge: "discount",
     discountValue: 15,
     featured: true,
@@ -248,6 +263,7 @@ const PRODUCTS: SeedProduct[] = [
       "Premium comfort in grey. Suede-and-mesh construction with N-ergy and ABZORB cushioning for all-day wear.",
     brand: "New Balance",
     category: "running",
+    gender: "unisex",
     badge: null,
     variants: [
       { color: "Rain Cloud", colorHex: "#9CA3AF", colorFamily: "grey", price: 159, image: 9, stock: { 40: 5, 41: 7, 42: 8, 43: 6, 44: 3 } },
@@ -260,6 +276,7 @@ const PRODUCTS: SeedProduct[] = [
       "Futuristic early-2000s tech. Stability web, N-ergy heel, and a breathable mesh upper in a metallic finish.",
     brand: "New Balance",
     category: "running",
+    gender: "men",
     badge: "limited",
     variants: [
       { color: "Silver Metallic", colorHex: "#C4C8CE", colorFamily: "grey", price: 175, image: 11, stock: { 41: 2, 42: 3, 43: 2, 44: 1 } },
@@ -274,6 +291,7 @@ const PRODUCTS: SeedProduct[] = [
       "Early-2000s running DNA. A mesh-and-synthetic upper with rearfoot GEL in understated quiet-luxury tones.",
     brand: "ASICS",
     category: "running",
+    gender: "unisex",
     badge: null,
     variants: [
       { color: "White / Clay Grey", colorHex: "#D9D2C7", colorFamily: "white", price: 129, image: 10, stock: { 40: 7, 41: 9, 42: 8, 43: 6, 44: 4 } },
@@ -286,6 +304,7 @@ const PRODUCTS: SeedProduct[] = [
       "The archival stability runner. Layered overlays, dual-density GEL, and a distinctly metallic silver upper.",
     brand: "ASICS",
     category: "running",
+    gender: "men",
     badge: "discount",
     discountValue: 25,
     variants: [
@@ -299,6 +318,7 @@ const PRODUCTS: SeedProduct[] = [
       "A hybrid of two ASICS icons. Chunky, comfortable, and finished in a versatile graphite grey.",
     brand: "ASICS",
     category: "lifestyle",
+    gender: "women",
     badge: "new",
     variants: [
       { color: "Graphite Grey", colorHex: "#6B7078", colorFamily: "grey", price: 159, image: 9, stock: { 40: 5, 41: 6, 42: 6, 43: 4, 44: 2 } },
@@ -313,6 +333,7 @@ const PRODUCTS: SeedProduct[] = [
       "A terrace icon revived. Soft suede, a T-toe overlay, and a gum sole in a fresh green colourway.",
     brand: "Puma",
     category: "lifestyle",
+    gender: "women",
     badge: "new",
     variants: [
       { color: "White / Green", colorHex: "#3E8E5A", colorFamily: "green", price: 100, image: 3, stock: { 40: 6, 41: 8, 42: 7, 43: 5, 44: 3 } },
@@ -325,6 +346,7 @@ const PRODUCTS: SeedProduct[] = [
       "The classic Suede, supersized. A chunky sole and premium suede upper for an exaggerated retro stance.",
     brand: "Puma",
     category: "lifestyle",
+    gender: "unisex",
     badge: "discount",
     discountValue: 30,
     variants: [
@@ -338,6 +360,7 @@ const PRODUCTS: SeedProduct[] = [
       "The spiky-soled cult classic returns. A minimal slip-on silhouette with a bold, aggressive outsole.",
     brand: "Puma",
     category: "lifestyle",
+    gender: "men",
     badge: "limited",
     variants: [
       { color: "Black", colorHex: "#141414", colorFamily: "black", price: 130, image: 2, stock: { 41: 2, 42: 2, 43: 1, 44: 0 } },
@@ -352,6 +375,7 @@ const PRODUCTS: SeedProduct[] = [
       "The premium Chuck. Higher rubber foxing, cushioned Ortholite footbed, and vintage canvas in true black.",
     brand: "Converse",
     category: "lifestyle",
+    gender: "women",
     badge: null,
     variants: [
       { color: "Black", colorHex: "#1A1A1A", colorFamily: "black", price: 89, image: 2, stock: { 39: 8, 40: 10, 41: 9, 42: 7, 43: 5, 44: 3 } },
@@ -364,6 +388,7 @@ const PRODUCTS: SeedProduct[] = [
       "Skate-ready heritage. A durable suede upper, Lunarlon cushioning, and the signature single star.",
     brand: "Converse",
     category: "skateboarding",
+    gender: "men",
     badge: "new",
     variants: [
       { color: "Navy", colorHex: "#22304A", colorFamily: "blue", price: 95, image: 1, stock: { 40: 5, 41: 6, 42: 6, 43: 4, 44: 2 } },
@@ -376,6 +401,7 @@ const PRODUCTS: SeedProduct[] = [
       "A Chuck on a jagged, chunky platform. Bold proportions with the classic canvas high-top up top.",
     brand: "Converse",
     category: "lifestyle",
+    gender: "women",
     badge: "discount",
     discountValue: 20,
     variants: [
@@ -411,6 +437,8 @@ async function main() {
   });
 
   // --- Reset catalog (children first to satisfy FKs) --------------------
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
   await prisma.cartItem.deleteMany();
   await prisma.cart.deleteMany();
   await prisma.wishlistItem.deleteMany();
@@ -439,6 +467,7 @@ async function main() {
         name: product.name,
         description: product.description,
         category: product.category,
+        gender: product.gender,
         badge: product.badge ?? undefined,
         discountValue: product.discountValue ?? undefined,
         featured: product.featured ?? false,

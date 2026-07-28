@@ -8,7 +8,7 @@ export default async function TrendingNowSection() {
   return (
     <SneakerGridSection
       title="Featured Picks"
-      viewAllHref="/new-drops"
+      viewAllHref="/browse-all?collection=featured"
       products={products}
     />
   );

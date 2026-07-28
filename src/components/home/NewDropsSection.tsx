@@ -7,7 +7,7 @@ export default async function NewDropsSection() {
   return (
     <SneakerGridSection
       title="New Drops"
-      viewAllHref="/new-drops"
+      viewAllHref="/browse-all?collection=new-drops"
       products={products}
     />
   );

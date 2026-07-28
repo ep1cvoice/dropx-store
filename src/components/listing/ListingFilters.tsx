@@ -8,6 +8,7 @@ import { inter } from "@/lib/fonts";
 import {
   COLLECTIONS,
   COLOR_FILTERS,
+  GENDER_FILTERS,
   PRICE_BOUNDS,
   SIZE_FILTERS,
   type BrandFacet,
@@ -18,6 +19,7 @@ type ListingFiltersProps = {
   brandFacets: BrandFacet[];
   showCollections: boolean;
   showBrands?: boolean;
+  showGender?: boolean;
 };
 
 const LABEL_CLASS =
@@ -27,12 +29,14 @@ export default function ListingFilters({
   brandFacets,
   showCollections,
   showBrands = true,
+  showGender = true,
 }: ListingFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const collection = searchParams.get("collection") ?? "browse-all";
+  const gender = searchParams.get("gender");
   const brands = parseCsv(searchParams.get("brand"));
   const activeSizes = parseCsv(searchParams.get("size"));
   const colors = parseCsv(searchParams.get("color"));
@@ -49,6 +53,7 @@ export default function ListingFilters({
   }, [minParam, maxParam]);
 
   const hasActiveFilters =
+    (showGender && gender != null) ||
     brands.length > 0 ||
     activeSizes.length > 0 ||
     colors.length > 0 ||
@@ -101,6 +106,35 @@ export default function ListingFilters({
                     }`}
                   />
                   {c.label}
+                </button>
+              );
+            })}
+          </div>
+        </FilterGroup>
+      )}
+
+      {showGender && (
+        <FilterGroup title="Gender">
+          <div className="flex flex-col gap-2">
+            {GENDER_FILTERS.map((g) => {
+              const active = gender === g.value;
+              return (
+                <button
+                  key={g.value}
+                  type="button"
+                  onClick={() =>
+                    navigate({ gender: active ? null : g.value })
+                  }
+                  className={`flex items-center gap-2 text-left text-sm transition-colors ${
+                    active ? "font-semibold text-[#121212]" : "text-[#666666] hover:text-[#121212]"
+                  }`}
+                >
+                  <span
+                    className={`h-3 w-3 rounded-none border ${
+                      active ? "border-[#e85d2a] bg-[#e85d2a]" : "border-gray-300"
+                    }`}
+                  />
+                  {g.label}
                 </button>
               );
             })}

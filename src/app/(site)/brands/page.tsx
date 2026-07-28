@@ -40,7 +40,7 @@ export default async function BrandsPage() {
           {brands.map((brand) => (
             <Link
               key={brand.slug}
-              href={`/brands/${brand.slug}`}
+              href={`/browse-all?brand=${brand.slug}`}
               className="group flex flex-col overflow-hidden rounded-none bg-white ring-1 ring-black/5 transition-shadow hover:shadow-md"
             >
               <div className="relative aspect-[4/3] overflow-hidden bg-[#f5f5f5]">
