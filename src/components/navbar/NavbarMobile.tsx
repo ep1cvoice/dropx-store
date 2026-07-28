@@ -11,10 +11,10 @@ import { getNavLinkClassName, navIconClassName, navLinks } from "./nav-links";
 import { useStoreBag } from "@/components/providers/StoreBagProvider";
 
 const iconButtonClassName =
-  "cursor-pointer text-white/60 transition-colors duration-200 hover:text-white active:text-white/80";
+  "cursor-pointer text-white/60 transition-colors duration-200 hover:text-[#e85d2a] active:text-[#e85d2a]";
 
 const navbarIconClassName =
-  "cursor-pointer text-white/90 transition-colors duration-200 hover:text-white active:text-white/70";
+  "cursor-pointer text-white/90 transition-colors duration-200 hover:text-[#e85d2a] active:text-[#e85d2a]";
 
 export default function NavbarMobile() {
   const [open, setOpen] = useState(false);
@@ -92,7 +92,7 @@ export default function NavbarMobile() {
                     onClick={closeMenu}
                     className={
                       getNavLinkClassName(accent) +
-                      " block cursor-pointer rounded-md px-3 py-3 transition-colors duration-150 hover:bg-white/5 active:bg-white/10"
+                      " block cursor-pointer rounded-none px-3 py-3 transition-colors duration-150 hover:bg-white/5 active:bg-white/10"
                     }
                   >
                     {label}
@@ -108,7 +108,7 @@ export default function NavbarMobile() {
                   aria-label="Search"
                   className={
                     iconButtonClassName +
-                    " rounded-lg p-2 hover:bg-white/5 active:bg-white/10"
+                    " rounded-none p-2 hover:bg-white/5 active:bg-white/10"
                   }
                 >
                   <Search className={navIconClassName} strokeWidth={1.75} />
@@ -123,7 +123,7 @@ export default function NavbarMobile() {
                   onClick={closeMenu}
                   className={
                     iconButtonClassName +
-                    " relative rounded-lg p-2 hover:bg-white/5 active:bg-white/10"
+                    " relative rounded-none p-2 hover:bg-white/5 active:bg-white/10"
                   }
                 >
                   <Heart className={navIconClassName} strokeWidth={1.75} />
@@ -135,7 +135,7 @@ export default function NavbarMobile() {
                   onClick={closeMenu}
                   className={
                     iconButtonClassName +
-                    " relative rounded-lg p-2 hover:bg-white/5 active:bg-white/10"
+                    " relative rounded-none p-2 hover:bg-white/5 active:bg-white/10"
                   }
                 >
                   <ShoppingBag className={navIconClassName} strokeWidth={1.75} />

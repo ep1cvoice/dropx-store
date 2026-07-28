@@ -118,7 +118,7 @@ export default function RegisterForm({
           <label className={`${inter.className} flex cursor-pointer items-start gap-2.5 text-sm text-gray-500`}>
             <input
               type='checkbox'
-              className='mt-0.5 size-4 shrink-0 rounded border-gray-300 accent-gray-900'
+              className='mt-0.5 size-4 shrink-0 rounded-none border-gray-300 accent-gray-900'
               {...register('terms')}
             />
             I agree to the Terms of Service and Privacy Policy

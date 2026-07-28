@@ -68,7 +68,7 @@ export default function UpcomingDropSection() {
 
         {/* Right — sneaker image */}
         <div className="flex w-full items-center justify-center md:flex-1">
-          <div className="w-full max-w-[480px] overflow-hidden rounded-2xl bg-[#e9e9e9] md:max-w-full">
+          <div className="w-full max-w-[480px] overflow-hidden rounded-none bg-[#e9e9e9] md:max-w-full">
             <div className="relative aspect-[4/3]">
               <Image
                 src="/dropAirMax.jpg"

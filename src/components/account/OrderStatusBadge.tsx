@@ -10,7 +10,7 @@ const STATUS_STYLES: Record<OrderStatus, string> = {
 export default function OrderStatusBadge({ status }: { status: OrderStatus }) {
   return (
     <span
-      className={`${inter.className} inline-flex shrink-0 rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${STATUS_STYLES[status]}`}
+      className={`${inter.className} inline-flex shrink-0 rounded-none px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${STATUS_STYLES[status]}`}
     >
       {status}
     </span>

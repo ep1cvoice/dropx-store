@@ -1,0 +1,33 @@
+"use client";
+
+import CheckoutInformationForm from "@/components/checkout/CheckoutInformationForm";
+import CheckoutSummary from "@/components/checkout/CheckoutSummary";
+import type { CartData } from "@/lib/cart";
+import type { CheckoutInformationValues } from "@/lib/validation";
+
+type CheckoutInformationViewProps = {
+  cart: CartData;
+  defaults?: CheckoutInformationValues | null;
+  isEditing?: boolean;
+};
+
+export default function CheckoutInformationView({
+  cart,
+  defaults,
+  isEditing = false,
+}: CheckoutInformationViewProps) {
+  return (
+    <div className="grid gap-10 lg:grid-cols-[1fr_360px] lg:gap-12">
+      <CheckoutInformationForm defaults={defaults} isEditing={isEditing} />
+      <aside className="lg:sticky lg:top-6 lg:self-start">
+        <CheckoutSummary
+          items={cart.items}
+          subtotal={cart.subtotal}
+          shipping={cart.shipping}
+          total={cart.total}
+          currency={cart.currency}
+        />
+      </aside>
+    </div>
+  );
+}

@@ -36,14 +36,14 @@ export default function AccountMobileHub({ name, email }: AccountMobileHubProps)
 
       {/* Profile card */}
       <div className="mt-8 flex flex-col items-center text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#e5e5e3] text-[#8a8a88]">
+        <div className="flex h-20 w-20 items-center justify-center rounded-none bg-[#e5e5e3] text-[#8a8a88]">
           <User size={34} strokeWidth={1.75} />
         </div>
         <p className={`${anton.className} mt-4 text-xl uppercase tracking-wide text-[#121212]`}>
           {name}
         </p>
         <p className="mt-1 text-sm text-[#888888]">{email}</p>
-        <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#121212] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white">
+        <span className="mt-3 inline-flex items-center gap-1.5 rounded-none bg-[#121212] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white">
           <Sparkles size={13} className="text-[#c8f065]" />
           DROPX Member
         </span>

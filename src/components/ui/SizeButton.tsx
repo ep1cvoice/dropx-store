@@ -22,7 +22,7 @@ export default function SizeButton({
       aria-pressed={selected}
       className={`
         ${inter.className}
-        relative flex h-11 w-14 items-center justify-center rounded-md
+        relative flex h-11 w-14 items-center justify-center rounded-none
         text-sm font-medium transition-colors
         ${
           !available
@@ -37,7 +37,7 @@ export default function SizeButton({
       {/* Diagonal strikethrough line for unavailable sizes */}
       {!available && (
         <span
-          className="pointer-events-none absolute inset-0 overflow-hidden rounded-md"
+          className="pointer-events-none absolute inset-0 overflow-hidden rounded-none"
           aria-hidden="true"
         >
           <svg

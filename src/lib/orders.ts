@@ -1,4 +1,6 @@
+import { getCurrentUserId } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
+import type { OrderStatus as PrismaOrderStatus } from "@/generated/prisma/client";
 
 export type OrderStatus = "processing" | "shipped" | "delivered";
 
@@ -11,52 +13,57 @@ export type OrderSummary = {
   currency: string;
   status: OrderStatus;
   thumbnailUrl: string | null;
+  /** First line label for the card subtitle, e.g. "Air Max 90 · EU 42". */
+  previewLabel: string | null;
 };
 
-// NOTE: There is no Order model yet — real orders arrive once checkout is wired
-// up. Until then we surface representative sample orders so the account UI is
-// reviewable. Thumbnails are pulled from real catalog images.
-const SAMPLE_ORDERS: Omit<OrderSummary, "thumbnailUrl">[] = [
-  {
-    id: "dx-78234",
-    number: "DX-78234",
-    placedAt: new Date("2026-03-28"),
-    itemCount: 2,
-    total: 359.9,
-    currency: "EUR",
-    status: "delivered",
-  },
-  {
-    id: "dx-77891",
-    number: "DX-77891",
-    placedAt: new Date("2026-04-05"),
-    itemCount: 1,
-    total: 219.95,
-    currency: "EUR",
-    status: "shipped",
-  },
-  {
-    id: "dx-76450",
-    number: "DX-76450",
-    placedAt: new Date("2026-04-12"),
-    itemCount: 3,
-    total: 547.85,
-    currency: "EUR",
-    status: "processing",
-  },
-];
+function toStatus(status: PrismaOrderStatus): OrderStatus {
+  return status;
+}
 
-/** Sample order history for the account area (placeholder until checkout lands). */
+/** Real order history for the signed-in user (newest first). */
 export async function getOrders(): Promise<OrderSummary[]> {
-  const variants = await prisma.productVariant.findMany({
-    where: { imageUrl: { not: null } },
-    take: SAMPLE_ORDERS.length,
-    orderBy: { createdAt: "asc" },
-    select: { imageUrl: true },
+  const userId = await getCurrentUserId();
+  if (!userId) return [];
+
+  const orders = await prisma.order.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      number: true,
+      createdAt: true,
+      total: true,
+      currency: true,
+      status: true,
+      items: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          quantity: true,
+          productName: true,
+          size: true,
+          imageUrl: true,
+        },
+      },
+    },
   });
 
-  return SAMPLE_ORDERS.map((order, index) => ({
-    ...order,
-    thumbnailUrl: variants[index]?.imageUrl ?? null,
-  }));
+  return orders.map((order) => {
+    const itemCount = order.items.reduce((sum, i) => sum + i.quantity, 0);
+    const first = order.items[0] ?? null;
+
+    return {
+      id: order.id,
+      number: order.number,
+      placedAt: order.createdAt,
+      itemCount,
+      total: order.total,
+      currency: order.currency,
+      status: toStatus(order.status),
+      thumbnailUrl: first?.imageUrl ?? null,
+      previewLabel: first
+        ? `${first.productName} · ${first.size}`
+        : null,
+    };
+  });
 }

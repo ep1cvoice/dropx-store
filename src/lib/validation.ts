@@ -42,3 +42,50 @@ export const registerSchema = z
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+
+const checkoutNameField = (label: string) =>
+  z
+    .string()
+    .trim()
+    .min(1, `${label} is required`)
+    .min(2, `${label} must be at least 2 characters`);
+
+export const checkoutInformationSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .email("Enter a valid email address"),
+  phone: z
+    .string()
+    .trim()
+    .refine((val) => !val || /^[+\d\s()-]{6,20}$/.test(val), {
+      message: "Enter a valid phone number",
+    }),
+  firstName: checkoutNameField("First name"),
+  lastName: checkoutNameField("Last name"),
+  address: z
+    .string()
+    .trim()
+    .min(1, "Address is required")
+    .min(5, "Enter a full street address"),
+  city: z.string().trim().min(1, "City is required"),
+  postalCode: z
+    .string()
+    .trim()
+    .min(1, "Postal code is required")
+    .min(3, "Enter a valid postal code"),
+  country: z.string().trim().min(1, "Country is required"),
+  shippingMethod: z.enum([
+    "inpost-paczkomat",
+    "inpost-kurier",
+    "dpd",
+    "dhl",
+    "poczta",
+  ]),
+});
+
+export type CheckoutInformationValues = z.infer<
+  typeof checkoutInformationSchema
+>;
+

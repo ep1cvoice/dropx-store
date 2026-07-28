@@ -26,7 +26,7 @@ export default function QuantitySelector({
 
   return (
     <div
-      className="inline-flex items-center overflow-hidden rounded-md border border-gray-200"
+      className="inline-flex items-center overflow-hidden rounded-none border border-gray-200"
       role="group"
       aria-label="Quantity"
     >
@@ -35,7 +35,7 @@ export default function QuantitySelector({
         onClick={decrement}
         disabled={value <= min}
         aria-label="Decrease quantity"
-        className="flex h-11 w-11 items-center justify-center text-gray-500 transition-colors hover:bg-gray-50 hover:text-[#121212] disabled:pointer-events-none disabled:text-gray-300"
+        className="flex h-11 w-11 items-center justify-center cursor-pointer text-gray-500 transition-colors hover:bg-gray-50 hover:text-[#121212] disabled:pointer-events-none disabled:text-gray-300"
       >
         <Minus size={14} />
       </button>
@@ -53,7 +53,7 @@ export default function QuantitySelector({
         onClick={increment}
         disabled={value >= max}
         aria-label="Increase quantity"
-        className="flex h-11 w-11 items-center justify-center text-gray-500 transition-colors hover:bg-gray-50 hover:text-[#121212] disabled:pointer-events-none disabled:text-gray-300"
+        className="flex h-11 w-11 items-center justify-center cursor-pointer text-gray-500 transition-colors hover:bg-gray-50 hover:text-[#121212] disabled:pointer-events-none disabled:text-gray-300"
       >
         <Plus size={14} />
       </button>

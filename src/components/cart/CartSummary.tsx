@@ -31,7 +31,7 @@ export default function CartSummary({
   }
 
   return (
-    <div className="rounded-xl bg-[#f4f4f2] p-6 md:p-7">
+    <div className="rounded-none bg-[#f4f4f2] p-6 md:p-7">
       <h2
         className={`${inter.className} text-xs font-bold uppercase tracking-[0.16em] text-[#121212]`}
       >
@@ -83,12 +83,12 @@ export default function CartSummary({
             }}
             placeholder="Promo code"
             aria-label="Promo code"
-            className={`${inter.className} min-w-0 flex-1 rounded-md border border-black/15 bg-white px-3 py-2.5 text-sm text-[#121212] placeholder:text-[#999999] focus:border-[#121212] focus:outline-none`}
+            className={`${inter.className} min-w-0 flex-1 rounded-none border border-black/15 bg-white px-3 py-2.5 text-sm text-[#121212] placeholder:text-[#999999] focus:border-[#121212] focus:outline-none`}
           />
           <Button
             type="button"
             onClick={applyPromo}
-            className="shrink-0 rounded-md"
+            className="shrink-0 rounded-none cursor-pointer"
           >
             Apply
           </Button>
@@ -103,7 +103,7 @@ export default function CartSummary({
       <Link href="/checkout" className="mt-4 block">
         <Button
           variant="accent"
-          className="h-12 w-full rounded-md text-sm font-semibold uppercase tracking-[0.12em]"
+          className="h-12 w-full rounded-none cursor-pointer text-sm font-semibold uppercase tracking-[0.12em]"
         >
           Proceed to checkout
         </Button>

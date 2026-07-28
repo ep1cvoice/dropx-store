@@ -96,7 +96,7 @@ export default function ListingFilters({
                   }`}
                 >
                   <span
-                    className={`h-3 w-3 rounded-full border ${
+                    className={`h-3 w-3 rounded-none border ${
                       active ? "border-[#e85d2a] bg-[#e85d2a]" : "border-gray-300"
                     }`}
                   />
@@ -164,7 +164,7 @@ export default function ListingFilters({
             onKeyDown={(e) => e.key === "Enter" && applyPrice()}
             placeholder={`€${PRICE_BOUNDS.min}`}
             aria-label="Minimum price"
-            className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+            className="w-full rounded-none border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
           />
           <span className="text-gray-400">—</span>
           <input
@@ -178,7 +178,7 @@ export default function ListingFilters({
             onKeyDown={(e) => e.key === "Enter" && applyPrice()}
             placeholder={`€${PRICE_BOUNDS.max}`}
             aria-label="Maximum price"
-            className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+            className="w-full rounded-none border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
           />
         </div>
       </FilterGroup>
@@ -197,7 +197,7 @@ export default function ListingFilters({
                 aria-label={color.label}
                 aria-pressed={active}
                 title={color.label}
-                className={`h-7 w-7 rounded-full border border-black/15 transition-transform hover:scale-110 ${
+                className={`h-7 w-7 rounded-none border border-black/15 transition-transform hover:scale-110 ${
                   active ? "ring-2 ring-[#121212] ring-offset-2" : ""
                 }`}
                 style={{ backgroundColor: color.hex }}

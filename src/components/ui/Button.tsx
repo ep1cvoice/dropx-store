@@ -27,7 +27,7 @@ export default function Button({
   return (
     <button
       type={type}
-      className={`${inter.className} inline-flex items-center justify-center gap-2 rounded-md px-6 py-2.5 text-sm transition-colors disabled:pointer-events-none disabled:opacity-50 ${variantStyles[variant]} ${className}`}
+      className={`${inter.className} inline-flex items-center justify-center gap-2 rounded-none px-6 py-2.5 text-sm transition-colors disabled:pointer-events-none disabled:opacity-50 ${variantStyles[variant]} ${className}`}
       {...props}
     >
       {children}

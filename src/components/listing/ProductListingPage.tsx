@@ -109,7 +109,7 @@ export default async function ProductListingPage({
           <div className="flex-1">
             {products.length === 0 ? (
               <div
-                className={`${inter.className} flex min-h-[40vh] items-center justify-center rounded-lg border border-dashed border-gray-200 text-center text-sm text-[#666666]`}
+                className={`${inter.className} flex min-h-[40vh] items-center justify-center rounded-none border border-dashed border-gray-200 text-center text-sm text-[#666666]`}
               >
                 No products match your filters. Try clearing some.
               </div>

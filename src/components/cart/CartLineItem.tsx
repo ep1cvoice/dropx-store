@@ -53,7 +53,7 @@ export default function CartLineItem({ item }: CartLineItemProps) {
     >
       <Link
         href={`/products/${item.slug}`}
-        className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[#eef4ff]"
+        className="relative h-20 w-20 shrink-0 overflow-hidden rounded-none bg-[#eef4ff]"
       >
         {item.imageUrl && (
           <Image
@@ -93,7 +93,7 @@ export default function CartLineItem({ item }: CartLineItemProps) {
           type="button"
           onClick={remove}
           aria-label={`Remove ${item.name} from cart`}
-          className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-[#bbbbbb] transition-colors hover:bg-black/5 hover:text-[#121212] md:order-3"
+          className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-none text-[#bbbbbb] transition-colors hover:bg-black/5 hover:text-[#121212] md:order-3"
         >
           <X size={16} />
         </button>

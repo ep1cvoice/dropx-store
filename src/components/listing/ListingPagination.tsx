@@ -31,7 +31,7 @@ export default function ListingPagination({
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   const baseItem =
-    "flex h-9 min-w-9 items-center justify-center rounded-md border px-3 text-sm transition-colors";
+    "flex h-9 min-w-9 items-center justify-center rounded-none border px-3 text-sm transition-colors";
 
   return (
     <nav

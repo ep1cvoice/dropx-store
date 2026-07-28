@@ -32,10 +32,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md">
+    <article className="group relative flex flex-col overflow-hidden rounded-none bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md">
       <Link
         href={`/products/${product.slug}`}
-        className="relative block aspect-square w-full overflow-hidden rounded-lg bg-[#f5f5f5]"
+        className="relative block aspect-square w-full overflow-hidden rounded-none bg-[#f5f5f5]"
         tabIndex={-1}
         aria-hidden="true"
       >
@@ -81,7 +81,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         disabled={isPending || !product.variantId}
         aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
         aria-pressed={wishlisted}
-        className="absolute right-3 top-3 z-10 cursor-pointer rounded-full p-1 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
+        className="absolute right-3 top-3 z-10 cursor-pointer rounded-none p-1 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <Heart
           size={20}

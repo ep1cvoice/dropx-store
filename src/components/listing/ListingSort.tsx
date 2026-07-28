@@ -28,7 +28,7 @@ export default function ListingSort() {
             { scroll: false },
           );
         }}
-        className="cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-[#121212] outline-none focus:border-gray-400"
+        className="cursor-pointer rounded-none border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-[#121212] outline-none focus:border-gray-400"
       >
         {SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>

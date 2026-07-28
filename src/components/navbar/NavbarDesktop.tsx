@@ -31,13 +31,13 @@ export default function NavbarDesktop() {
 			</div>
 
 			<div className='flex items-center gap-5'>
-				<button type='button' aria-label='Search' className='cursor-pointer text-white/90 transition-colors hover:text-white'>
+				<button type='button' aria-label='Search' className='cursor-pointer text-white/90 transition-colors hover:text-[#e85d2a]'>
 					<Search className={navIconClassName} strokeWidth={1.75} />
 				</button>
 				<Link
 					href='/account/wishlist'
 					aria-label={wishlistCount > 0 ? `Wishlist, ${wishlistCount} items` : 'Wishlist'}
-					className='relative cursor-pointer text-white/90 transition-colors hover:text-white'
+					className='relative cursor-pointer text-white/90 transition-colors hover:text-[#e85d2a]'
 				>
 					<Heart className={navIconClassName} strokeWidth={1.75} />
 					<NavCountBadge count={wishlistCount} />
@@ -45,7 +45,7 @@ export default function NavbarDesktop() {
 				<Link
 					href='/cart'
 					aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : 'Cart'}
-					className='relative cursor-pointer text-white/90 transition-colors hover:text-white'
+					className='relative cursor-pointer text-white/90 transition-colors hover:text-[#e85d2a]'
 				>
 					<ShoppingBag className={navIconClassName} strokeWidth={1.75} />
 					<NavCountBadge count={cartCount} />
@@ -53,7 +53,7 @@ export default function NavbarDesktop() {
 
 				{status === 'authenticated' ? (
 					<>
-						<Link href='/account' aria-label='Account' className='cursor-pointer text-white/90 transition-colors hover:text-white'>
+						<Link href='/account' aria-label='Account' className='cursor-pointer text-white/90 transition-colors hover:text-[#e85d2a]'>
 							<User className={navIconClassName} strokeWidth={1.75} />
 						</Link>
 						<Button

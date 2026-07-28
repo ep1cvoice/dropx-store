@@ -14,7 +14,7 @@ export default function NavCountBadge({ count }: NavCountBadgeProps) {
 
   return (
     <span
-      className={`${inter.className} absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#e85d2a] px-1 text-[10px] font-bold leading-none text-white`}
+      className={`${inter.className} absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-none bg-[#e85d2a] px-1 text-[10px] font-bold leading-none text-white`}
     >
       {label}
     </span>

@@ -111,7 +111,7 @@ export default function LoginForm({
               type='checkbox'
               name='remember'
               defaultChecked
-              className='size-4 rounded border-gray-300 accent-gray-900'
+              className='size-4 rounded-none border-gray-300 accent-gray-900'
             />
             Remember me
           </label>

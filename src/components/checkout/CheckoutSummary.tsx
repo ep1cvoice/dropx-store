@@ -22,7 +22,7 @@ export default function CheckoutSummary({
   const tax = includedVat(total);
 
   return (
-    <div className="rounded-xl bg-[#f4f4f2] p-6">
+    <div className="rounded-none bg-[#f4f4f2] p-6">
       <h2
         className={`${inter.className} text-xs font-bold uppercase tracking-[0.16em] text-[#121212]`}
       >
@@ -32,7 +32,7 @@ export default function CheckoutSummary({
       <ul className="mt-5 space-y-4">
         {items.map((item) => (
           <li key={item.id} className="flex items-center gap-3">
-            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-[#eef4ff]">
+            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-none bg-[#eef4ff]">
               {item.imageUrl && (
                 <Image
                   src={item.imageUrl}

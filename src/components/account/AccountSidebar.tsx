@@ -22,9 +22,9 @@ export default function AccountSidebar({ name, email }: AccountSidebarProps) {
     (href === "/account/orders" && pathname === "/account");
 
   return (
-    <div className="rounded-2xl bg-[#f4f4f2] p-6">
+    <div className="rounded-none bg-[#f4f4f2] p-6">
       <div className="flex flex-col items-center text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#dcdcda] text-[#8a8a88]">
+        <div className="flex h-20 w-20 items-center justify-center rounded-none bg-[#dcdcda] text-[#8a8a88]">
           <User size={32} strokeWidth={1.75} />
         </div>
         <p
@@ -44,7 +44,7 @@ export default function AccountSidebar({ name, email }: AccountSidebarProps) {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 rounded-none px-3 py-2.5 text-sm font-medium transition-colors ${
                 active
                   ? "bg-[#e85d2a] text-white"
                   : "text-[#333333] hover:bg-black/5"
@@ -59,7 +59,7 @@ export default function AccountSidebar({ name, email }: AccountSidebarProps) {
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="mt-1 flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#e11d48] transition-colors hover:bg-[#e11d48]/8"
+          className="mt-1 flex cursor-pointer items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#e11d48] transition-colors hover:bg-[#e11d48]/8"
         >
           <LogOut size={18} strokeWidth={1.75} />
           Log Out

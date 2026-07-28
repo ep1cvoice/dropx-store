@@ -9,7 +9,7 @@ export default function Logo({ className = "" }: LogoProps) {
   return (
     <Link
       href="/"
-      className={`${anton.className} text-2xl uppercase tracking-wide md:text-[28px] lg:text-[32px] ${className}`}
+      className={`${anton.className} text-2xl uppercase tracking-wide text-white transition-colors hover:text-[#e85d2a] md:text-[28px] lg:text-[32px] ${className}`}
     >
       DROPX
     </Link>

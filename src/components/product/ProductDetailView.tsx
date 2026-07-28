@@ -27,7 +27,7 @@ function formatPrice(price: number, currency: string): string {
 }
 
 const TRUST_POINTS = [
-  { icon: Truck, label: "Free shipping on orders over €100" },
+  { icon: Truck, label: "Free shipping on orders over €200" },
   { icon: RotateCcw, label: "30-day free returns" },
   { icon: ShieldCheck, label: "100% authentic guaranteed" },
 ] as const;
@@ -121,7 +121,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                   onClick={() => selectVariant(variant.id)}
                   aria-label={`View ${variant.color}`}
                   aria-pressed={active}
-                  className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-[#f5f5f5] ring-1 transition-colors md:h-20 md:w-20 ${
+                  className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-none bg-[#f5f5f5] ring-1 transition-colors md:h-20 md:w-20 ${
                     active ? "ring-2 ring-[#121212]" : "ring-black/10 hover:ring-black/30"
                   }`}
                 >
@@ -140,7 +140,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           </div>
         )}
 
-        <div className="relative aspect-square flex-1 overflow-hidden rounded-lg bg-[#f5f5f5]">
+        <div className="relative aspect-square flex-1 overflow-hidden rounded-none bg-[#f5f5f5]">
           {selectedVariant?.imageUrl && (
             <Image
               src={selectedVariant.imageUrl}
@@ -263,7 +263,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                     aria-label={variant.color}
                     aria-pressed={active}
                     title={variant.color}
-                    className={`h-7 w-7 rounded-full border border-black/15 transition-transform hover:scale-110 ${
+                    className={`h-7 w-7 rounded-none border border-black/15 transition-transform hover:scale-110 ${
                       active ? "ring-2 ring-[#121212] ring-offset-2" : ""
                     }`}
                     style={{ backgroundColor: variant.colorHex }}
@@ -280,7 +280,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             variant="accent"
             onClick={handleAddToCart}
             disabled={!canAddToCart || isPending}
-            className="h-14 flex-1 cursor-pointer rounded-md text-sm font-semibold uppercase tracking-[0.14em]"
+            className="h-14 flex-1 cursor-pointer rounded-none text-sm font-semibold uppercase tracking-[0.14em]"
           >
             {added ? (
               <>
@@ -301,7 +301,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             disabled={isPending}
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
             aria-pressed={wishlisted}
-            className="flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-200 transition-colors hover:border-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-none border border-gray-200 transition-colors hover:border-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Heart
               size={20}

@@ -55,7 +55,7 @@ export default async function CartPage() {
             <Link href="/browse-all">
               <Button
                 variant="accent"
-                className="h-12 rounded-md px-8 text-sm font-semibold uppercase tracking-[0.12em]"
+                className="h-12 rounded-none px-8 text-sm font-semibold uppercase tracking-[0.12em]"
               >
                 Start shopping
               </Button>
@@ -86,7 +86,7 @@ export default async function CartPage() {
         className={`${inter.className} mt-10 flex items-center justify-center gap-2 bg-[#121212] px-4 py-3 text-center text-xs font-medium text-white`}
       >
         <Truck size={15} className="text-[#4ade80]" />
-        Free shipping on all orders over €100
+        Free shipping on all orders over €200
       </div>
     </div>
   );

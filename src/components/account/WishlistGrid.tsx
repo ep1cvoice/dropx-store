@@ -40,7 +40,7 @@ export default function WishlistGrid({
         <Link href="/browse-all">
           <Button
             variant="accent"
-            className="h-12 rounded-md px-8 text-sm font-semibold uppercase tracking-[0.12em]"
+            className="h-12 rounded-none px-8 text-sm font-semibold uppercase tracking-[0.12em]"
           >
             Discover sneakers
           </Button>
@@ -54,21 +54,21 @@ export default function WishlistGrid({
       {list.map((item) => (
         <article
           key={item.variantId}
-          className="group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-black/5"
+          className="group relative flex flex-col overflow-hidden rounded-none bg-white shadow-sm ring-1 ring-black/5"
         >
           <button
             type="button"
             onClick={() => remove(item.variantId)}
             disabled={isPending}
             aria-label={`Remove ${item.name} from wishlist`}
-            className="absolute right-3 top-3 z-10 cursor-pointer rounded-full p-1 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
+            className="absolute right-3 top-3 z-10 cursor-pointer rounded-none p-1 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Heart size={20} className="fill-[#e85d2a] stroke-[#e85d2a]" />
           </button>
 
           <Link
             href={`/products/${item.slug}`}
-            className="relative block aspect-square w-full overflow-hidden rounded-lg bg-[#f5f5f5]"
+            className="relative block aspect-square w-full overflow-hidden rounded-none bg-[#f5f5f5]"
           >
             {item.imageUrl && (
               <Image

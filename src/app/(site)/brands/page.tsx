@@ -41,7 +41,7 @@ export default async function BrandsPage() {
             <Link
               key={brand.slug}
               href={`/brands/${brand.slug}`}
-              className="group flex flex-col overflow-hidden rounded-lg bg-white ring-1 ring-black/5 transition-shadow hover:shadow-md"
+              className="group flex flex-col overflow-hidden rounded-none bg-white ring-1 ring-black/5 transition-shadow hover:shadow-md"
             >
               <div className="relative aspect-[4/3] overflow-hidden bg-[#f5f5f5]">
                 {brand.imageUrl ? (
