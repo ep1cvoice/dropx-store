@@ -4,14 +4,12 @@ import {
   footerCopyright,
   footerDescription,
 } from "./footer-links";
-import { socialIcons } from "./social-icons";
 
 export default function Footer() {
   return (
     <footer className="bg-[#121212] text-white">
       <div className="mx-auto max-w-[1600px] px-6 py-10 md:py-14 lg:px-10 lg:py-16">
-
-        {/* ── Mobile: logo + description + socials ── */}
+        {/* ── Mobile: logo + description ── */}
         <div className="lg:hidden">
           <span
             className={`${anton.className} block text-2xl uppercase tracking-wide md:text-[28px]`}
@@ -115,19 +113,14 @@ export default function Footer() {
         {/* ── Bottom bar: all breakpoints ── */}
         <div className="mt-10 border-t border-white/10 pt-6 md:mt-12 lg:mt-14 lg:pt-8">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-            <span className={`${inter.className} text-xs text-white/40 md:text-sm`}>
+            <span
+              className={`${inter.className} text-xs text-white/40 md:text-sm`}
+            >
               {footerCopyright}
             </span>
-            <div className="flex items-center gap-5">
-              {socialIcons.map(({ label, icon: Icon }) => (
-                <span key={label} aria-label={label} className="text-white/70">
-                  <Icon />
-                </span>
-              ))}
-            </div>
+            <div className="flex items-center gap-5" />
           </div>
         </div>
-
       </div>
     </footer>
   );

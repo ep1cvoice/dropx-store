@@ -2,7 +2,7 @@ import SneakerGridSection from "@/components/home/SneakerGridSection";
 import { getProductCards } from "@/lib/catalog";
 
 export default async function BrowseAllSneakersSection() {
-  const products = await getProductCards({ take: 8 });
+  const products = await getProductCards({ take: 10 });
 
   return (
     <SneakerGridSection

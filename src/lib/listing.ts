@@ -1,16 +1,27 @@
-import type { GenderFilter, ProductCardData } from "@/types/product";
+import type {
+  GenderFilter,
+  ProductCardData,
+  ProductCategory,
+} from "@/types/product";
 
 // Client-safe listing constants and types (no Prisma import), so both the
 // server query layer (catalog.ts) and client filter components can use them.
 
 export type SortOption = "newest" | "price-asc" | "price-desc";
 export type CollectionSlug = "browse-all" | "new-drops" | "featured" | "sale";
-export type { GenderFilter };
+export type { GenderFilter, ProductCategory };
 
 export const GENDER_FILTERS: { value: GenderFilter; label: string }[] = [
   { value: "men", label: "Male" },
   { value: "women", label: "Female" },
   { value: "unisex", label: "Unisex" },
+];
+
+export const CATEGORY_FILTERS: { value: ProductCategory; label: string }[] = [
+  { value: "running", label: "Running" },
+  { value: "lifestyle", label: "Lifestyle" },
+  { value: "basketball", label: "Basketball" },
+  { value: "skateboarding", label: "Skate" },
 ];
 
 export const COLLECTIONS: { slug: CollectionSlug; label: string }[] = [
@@ -67,6 +78,12 @@ export function isGenderFilter(
   value: string | undefined,
 ): value is GenderFilter {
   return GENDER_FILTERS.some((g) => g.value === value);
+}
+
+export function isProductCategory(
+  value: string | undefined,
+): value is ProductCategory {
+  return CATEGORY_FILTERS.some((c) => c.value === value);
 }
 
 export type BrandFacet = { slug: string; name: string; count: number };

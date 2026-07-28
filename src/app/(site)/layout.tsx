@@ -1,4 +1,6 @@
+import ContactBar from "@/components/footer/ContactBar";
 import Footer from "@/components/footer/Footer";
+import PaymentShippingBar from "@/components/footer/PaymentShippingBar";
 import Navbar from "@/components/navbar/Navbar";
 import { StoreBagProvider } from "@/components/providers/StoreBagProvider";
 import { getCartItemCount } from "@/lib/cart";
@@ -21,7 +23,9 @@ export default async function SiteLayout({
     >
       <Navbar />
       <main className="flex-1">{children}</main>
+      <ContactBar />
       <Footer />
+      <PaymentShippingBar />
     </StoreBagProvider>
   );
 }

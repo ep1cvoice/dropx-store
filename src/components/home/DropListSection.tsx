@@ -1,9 +1,13 @@
+import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { anton, inter } from "@/lib/fonts";
 
 export default function DropListSection() {
   return (
-    <section className="bg-[#121212] px-6 py-16 md:py-24 lg:py-28">
+    <section
+      id="newsletter"
+      className="scroll-mt-28 bg-[#121212] px-6 py-16 md:scroll-mt-32 md:py-24 lg:py-28"
+    >
       <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
         <p
           className={`${inter.className} text-xs font-medium uppercase tracking-[0.25em] text-[#e85d2a] md:text-sm`}
@@ -20,18 +24,22 @@ export default function DropListSection() {
         </h2>
 
         <p
-          className={`${inter.className} mt-5 max-w-md text-sm leading-relaxed text-white/50 md:mt-6 md:max-w-lg md:text-base`}
+          className={`${inter.className} mt-5 max-w-lg text-sm leading-relaxed text-white/80 md:text-base`}
         >
-          Get early access to exclusive drops, restocks, and member-only deals.
-          Be the first to know.
+          Subscribe to our newsletter to be the first to know about new drops,
+          restocks, and member-only deals.
         </p>
 
-        <form
-          className="mt-8 w-full max-w-xl sm:mt-10"
-          action="#"
-          noValidate
+        <p
+          className={`${inter.className} mt-4 flex flex-wrap items-center justify-center gap-2 text-sm text-white/80 md:text-base`}
         >
-          <div className="flex flex-col sm:flex-row gap-4 md:gap-0">
+          <span>As a subscriber, you&apos;ll get a</span>
+          <Badge variant="discount" discountValue={10} />
+          <span>discount with a minimum purchase of €400 via coupon code.</span>
+        </p>
+
+        <form className="mt-8 w-full max-w-xl sm:mt-10" action="#" noValidate>
+          <div className="flex flex-col gap-4 sm:flex-row md:gap-0">
             <label htmlFor="drop-list-email" className="sr-only">
               Email address
             </label>
@@ -41,7 +49,7 @@ export default function DropListSection() {
               type="email"
               autoComplete="email"
               placeholder="Enter your email"
-              className={`${inter.className} w-full flex-1 border border-transparent bg-[#222222] px-4 py-3.5 text-sm text-white outline-none placeholder:text-white/40 focus:border-white/20 rounded-none sm:py-4 sm:text-base`}
+              className={`${inter.className} w-full flex-1 rounded-none border border-transparent bg-[#222222] px-4 py-3.5 text-sm text-white outline-none placeholder:text-white/40 focus:border-white/20 sm:py-4 sm:text-base`}
             />
             <Button
               type="submit"

@@ -319,6 +319,7 @@ function collectionWhere(collection: CollectionSlug): Prisma.ProductWhereInput {
 export type ProductListingOptions = {
   collection: CollectionSlug;
   gender?: GenderFilter;
+  category?: ProductCategory;
   brands?: string[]; // brand slugs
   sizes?: string[]; // bare EU numbers, e.g. ["40", "41"]
   colors?: string[]; // color families
@@ -335,6 +336,7 @@ export async function getProductListing(
   const {
     collection,
     gender,
+    category,
     brands = [],
     sizes: sizeFilters = [],
     colors = [],
@@ -355,6 +357,10 @@ export async function getProductListing(
     and.push({ gender: { in: ["women", "unisex"] } });
   } else if (gender === "unisex") {
     and.push({ gender: "unisex" });
+  }
+
+  if (category) {
+    and.push({ category });
   }
 
   if (brands.length > 0) {

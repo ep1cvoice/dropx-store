@@ -45,7 +45,7 @@ export default function SneakerGridSection({
           </Link>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-2.5">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

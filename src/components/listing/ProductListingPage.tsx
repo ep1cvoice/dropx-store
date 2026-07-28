@@ -10,11 +10,13 @@ import { anton, inter } from "@/lib/fonts";
 import {
   isCollectionSlug,
   isGenderFilter,
+  isProductCategory,
   isSortOption,
   type CollectionSlug,
   type GenderFilter,
   type SortOption,
 } from "@/lib/listing";
+import type { ProductCategory } from "@/types/product";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -59,6 +61,11 @@ export default async function ProductListingPage({
     lockedGender ??
     (isGenderFilter(genderParam) ? genderParam : undefined);
 
+  const categoryParam = first(searchParams.category);
+  const category: ProductCategory | undefined = isProductCategory(categoryParam)
+    ? categoryParam
+    : undefined;
+
   const brands = lockedBrandSlug
     ? [lockedBrandSlug]
     : parseCsv(first(searchParams.brand));
@@ -67,6 +74,7 @@ export default async function ProductListingPage({
     await getProductListing({
       collection,
       gender,
+      category,
       brands,
       sizes: parseCsv(first(searchParams.size)),
       colors: parseCsv(first(searchParams.color)),

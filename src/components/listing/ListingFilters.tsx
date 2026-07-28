@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import SizeButton from "@/components/ui/SizeButton";
 import { inter } from "@/lib/fonts";
 import {
+  CATEGORY_FILTERS,
   COLLECTIONS,
   COLOR_FILTERS,
   GENDER_FILTERS,
@@ -37,6 +38,7 @@ export default function ListingFilters({
 
   const collection = searchParams.get("collection") ?? "browse-all";
   const gender = searchParams.get("gender");
+  const category = searchParams.get("category");
   const brands = parseCsv(searchParams.get("brand"));
   const activeSizes = parseCsv(searchParams.get("size"));
   const colors = parseCsv(searchParams.get("color"));
@@ -54,6 +56,7 @@ export default function ListingFilters({
 
   const hasActiveFilters =
     (showGender && gender != null) ||
+    category != null ||
     brands.length > 0 ||
     activeSizes.length > 0 ||
     colors.length > 0 ||
@@ -141,6 +144,33 @@ export default function ListingFilters({
           </div>
         </FilterGroup>
       )}
+
+      <FilterGroup title="Category">
+        <div className="flex flex-col gap-2">
+          {CATEGORY_FILTERS.map((c) => {
+            const active = category === c.value;
+            return (
+              <button
+                key={c.value}
+                type="button"
+                onClick={() =>
+                  navigate({ category: active ? null : c.value })
+                }
+                className={`flex items-center gap-2 text-left text-sm transition-colors ${
+                  active ? "font-semibold text-[#121212]" : "text-[#666666] hover:text-[#121212]"
+                }`}
+              >
+                <span
+                  className={`h-3 w-3 rounded-none border ${
+                    active ? "border-[#e85d2a] bg-[#e85d2a]" : "border-gray-300"
+                  }`}
+                />
+                {c.label}
+              </button>
+            );
+          })}
+        </div>
+      </FilterGroup>
 
       {showBrands && (
       <FilterGroup title="Brand">

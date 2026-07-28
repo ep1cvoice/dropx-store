@@ -1,29 +1,36 @@
 import Image from "next/image";
 import Link from "next/link";
-import { anton } from "@/lib/fonts";
 
-const categories = [
+import { anton } from "@/lib/fonts";
+import type { ProductCategory } from "@/types/product";
+
+const categories: {
+  name: string;
+  category: ProductCategory;
+  image: string;
+  alt: string;
+}[] = [
   {
     name: "Running",
-    href: "#",
+    category: "running",
     image: "/Running.jpg",
     alt: "Runner on a track",
   },
   {
     name: "Lifestyle",
-    href: "#",
+    category: "lifestyle",
     image: "/Lifestyle.jpg",
     alt: "Lifestyle street look",
   },
   {
     name: "Basketball",
-    href: "#",
+    category: "basketball",
     image: "/Basketball.jpg",
     alt: "Basketball sneakers",
   },
   {
     name: "Skate",
-    href: "#",
+    category: "skateboarding",
     image: "/Skateboarding.jpg",
     alt: "Skateboarder on a skateboard",
   },
@@ -42,8 +49,8 @@ export default function ShopByCategorySection() {
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
           {categories.map((cat) => (
             <Link
-              key={cat.name}
-              href={cat.href}
+              key={cat.category}
+              href={`/browse-all?category=${cat.category}`}
               className="group relative aspect-[3/4] overflow-hidden md:aspect-[2/3] lg:aspect-[3/4]"
             >
               <Image

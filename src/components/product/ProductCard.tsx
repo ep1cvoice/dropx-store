@@ -44,7 +44,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             src={product.imageUrl}
             alt={product.name}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
@@ -65,7 +65,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
 
         {product.badge && (
-          <div className="absolute left-3 top-3">
+          <div className="absolute left-2 top-2">
             {product.badge === "discount" && product.discountValue != null ? (
               <Badge variant="discount" discountValue={product.discountValue} />
             ) : product.badge !== "discount" ? (
@@ -81,10 +81,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         disabled={isPending || !product.variantId}
         aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
         aria-pressed={wishlisted}
-        className="absolute right-3 top-3 z-10 cursor-pointer rounded-none p-1 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
+        className="absolute right-2 top-2 z-10 cursor-pointer rounded-none p-1 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <Heart
-          size={20}
+          size={18}
           className={
             wishlisted
               ? "fill-[#e85d2a] stroke-[#e85d2a]"
@@ -95,26 +95,26 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       <Link
         href={`/products/${product.slug}`}
-        className="flex flex-col gap-1 px-3 pb-3 pt-3"
+        className="flex flex-col gap-1 px-2.5 pb-2.5 pt-2.5"
       >
         <span
-          className={`${inter.className} text-[11px] font-semibold uppercase tracking-[1.5px] text-[#666666]`}
+          className={`${inter.className} text-[10px] font-semibold uppercase tracking-[1.5px] text-[#666666]`}
         >
           {product.brand}
         </span>
 
         <span
-          className={`${inter.className} text-[15px] font-medium leading-tight text-[#1A1A1A]`}
+          className={`${inter.className} line-clamp-2 text-sm font-medium leading-tight text-[#1A1A1A]`}
         >
           {product.name}
         </span>
 
-        <div className="mt-1 flex items-center justify-between">
-          <span className={`${inter.className} text-base font-bold text-[#1A1A1A]`}>
+        <div className="mt-1 flex items-center justify-between gap-1">
+          <span className={`${inter.className} text-sm font-bold text-[#1A1A1A]`}>
             {formatPrice(product.priceFrom, product.currency)}
           </span>
           {product.stockText && (
-            <span className={`${inter.className} text-[11px] font-medium text-[#FF4D00]`}>
+            <span className={`${inter.className} text-[10px] font-medium text-[#FF4D00]`}>
               {product.stockText}
             </span>
           )}
