@@ -5,7 +5,7 @@ import { anton, inter } from "@/lib/fonts";
 
 export default function HottestDropsPromoSection() {
   return (
-    <section className="bg-[#f1f1f1]">
+    <section className="bg-[#f1f1f1] pb-10">
       <div className="mx-auto grid max-w-[1600px] lg:grid-cols-2">
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center md:px-10 md:py-20 lg:py-24">
           <h2

@@ -30,7 +30,7 @@ const tiles = [
 
 export default function GenderShopSection() {
   return (
-    <section className="bg-[#f1f1f1] px-4 py-10 md:px-6 md:py-12 lg:px-10 xl:px-14">
+    <section className="bg-[#07090c] px-4 py-10 md:px-6 md:py-12 lg:px-10 xl:px-14">
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-3 md:gap-4">
         {tiles.map((tile) => (
           <Link
@@ -38,7 +38,7 @@ export default function GenderShopSection() {
             href={tile.href}
             className="group block"
           >
-            <div className="relative aspect-square overflow-hidden bg-[#e4e4e4]">
+            <div className="relative aspect-square overflow-hidden bg-[#1a1a1a]">
               <Image
                 src={tile.image}
                 alt={tile.alt}
@@ -48,7 +48,7 @@ export default function GenderShopSection() {
                 style={{ objectPosition: tile.objectPosition }}
               />
             </div>
-            <div className="mt-3 flex items-center justify-end gap-2 text-[#121212]">
+            <div className="mt-3 flex items-center justify-end gap-2 text-white">
               <span
                 className={`${anton.className} text-lg uppercase tracking-[0.04em] md:text-xl lg:text-2xl`}
               >
