@@ -8,7 +8,12 @@ import type {
 // server query layer (catalog.ts) and client filter components can use them.
 
 export type SortOption = "newest" | "price-asc" | "price-desc";
-export type CollectionSlug = "browse-all" | "new-drops" | "featured" | "sale";
+export type CollectionSlug =
+  | "browse-all"
+  | "new-drops"
+  | "featured"
+  | "limited"
+  | "sale";
 export type { GenderFilter, ProductCategory };
 
 export const GENDER_FILTERS: { value: GenderFilter; label: string }[] = [
@@ -28,6 +33,7 @@ export const COLLECTIONS: { slug: CollectionSlug; label: string }[] = [
   { slug: "browse-all", label: "Browse All" },
   { slug: "new-drops", label: "New Drops" },
   { slug: "featured", label: "Featured Picks" },
+  { slug: "limited", label: "Limited" },
   { slug: "sale", label: "On Sale" },
 ];
 

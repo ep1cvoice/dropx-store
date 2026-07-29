@@ -72,11 +72,12 @@ function toProductCardData(product: ProductCardRow): ProductCardData {
     name: product.name,
     brand: product.brand.name,
     variantId: variants[0]?.id ?? "",
-    badge: product.badge,
+    badge: product.badge as BadgeVariant | null,
     discountValue: product.discountValue,
     currency: product.currency,
     imageUrl,
     priceFrom,
+    outOfStock: totalStock === 0,
     stockText,
   };
 }
@@ -309,6 +310,8 @@ function collectionWhere(collection: CollectionSlug): Prisma.ProductWhereInput {
       return { badge: "new" };
     case "featured":
       return { featured: true };
+    case "limited":
+      return { badge: "limited" };
     case "sale":
       return { discountValue: { not: null } };
     default:
@@ -325,6 +328,8 @@ export type ProductListingOptions = {
   colors?: string[]; // color families
   priceMin?: number;
   priceMax?: number;
+  /** When false (default), products with zero total stock are hidden. */
+  includeOutOfStock?: boolean;
   sort?: SortOption;
   page?: number;
   pageSize?: number;
@@ -342,6 +347,7 @@ export async function getProductListing(
     colors = [],
     priceMin,
     priceMax,
+    includeOutOfStock = false,
     sort = "newest",
     page = 1,
     pageSize = DEFAULT_PAGE_SIZE,
@@ -388,6 +394,13 @@ export async function getProductListing(
     });
   }
 
+  // Default shop view: only products that still have at least one size in stock.
+  if (!includeOutOfStock) {
+    and.push({
+      variants: { some: { sizes: { some: { stock: { gt: 0 } } } } },
+    });
+  }
+
   const where: Prisma.ProductWhereInput =
     and.length > 0 ? { ...base, AND: and } : base;
 
@@ -405,6 +418,13 @@ export async function getProductListing(
     products = products.sort((a, b) => a.priceFrom - b.priceFrom);
   } else if (sort === "price-desc") {
     products = products.sort((a, b) => b.priceFrom - a.priceFrom);
+  }
+
+  // Keep sold-out items at the end when they're included.
+  if (includeOutOfStock) {
+    products = products.sort(
+      (a, b) => Number(a.outOfStock) - Number(b.outOfStock),
+    );
   }
 
   const total = products.length;

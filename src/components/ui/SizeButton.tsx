@@ -28,8 +28,8 @@ export default function SizeButton({
           !available
             ? "cursor-not-allowed bg-[#e8e8e8] text-gray-400 select-none"
             : selected
-              ? "border-2 border-[#121212] bg-[#121212] text-white"
-              : "border border-gray-200 bg-white text-[#121212] hover:border-gray-400"
+              ? "cursor-pointer border-2 border-[#121212] bg-[#121212] text-white"
+              : "cursor-pointer border border-gray-200 bg-white text-[#121212] hover:border-gray-400"
         }
       `}
     >

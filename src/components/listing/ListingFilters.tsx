@@ -44,6 +44,7 @@ export default function ListingFilters({
   const colors = parseCsv(searchParams.get("color"));
   const minParam = searchParams.get("min");
   const maxParam = searchParams.get("max");
+  const showOutOfStock = searchParams.get("oos") === "1";
 
   const [minPrice, setMinPrice] = useState(minParam ?? "");
   const [maxPrice, setMaxPrice] = useState(maxParam ?? "");
@@ -61,7 +62,8 @@ export default function ListingFilters({
     activeSizes.length > 0 ||
     colors.length > 0 ||
     minParam != null ||
-    maxParam != null;
+    maxParam != null ||
+    showOutOfStock;
 
   function navigate(updates: Record<string, string | null>) {
     // Any filter change resets pagination.
@@ -99,7 +101,7 @@ export default function ListingFilters({
                   onClick={() =>
                     navigate({ collection: c.slug === "browse-all" ? null : c.slug })
                   }
-                  className={`flex items-center gap-2 text-left text-sm transition-colors ${
+                  className={`flex cursor-pointer items-center gap-2 text-left text-sm transition-colors ${
                     active ? "font-semibold text-[#121212]" : "text-[#666666] hover:text-[#121212]"
                   }`}
                 >
@@ -128,7 +130,7 @@ export default function ListingFilters({
                   onClick={() =>
                     navigate({ gender: active ? null : g.value })
                   }
-                  className={`flex items-center gap-2 text-left text-sm transition-colors ${
+                  className={`flex cursor-pointer items-center gap-2 text-left text-sm transition-colors ${
                     active ? "font-semibold text-[#121212]" : "text-[#666666] hover:text-[#121212]"
                   }`}
                 >
@@ -156,7 +158,7 @@ export default function ListingFilters({
                 onClick={() =>
                   navigate({ category: active ? null : c.value })
                 }
-                className={`flex items-center gap-2 text-left text-sm transition-colors ${
+                className={`flex cursor-pointer items-center gap-2 text-left text-sm transition-colors ${
                   active ? "font-semibold text-[#121212]" : "text-[#666666] hover:text-[#121212]"
                 }`}
               >
@@ -173,30 +175,30 @@ export default function ListingFilters({
       </FilterGroup>
 
       {showBrands && (
-      <FilterGroup title="Brand">
-        <div className="flex flex-col gap-2.5">
-          {brandFacets.map((brand) => {
-            const checked = brands.includes(brand.slug);
-            return (
-              <label
-                key={brand.slug}
-                className="flex cursor-pointer items-center gap-2.5 text-sm text-[#333333]"
-              >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() =>
-                    navigate({ brand: toggleCsv(searchParams.get("brand"), brand.slug) })
-                  }
-                  className="h-4 w-4 shrink-0 accent-[#e85d2a]"
-                />
-                <span className="flex-1">{brand.name}</span>
-                <span className="text-xs text-[#999999]">{brand.count}</span>
-              </label>
-            );
-          })}
-        </div>
-      </FilterGroup>
+        <FilterGroup title="Brand">
+          <div className="flex flex-col gap-2.5">
+            {brandFacets.map((brand) => {
+              const checked = brands.includes(brand.slug);
+              return (
+                <label
+                  key={brand.slug}
+                  className="flex cursor-pointer items-center gap-2.5 text-sm text-[#333333]"
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() =>
+                      navigate({ brand: toggleCsv(searchParams.get("brand"), brand.slug) })
+                    }
+                    className="h-4 w-4 shrink-0 cursor-pointer accent-[#e85d2a]"
+                  />
+                  <span className="flex-1">{brand.name}</span>
+                  <span className="text-xs text-[#999999]">{brand.count}</span>
+                </label>
+              );
+            })}
+          </div>
+        </FilterGroup>
       )}
 
       <FilterGroup title="Size (EU)">
@@ -212,6 +214,30 @@ export default function ListingFilters({
               }
             />
           ))}
+        </div>
+      </FilterGroup>
+
+      <FilterGroup title="Color">
+        <div className="flex flex-wrap gap-3">
+          {COLOR_FILTERS.map((color) => {
+            const active = colors.includes(color.family);
+            return (
+              <button
+                key={color.family}
+                type="button"
+                onClick={() =>
+                  navigate({ color: toggleCsv(searchParams.get("color"), color.family) })
+                }
+                aria-label={color.label}
+                aria-pressed={active}
+                title={color.label}
+                className={`h-7 w-7 cursor-pointer rounded-none border border-black/15 transition-transform hover:scale-110 ${
+                  active ? "ring-2 ring-[#121212] ring-offset-2" : ""
+                }`}
+                style={{ backgroundColor: color.hex }}
+              />
+            );
+          })}
         </div>
       </FilterGroup>
 
@@ -247,35 +273,25 @@ export default function ListingFilters({
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Color">
-        <div className="flex flex-wrap gap-3">
-          {COLOR_FILTERS.map((color) => {
-            const active = colors.includes(color.family);
-            return (
-              <button
-                key={color.family}
-                type="button"
-                onClick={() =>
-                  navigate({ color: toggleCsv(searchParams.get("color"), color.family) })
-                }
-                aria-label={color.label}
-                aria-pressed={active}
-                title={color.label}
-                className={`h-7 w-7 rounded-none border border-black/15 transition-transform hover:scale-110 ${
-                  active ? "ring-2 ring-[#121212] ring-offset-2" : ""
-                }`}
-                style={{ backgroundColor: color.hex }}
-              />
-            );
-          })}
-        </div>
+      <FilterGroup title="Availability">
+        <label className="flex cursor-pointer items-center gap-2.5 text-sm text-[#333333]">
+          <input
+            type="checkbox"
+            checked={showOutOfStock}
+            onChange={() =>
+              navigate({ oos: showOutOfStock ? null : "1" })
+            }
+            className="h-4 w-4 shrink-0 cursor-pointer accent-[#e85d2a]"
+          />
+          <span>Show out of stock</span>
+        </label>
       </FilterGroup>
 
       {hasActiveFilters && (
         <button
           type="button"
           onClick={clearAll}
-          className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#e85d2a] transition-opacity hover:opacity-70"
+          className="mt-2 cursor-pointer text-xs font-semibold uppercase tracking-[0.14em] text-[#e85d2a] transition-opacity hover:opacity-70"
         >
           Clear all filters
         </button>

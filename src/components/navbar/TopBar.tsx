@@ -63,7 +63,14 @@ export default function TopBar() {
               <li>
                 <Link
                   href="/#newsletter"
+                  scroll={false}
                   tabIndex={atTop ? undefined : -1}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    document
+                      .getElementById("newsletter")
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
                   className="inline-flex items-center gap-1.5 font-medium text-white/85 transition-colors hover:text-[#e85d2a]"
                 >
                   <Mail className={iconClassName} strokeWidth={1.75} aria-hidden />

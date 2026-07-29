@@ -363,7 +363,7 @@ const PRODUCTS: SeedProduct[] = [
     gender: "men",
     badge: "limited",
     variants: [
-      { color: "Black", colorHex: "#141414", colorFamily: "black", price: 130, image: 2, stock: { 41: 2, 42: 2, 43: 1, 44: 0 } },
+      { color: "Black", colorHex: "#141414", colorFamily: "black", price: 130, image: 2, stock: { 41: 0, 42: 0, 43: 0, 44: 0 } },
     ],
   },
 

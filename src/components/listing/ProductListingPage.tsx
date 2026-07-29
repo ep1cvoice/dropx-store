@@ -80,6 +80,7 @@ export default async function ProductListingPage({
       colors: parseCsv(first(searchParams.color)),
       priceMin: toInt(first(searchParams.min)),
       priceMax: toInt(first(searchParams.max)),
+      includeOutOfStock: first(searchParams.oos) === "1",
       sort,
       page: toInt(first(searchParams.page)) ?? 1,
     });

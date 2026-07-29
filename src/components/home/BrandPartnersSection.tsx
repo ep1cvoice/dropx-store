@@ -1,29 +1,29 @@
-import { anton, inter } from "@/lib/fonts";
+import { anton, inter } from '@/lib/fonts';
+import { brands as brandLinks } from '@/components/navbar/nav-links';
+import Link from 'next/link';
 
-const brands = ["Nike", "Adidas", "New Balance", "Puma", "Converse"];
+const brands = ['Asics', 'Nike', 'Adidas', 'New Balance', 'Puma', 'Converse'];
 
 export default function BrandPartnersSection() {
-  return (
-    <section className="bg-[#121212] px-4 py-10 md:py-14">
-      <div className="mx-auto max-w-[1600px]">
-        <p
-          className={`${inter.className} mb-8 text-center text-[10px] font-medium uppercase tracking-[0.28em] text-white/40 md:mb-10 md:text-[11px] md:tracking-[0.32em]`}
-        >
-          Official Brand Partners
-        </p>
+	return (
+		<section className='bg-[#121212] px-4 py-10 md:py-14'>
+			<div className='mx-auto max-w-[1600px]'>
+				<p
+					className={`${inter.className} mb-8 text-center text-[10px] font-medium uppercase tracking-[0.28em] text-white/40 md:mb-10 md:text-[11px] md:tracking-[0.32em]`}>
+					Official Brand Partners
+				</p>
 
-        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 md:gap-x-16 lg:gap-x-20 xl:gap-x-24">
-          {brands.map((brand) => (
-            <span
-              key={brand}
-              className={`${anton.className} cursor-pointer text-[28px] uppercase tracking-[0.06em] text-white transition-colors duration-200 hover:text-gray-400 md:text-[36px] lg:text-[42px]`}
-            >
-              {brand}
-            </span>
-          ))}
-        </div>
-
-      </div>
-    </section>
-  );
+				<div className='flex flex-wrap items-center justify-center gap-x-10 gap-y-4 md:gap-x-16 lg:gap-x-20 xl:gap-x-24'>
+					{brands.map((brand) => (
+						<Link href={brandLinks.find((link) => link.label === brand)?.href || ''} key={brand}>
+							<span
+								className={`${anton.className} cursor-pointer text-[28px] uppercase tracking-[0.06em] text-white transition-colors duration-200 hover:text-gray-400 md:text-[36px] lg:text-[42px]`}>
+								{brand}
+							</span>
+						</Link>
+					))}
+				</div>
+			</div>
+		</section>
+	);
 }

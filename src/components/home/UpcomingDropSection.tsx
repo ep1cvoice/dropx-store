@@ -1,8 +1,10 @@
-'use client';
+"use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { anton, inter } from "@/lib/fonts";
 import Button from "@/components/ui/Button";
+import { BellIcon } from "lucide-react";
 
 const countdownItems = [
   { value: "10", label: "Days" },
@@ -15,7 +17,6 @@ export default function UpcomingDropSection() {
   return (
     <section className="bg-[#f5f5f0] px-4 py-10 md:px-6 md:py-14 lg:px-10 lg:py-16 xl:px-14">
       <div className="mx-auto flex max-w-[1600px] flex-col items-center gap-8 md:flex-row md:gap-10 lg:gap-16">
-
         {/* Left — text content */}
         <div className="w-full text-center md:flex-1 md:text-left">
           <p
@@ -58,12 +59,25 @@ export default function UpcomingDropSection() {
             ))}
           </div>
 
-          <Button
-            variant="accent"
-            className="mx-auto mt-6 cursor-pointer rounded-none px-8 py-3 text-sm font-semibold uppercase tracking-[0.14em] md:mx-0 md:mt-7 md:px-10 md:py-3.5"
+          <Link
+            href="/#newsletter"
+            scroll={false}
+            onClick={(event) => {
+              event.preventDefault();
+              document
+                .getElementById("newsletter")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            className="mx-auto mt-6 inline-block md:mx-0 md:mt-7"
           >
-            Notify Me
-          </Button>
+            <Button
+              variant="accent"
+              className="cursor-pointer rounded-none px-8 py-3 text-sm font-semibold uppercase tracking-[0.14em] md:px-10 md:py-3.5"
+            >
+              Notify Me
+              <BellIcon className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
         </div>
 
         {/* Right — sneaker image */}
@@ -81,7 +95,6 @@ export default function UpcomingDropSection() {
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );

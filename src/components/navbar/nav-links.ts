@@ -17,6 +17,15 @@ export const navLinks: NavLink[] = [
   { href: "/about", label: "About" },
 ];
 
+export const brands = [
+  { href: "/browse-all?brand=asics", label: "Asics" },
+  { href: "/browse-all?brand=nike", label: "Nike" },
+  { href: "/browse-all?brand=adidas", label: "Adidas" },
+  { href: "/browse-all?brand=new-balance", label: "New Balance" },
+  { href: "/browse-all?brand=puma", label: "Puma" },
+  { href: "/browse-all?brand=converse", label: "Converse" },
+];
+
 export const navLinkTextClassName =
   "text-lg md:text-[16px] lg:text-[18px]";
 

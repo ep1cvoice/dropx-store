@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { anton, inter } from "@/lib/fonts";
-
+import { ArrowRightIcon } from "lucide-react";
 export default function HottestDropsPromoSection() {
   return (
     <section className="bg-[#f1f1f1] pb-10">
@@ -20,6 +20,7 @@ export default function HottestDropsPromoSection() {
             className={`${inter.className} mt-8 inline-flex items-center justify-center rounded-none bg-[#e85d2a] px-8 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#f06d3a] active:bg-[#d45220]`}
           >
             Shop new drops
+            <ArrowRightIcon className="ml-2 h-4 w-4" />
           </Link>
         </div>
 
