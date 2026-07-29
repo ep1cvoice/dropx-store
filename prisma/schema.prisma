@@ -263,6 +263,8 @@ model Order {
   currency String @default("EUR")
   subtotal Float
   shipping Float
+  discount Float  @default(0)
+  promoCode String? @map("promo_code")
   total    Float
 
   // Contact + shipping snapshot at checkout
@@ -311,4 +313,18 @@ model OrderItem {
 
   @@index([orderId])
   @@map("order_items")
+}
+
+// ---------------------------------------------------------------------------
+// Newsletter
+// Guests can subscribe; unique email. MEMBER10 unlocks when a user signs in
+// with a subscribed email.
+// ---------------------------------------------------------------------------
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("newsletter_subscribers")
 }

@@ -8,6 +8,8 @@ type CheckoutSummaryProps = {
   items: CartItem[];
   subtotal: number;
   shipping: number;
+  discount?: number;
+  promoCode?: string | null;
   total: number;
   currency: string;
 };
@@ -16,6 +18,8 @@ export default function CheckoutSummary({
   items,
   subtotal,
   shipping,
+  discount = 0,
+  promoCode = null,
   total,
   currency,
 }: CheckoutSummaryProps) {
@@ -71,6 +75,14 @@ export default function CheckoutSummary({
             {formatPrice(subtotal, currency)}
           </dd>
         </div>
+        {discount > 0 && (
+          <div className="flex items-center justify-between">
+            <dt className="text-[#1f9d55]">Discount ({promoCode})</dt>
+            <dd className="font-semibold text-[#1f9d55]">
+              −{formatPrice(discount, currency)}
+            </dd>
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <dt className="text-[#666666]">Shipping</dt>
           <dd

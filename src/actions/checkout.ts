@@ -9,6 +9,10 @@ import {
   getCheckoutDraft,
 } from "@/lib/checkout-draft";
 import { shippingFor } from "@/lib/currency";
+import {
+  clearAppliedPromoCode,
+  resolveCartPromo,
+} from "@/lib/newsletter";
 import { prisma } from "@/lib/prisma";
 import type { PaymentMethod } from "@/generated/prisma/client";
 
@@ -94,7 +98,8 @@ export async function placeMockOrder(method: MockPaymentMethod) {
     0,
   );
   const shipping = shippingFor(subtotal);
-  const total = subtotal + shipping;
+  const { promoCode, discount } = await resolveCartPromo(subtotal);
+  const total = Math.max(0, subtotal - discount) + shipping;
 
   let orderNumber = generateOrderNumber();
   const existing = await prisma.order.findUnique({
@@ -112,6 +117,8 @@ export async function placeMockOrder(method: MockPaymentMethod) {
         currency,
         subtotal,
         shipping,
+        discount,
+        promoCode,
         total,
         email: draft.email,
         phone: draft.phone || null,
@@ -149,6 +156,7 @@ export async function placeMockOrder(method: MockPaymentMethod) {
   });
 
   await clearCheckoutDraft();
+  await clearAppliedPromoCode();
 
   revalidatePath("/", "layout");
   revalidatePath("/cart");

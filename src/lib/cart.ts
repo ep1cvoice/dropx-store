@@ -1,6 +1,7 @@
-import { auth } from "@/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { shippingFor } from "@/lib/currency";
+import { getCurrentUserId } from "@/lib/current-user";
+import { resolveCartPromo } from "@/lib/newsletter";
 import type { CartItem } from "@/types/cart";
 
 export type CartData = {
@@ -8,6 +9,8 @@ export type CartData = {
   itemCount: number;
   subtotal: number;
   shipping: number;
+  discount: number;
+  promoCode: string | null;
   total: number;
   currency: string;
 };
@@ -17,26 +20,13 @@ const EMPTY_CART: CartData = {
   itemCount: 0,
   subtotal: 0,
   shipping: 0,
+  discount: 0,
+  promoCode: null,
   total: 0,
   currency: "EUR",
 };
 
-/**
- * Resolve the current user's id from the session. The credentials session only
- * carries email, so we look up the id by email (email is unique).
- */
-export async function getCurrentUserId(): Promise<string | null> {
-  const session = await auth();
-  const email = session?.user?.email;
-  if (!email) return null;
-
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: { id: true },
-  });
-
-  return user?.id ?? null;
-}
+export { getCurrentUserId };
 
 const cartItemSelect = {
   id: true,
@@ -124,13 +114,16 @@ export async function getCart(): Promise<CartData> {
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
   const shipping = shippingFor(subtotal);
   const currency = items[0]?.currency ?? "EUR";
+  const { promoCode, discount } = await resolveCartPromo(subtotal);
 
   return {
     items,
     itemCount,
     subtotal,
     shipping,
-    total: subtotal + shipping,
+    discount,
+    promoCode,
+    total: Math.max(0, subtotal - discount) + shipping,
     currency,
   };
 }

@@ -73,6 +73,8 @@ export default async function CartPage() {
               <CartSummary
                 subtotal={cart.subtotal}
                 shipping={cart.shipping}
+                discount={cart.discount}
+                promoCode={cart.promoCode}
                 total={cart.total}
                 currency={cart.currency}
               />

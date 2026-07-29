@@ -35,6 +35,8 @@ export default async function CheckoutConfirmationPage({
     itemCount: 0,
     subtotal: 0,
     shipping: 0,
+    discount: 0,
+    promoCode: null as string | null,
     total: 0,
     currency: "EUR",
   };

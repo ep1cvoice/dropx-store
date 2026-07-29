@@ -1,9 +1,13 @@
 import Badge from "@/components/ui/Badge";
-import Button from "@/components/ui/Button";
+import NewsletterSubscribeForm from "@/components/home/NewsletterSubscribeForm";
 import ScrollToNewsletterHash from "@/components/home/ScrollToNewsletterHash";
+import { auth } from "@/auth/auth";
 import { anton, inter } from "@/lib/fonts";
 
-export default function DropListSection() {
+export default async function DropListSection() {
+  const session = await auth();
+  const defaultEmail = session?.user?.email?.trim() ?? "";
+
   return (
     <section
       id="newsletter"
@@ -40,28 +44,7 @@ export default function DropListSection() {
           <span>discount with a minimum purchase of €400 via coupon code.</span>
         </p>
 
-        <form className="mt-8 w-full max-w-xl sm:mt-10" action="#" noValidate>
-          <div className="flex flex-col gap-4 sm:flex-row md:gap-0">
-            <label htmlFor="drop-list-email" className="sr-only">
-              Email address
-            </label>
-            <input
-              id="drop-list-email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="Enter your email"
-              className={`${inter.className} w-full flex-1 rounded-none border border-transparent bg-[#222222] px-4 py-3.5 text-sm text-white outline-none placeholder:text-white/40 focus:border-white/20 sm:py-4 sm:text-base`}
-            />
-            <Button
-              type="submit"
-              variant="accent"
-              className="w-full shrink-0 cursor-pointer rounded-none px-8 py-3.5 text-sm uppercase tracking-wide sm:w-auto sm:py-4"
-            >
-              Subscribe
-            </Button>
-          </div>
-        </form>
+        <NewsletterSubscribeForm defaultEmail={defaultEmail} />
       </div>
     </section>
   );

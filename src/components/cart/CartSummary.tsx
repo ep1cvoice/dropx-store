@@ -1,16 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Lock } from "lucide-react";
 
+import { applyPromoCode, clearPromoCode } from "@/actions/promo";
 import Button from "@/components/ui/Button";
 import { formatPrice } from "@/lib/currency";
 import { inter } from "@/lib/fonts";
+import {
+  MEMBER_PROMO_CODE,
+  MEMBER_PROMO_MIN_SUBTOTAL,
+} from "@/lib/promo";
 
 type CartSummaryProps = {
   subtotal: number;
   shipping: number;
+  discount: number;
+  promoCode: string | null;
   total: number;
   currency: string;
 };
@@ -18,16 +25,45 @@ type CartSummaryProps = {
 export default function CartSummary({
   subtotal,
   shipping,
+  discount,
+  promoCode,
   total,
   currency,
 }: CartSummaryProps) {
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(promoCode ?? "");
   const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
 
-  function applyPromo() {
-    if (!code.trim()) return;
-    // Promo engine isn't wired up yet — give honest feedback for now.
-    setMessage("That code isn't valid.");
+  useEffect(() => {
+    setCode(promoCode ?? "");
+  }, [promoCode]);
+
+  const remainingForPromo = Math.max(0, MEMBER_PROMO_MIN_SUBTOTAL - subtotal);
+  const promoActive = Boolean(promoCode) && discount > 0;
+  const promoSavedUnderThreshold = Boolean(promoCode) && discount === 0;
+
+  function handleApply() {
+    setMessage(null);
+    setError(null);
+    startTransition(async () => {
+      const result = await applyPromoCode(code);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setCode(result.code);
+      setMessage(result.message);
+    });
+  }
+
+  function handleClear() {
+    setMessage(null);
+    setError(null);
+    startTransition(async () => {
+      await clearPromoCode();
+      setCode("");
+    });
   }
 
   return (
@@ -45,6 +81,14 @@ export default function CartSummary({
             {formatPrice(subtotal, currency)}
           </dd>
         </div>
+        {discount > 0 && (
+          <div className="flex items-center justify-between">
+            <dt className="text-[#1f9d55]">Discount ({promoCode})</dt>
+            <dd className="font-semibold text-[#1f9d55]">
+              −{formatPrice(discount, currency)}
+            </dd>
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <dt className="text-[#666666]">Shipping</dt>
           <dd
@@ -80,22 +124,62 @@ export default function CartSummary({
             onChange={(e) => {
               setCode(e.target.value);
               if (message) setMessage(null);
+              if (error) setError(null);
             }}
             placeholder="Promo code"
             aria-label="Promo code"
-            className={`${inter.className} min-w-0 flex-1 rounded-none border border-black/15 bg-white px-3 py-2.5 text-sm text-[#121212] placeholder:text-[#999999] focus:border-[#121212] focus:outline-none`}
+            disabled={pending || Boolean(promoCode)}
+            className={`${inter.className} min-w-0 flex-1 rounded-none border border-black/15 bg-white px-3 py-2.5 text-sm text-[#121212] placeholder:text-[#999999] focus:border-[#121212] focus:outline-none disabled:bg-[#ececec]`}
           />
-          <Button
-            type="button"
-            onClick={applyPromo}
-            className="shrink-0 rounded-none cursor-pointer"
-          >
-            Apply
-          </Button>
+          {promoCode ? (
+            <Button
+              type="button"
+              onClick={handleClear}
+              disabled={pending}
+              className="shrink-0 cursor-pointer rounded-none"
+            >
+              Remove
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              onClick={handleApply}
+              disabled={pending}
+              className="shrink-0 cursor-pointer rounded-none"
+            >
+              Apply
+            </Button>
+          )}
         </div>
-        {message && (
-          <p className={`${inter.className} mt-2 text-xs text-[#e85d2a]`}>
-            {message}
+        {(message || error) && (
+          <p
+            className={`${inter.className} mt-2 text-xs ${
+              error ? "text-[#e11d48]" : "text-[#1f9d55]"
+            }`}
+          >
+            {error ?? message}
+          </p>
+        )}
+        {!promoActive && (
+          <p className={`${inter.className} mt-2 text-xs leading-relaxed text-[#888888]`}>
+            {promoSavedUnderThreshold ? (
+              <>
+                {MEMBER_PROMO_CODE} is saved. Add{" "}
+                {formatPrice(remainingForPromo, currency)} more to unlock 10%
+                off.
+              </>
+            ) : remainingForPromo > 0 ? (
+              <>
+                Newsletter members: use {MEMBER_PROMO_CODE} for 10% off when your
+                cart reaches €{MEMBER_PROMO_MIN_SUBTOTAL} (need{" "}
+                {formatPrice(remainingForPromo, currency)} more).
+              </>
+            ) : (
+              <>
+                Cart is over €{MEMBER_PROMO_MIN_SUBTOTAL} — apply {MEMBER_PROMO_CODE}{" "}
+                for 10% off if you&apos;re on the drop list.
+              </>
+            )}
           </p>
         )}
       </div>
@@ -103,7 +187,7 @@ export default function CartSummary({
       <Link href="/checkout" className="mt-4 block">
         <Button
           variant="accent"
-          className="h-12 w-full rounded-none cursor-pointer text-sm font-semibold uppercase tracking-[0.12em]"
+          className="h-12 w-full cursor-pointer rounded-none text-sm font-semibold uppercase tracking-[0.12em]"
         >
           Proceed to checkout
         </Button>

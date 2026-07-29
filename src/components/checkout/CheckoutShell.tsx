@@ -45,6 +45,8 @@ export default function CheckoutShell({
               items={cart.items}
               subtotal={cart.subtotal}
               shipping={cart.shipping}
+              discount={cart.discount}
+              promoCode={cart.promoCode}
               total={cart.total}
               currency={cart.currency}
             />

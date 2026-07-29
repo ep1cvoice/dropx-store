@@ -27,7 +27,7 @@ const benefits: Benefit[] = [
           discountValue={10}
           className="mx-0.5 align-middle"
         />{" "}
-        discount with a minimum purchase of €400.
+        with code MEMBER10 on orders over €400 after you join the drop list.
       </>
     ),
     icon: <Mail className="size-6" strokeWidth={1.5} aria-hidden />,
