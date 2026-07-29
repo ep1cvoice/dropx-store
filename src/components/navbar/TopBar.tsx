@@ -66,6 +66,9 @@ export default function TopBar() {
                   scroll={false}
                   tabIndex={atTop ? undefined : -1}
                   onClick={(event) => {
+                    // Only intercept on the home page where #newsletter exists.
+                    // Elsewhere, navigate to /#newsletter normally.
+                    if (window.location.pathname !== "/") return;
                     event.preventDefault();
                     document
                       .getElementById("newsletter")

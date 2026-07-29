@@ -18,7 +18,7 @@ export default async function OrdersPanel() {
 
   if (orders.length === 0) {
     return (
-      <div className="flex flex-col items-start gap-4 rounded-none border border-dashed border-black/15 px-6 py-12">
+      <div className="flex flex-col items-center gap-4 rounded-none border border-dashed border-black/15 px-6 py-12 text-center">
         <p className={`${inter.className} text-sm text-[#666666]`}>
           You haven&apos;t placed any orders yet.
         </p>

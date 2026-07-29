@@ -4,6 +4,7 @@ import {
   MapPin,
   Settings,
   ShoppingBag,
+  TicketPercent,
   type LucideIcon,
 } from "lucide-react";
 
@@ -16,6 +17,7 @@ export type AccountNavItem = {
 export const ACCOUNT_NAV: AccountNavItem[] = [
   { href: "/account/orders", label: "My Orders", icon: ShoppingBag },
   { href: "/account/wishlist", label: "Wishlist", icon: Heart },
+  { href: "/account/discount-codes", label: "Discount Codes", icon: TicketPercent },
   { href: "/account/addresses", label: "Addresses", icon: MapPin },
   {
     href: "/account/payment-methods",

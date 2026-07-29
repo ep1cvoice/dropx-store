@@ -3,7 +3,7 @@ import { Mail, MessagesSquare, Phone } from "lucide-react";
 import { inter } from "@/lib/fonts";
 
 const CONTACT_PHONE = "+48 500 284 119";
-const CONTACT_EMAIL = "SHOP@DROPX.STORE";
+const CONTACT_EMAIL = "hello@dropx.store";
 
 function InstagramCircleIcon() {
   return (

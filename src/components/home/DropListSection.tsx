@@ -1,5 +1,6 @@
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import ScrollToNewsletterHash from "@/components/home/ScrollToNewsletterHash";
 import { anton, inter } from "@/lib/fonts";
 
 export default function DropListSection() {
@@ -8,6 +9,7 @@ export default function DropListSection() {
       id="newsletter"
       className="scroll-mt-28 bg-[#121212] px-6 py-16 md:scroll-mt-32 md:py-24 lg:py-28"
     >
+      <ScrollToNewsletterHash />
       <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
         <p
           className={`${inter.className} text-xs font-medium uppercase tracking-[0.25em] text-[#e85d2a] md:text-sm`}
