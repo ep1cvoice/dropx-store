@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { GoogleIcon } from '@/components/footer/social-icons';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { anton, inter } from '@/lib/fonts';
@@ -121,7 +120,13 @@ export default function RegisterForm({
               className='mt-0.5 size-4 shrink-0 rounded-none border-gray-300 accent-gray-900'
               {...register('terms')}
             />
-            I agree to the Terms of Service and Privacy Policy
+            I agree to the{" "}
+            <Link
+              href="/privacy"
+              className="font-medium text-[#e85d2a] underline underline-offset-2"
+            >
+              Terms of Service and Privacy Policy
+            </Link>
           </label>
           {errors.terms && (
             <p role='alert' className={`${inter.className} mt-1.5 text-xs text-red-500`}>
@@ -154,15 +159,6 @@ export default function RegisterForm({
           <span className={`${inter.className} bg-white px-3 text-xs uppercase tracking-wider text-gray-400`}>Or</span>
         </div>
       </div>
-
-      <Button
-        type='button'
-        variant='outline'
-        className='w-full cursor-pointer gap-2 py-3 font-medium text-gray-900 hover:text-gray-900'
-      >
-        <GoogleIcon />
-        Sign up with Google
-      </Button>
 
       <p
         className={`${inter.className} pt-6 text-center text-sm text-gray-500 md:pt-0 ${compact ? 'lg:pt-4' : 'mt-auto md:mt-10'}`}

@@ -1,9 +1,34 @@
+import Link from "next/link";
+
 import { anton, inter } from "@/lib/fonts";
 import {
   footerColumns,
   footerCopyright,
   footerDescription,
+  type FooterLink,
 } from "./footer-links";
+
+function FooterNavLink({ link }: { link: FooterLink }) {
+  const className = `${inter.className} text-sm text-white/80 transition-colors hover:text-white lg:text-[15px] lg:text-white/90`;
+
+  if (!link.href) {
+    return <span className={className}>{link.label}</span>;
+  }
+
+  if (link.href.startsWith("mailto:")) {
+    return (
+      <a href={link.href} className={className}>
+        {link.label}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={link.href} className={className}>
+      {link.label}
+    </Link>
+  );
+}
 
 export default function Footer() {
   return (
@@ -34,11 +59,7 @@ export default function Footer() {
                 <ul className="mt-4 space-y-2.5">
                   {column.links.map((link) => (
                     <li key={link.label}>
-                      <span
-                        className={`${inter.className} text-sm text-white/80`}
-                      >
-                        {link.label}
-                      </span>
+                      <FooterNavLink link={link} />
                     </li>
                   ))}
                 </ul>
@@ -58,11 +79,7 @@ export default function Footer() {
                 <ul className="mt-3 space-y-2">
                   {column.links.map((link) => (
                     <li key={link.label}>
-                      <span
-                        className={`${inter.className} text-sm text-white/80`}
-                      >
-                        {link.label}
-                      </span>
+                      <FooterNavLink link={link} />
                     </li>
                   ))}
                 </ul>
@@ -97,11 +114,7 @@ export default function Footer() {
                 <ul className="mt-5 space-y-3">
                   {column.links.map((link) => (
                     <li key={link.label}>
-                      <span
-                        className={`${inter.className} text-[15px] text-white/90`}
-                      >
-                        {link.label}
-                      </span>
+                      <FooterNavLink link={link} />
                     </li>
                   ))}
                 </ul>
@@ -118,7 +131,12 @@ export default function Footer() {
             >
               {footerCopyright}
             </span>
-            <div className="flex items-center gap-5" />
+            <Link
+              href="/privacy"
+              className={`${inter.className} text-xs text-white/40 transition-colors hover:text-white md:text-sm`}
+            >
+              Privacy Policy
+            </Link>
           </div>
         </div>
       </div>

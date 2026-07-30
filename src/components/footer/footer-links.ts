@@ -1,5 +1,6 @@
 export type FooterLink = {
   label: string;
+  href?: string;
 };
 
 export type FooterColumn = {
@@ -11,9 +12,9 @@ export const footerColumns: FooterColumn[] = [
   {
     title: "Shop",
     links: [
-      { label: "New Drops" },
-      { label: "Brands" },
-      { label: "Sale" },
+      { label: "New Drops", href: "/browse-all?collection=new-drops" },
+      { label: "Brands", href: "/browse-all" },
+      { label: "Sale", href: "/browse-all?collection=sale" },
       { label: "Gift Cards" },
     ],
   },
@@ -23,16 +24,16 @@ export const footerColumns: FooterColumn[] = [
       { label: "FAQ" },
       { label: "Shipping" },
       { label: "Returns" },
-      { label: "Contact Us" },
+      { label: "Contact Us", href: "mailto:hello@dropx.store" },
     ],
   },
   {
     title: "Company",
     links: [
-      { label: "About" },
+      { label: "About", href: "/about" },
       { label: "Careers" },
       { label: "Press" },
-      { label: "Privacy Policy" },
+      { label: "Privacy Policy", href: "/privacy" },
     ],
   },
 ];

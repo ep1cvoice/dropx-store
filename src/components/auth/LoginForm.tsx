@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { GoogleIcon } from '@/components/footer/social-icons';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { anton, inter } from '@/lib/fonts';
@@ -144,15 +143,6 @@ export default function LoginForm({
           <span className={`${inter.className} bg-white px-3 text-xs uppercase tracking-wider text-gray-400`}>Or</span>
         </div>
       </div>
-
-      <Button
-        type='button'
-        variant='outline'
-        className='w-full gap-2 py-3 font-medium text-gray-900 hover:text-gray-900 cursor-pointer'
-      >
-        <GoogleIcon />
-        Sign in with Google
-      </Button>
 
       <p
         className={`${inter.className} pt-6 text-center text-sm text-gray-500 md:pt-0 ${compact ? 'lg:pt-4' : 'mt-auto md:mt-10'}`}
