@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
+
+import About from "./About";
+
+export const metadata: Metadata = {
+  title: "About — DROPX",
+  description:
+    "DROPX is a drop-focused sneaker storefront — limited releases, curated brands, and member perks.",
+};
+
 export default function AboutPage() {
-  return (
-    <section className="flex min-h-[70vh] items-center justify-center bg-[#07090c]">
-      <p className="text-2xl font-semibold uppercase tracking-widest text-white/20">
-        About — Coming Soon
-      </p>
-    </section>
-  );
+  return <About />;
 }

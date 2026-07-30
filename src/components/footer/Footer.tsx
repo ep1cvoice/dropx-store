@@ -131,12 +131,20 @@ export default function Footer() {
             >
               {footerCopyright}
             </span>
-            <Link
-              href="/privacy"
-              className={`${inter.className} text-xs text-white/40 transition-colors hover:text-white md:text-sm`}
-            >
-              Privacy Policy
-            </Link>
+            <div className="flex items-center gap-5">
+              <Link
+                href="/about"
+                className={`${inter.className} text-xs text-white/40 transition-colors hover:text-white md:text-sm`}
+              >
+                About
+              </Link>
+              <Link
+                href="/privacy"
+                className={`${inter.className} text-xs text-white/40 transition-colors hover:text-white md:text-sm`}
+              >
+                Privacy Policy
+              </Link>
+            </div>
           </div>
         </div>
       </div>
