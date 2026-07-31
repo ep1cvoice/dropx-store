@@ -302,7 +302,7 @@ export async function getAllBrandSlugs(): Promise<string[]> {
 // Listing page — collections, filters, facets
 // ---------------------------------------------------------------------------
 
-const DEFAULT_PAGE_SIZE = 9;
+const DEFAULT_PAGE_SIZE = 10;
 
 function collectionWhere(collection: CollectionSlug): Prisma.ProductWhereInput {
   switch (collection) {

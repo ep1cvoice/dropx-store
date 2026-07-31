@@ -48,6 +48,7 @@ export default function ListingFilters({
 
   const [minPrice, setMinPrice] = useState(minParam ?? "");
   const [maxPrice, setMaxPrice] = useState(maxParam ?? "");
+  const [open, setOpen] = useState(false);
 
   // Keep local price inputs in sync when the URL changes (e.g. Clear All).
   useEffect(() => {
@@ -55,15 +56,18 @@ export default function ListingFilters({
     setMaxPrice(maxParam ?? "");
   }, [minParam, maxParam]);
 
-  const hasActiveFilters =
-    (showGender && gender != null) ||
-    category != null ||
-    brands.length > 0 ||
-    activeSizes.length > 0 ||
-    colors.length > 0 ||
-    minParam != null ||
-    maxParam != null ||
-    showOutOfStock;
+  const activeFilterCount =
+    (showGender && gender != null ? 1 : 0) +
+    (category != null ? 1 : 0) +
+    brands.length +
+    activeSizes.length +
+    colors.length +
+    (minParam != null ? 1 : 0) +
+    (maxParam != null ? 1 : 0) +
+    (showOutOfStock ? 1 : 0) +
+    (showCollections && collection !== "browse-all" ? 1 : 0);
+
+  const hasActiveFilters = activeFilterCount > 0;
 
   function navigate(updates: Record<string, string | null>) {
     // Any filter change resets pagination.
@@ -88,26 +92,115 @@ export default function ListingFilters({
   }
 
   return (
-    <aside className={`${inter.className} w-full`}>
-      {showCollections && (
-        <FilterGroup title="Collection">
+    <div className={`${inter.className} w-full`}>
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        className="flex w-full cursor-pointer items-center justify-between border border-gray-200 bg-white px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.14em] text-[#121212] transition-colors hover:border-gray-400 min-[1200px]:hidden"
+      >
+        <span className="flex items-center gap-2">
+          Filters
+          {activeFilterCount > 0 && (
+            <span className="text-[#e85d2a]">({activeFilterCount})</span>
+          )}
+        </span>
+        <span aria-hidden="true" className="text-base font-normal leading-none">
+          {open ? "−" : "+"}
+        </span>
+      </button>
+
+      <aside
+        className={`${open ? "mt-4 block" : "hidden"} min-[1200px]:mt-0 min-[1200px]:block`}
+      >
+        {showCollections && (
+          <FilterGroup title="Collection">
+            <div className="flex flex-col gap-2">
+              {COLLECTIONS.map((c) => {
+                const active = collection === c.slug;
+                return (
+                  <button
+                    key={c.slug}
+                    type="button"
+                    onClick={() =>
+                      navigate({
+                        collection: c.slug === "browse-all" ? null : c.slug,
+                      })
+                    }
+                    className={`flex cursor-pointer items-center gap-2 text-left text-sm transition-colors ${
+                      active
+                        ? "font-semibold text-[#121212]"
+                        : "text-[#666666] hover:text-[#121212]"
+                    }`}
+                  >
+                    <span
+                      className={`h-3 w-3 rounded-none border ${
+                        active
+                          ? "border-[#e85d2a] bg-[#e85d2a]"
+                          : "border-gray-300"
+                      }`}
+                    />
+                    {c.label}
+                  </button>
+                );
+              })}
+            </div>
+          </FilterGroup>
+        )}
+
+        {showGender && (
+          <FilterGroup title="Gender">
+            <div className="flex flex-col gap-2">
+              {GENDER_FILTERS.map((g) => {
+                const active = gender === g.value;
+                return (
+                  <button
+                    key={g.value}
+                    type="button"
+                    onClick={() => navigate({ gender: active ? null : g.value })}
+                    className={`flex cursor-pointer items-center gap-2 text-left text-sm transition-colors ${
+                      active
+                        ? "font-semibold text-[#121212]"
+                        : "text-[#666666] hover:text-[#121212]"
+                    }`}
+                  >
+                    <span
+                      className={`h-3 w-3 rounded-none border ${
+                        active
+                          ? "border-[#e85d2a] bg-[#e85d2a]"
+                          : "border-gray-300"
+                      }`}
+                    />
+                    {g.label}
+                  </button>
+                );
+              })}
+            </div>
+          </FilterGroup>
+        )}
+
+        <FilterGroup title="Category">
           <div className="flex flex-col gap-2">
-            {COLLECTIONS.map((c) => {
-              const active = collection === c.slug;
+            {CATEGORY_FILTERS.map((c) => {
+              const active = category === c.value;
               return (
                 <button
-                  key={c.slug}
+                  key={c.value}
                   type="button"
                   onClick={() =>
-                    navigate({ collection: c.slug === "browse-all" ? null : c.slug })
+                    navigate({ category: active ? null : c.value })
                   }
                   className={`flex cursor-pointer items-center gap-2 text-left text-sm transition-colors ${
-                    active ? "font-semibold text-[#121212]" : "text-[#666666] hover:text-[#121212]"
+                    active
+                      ? "font-semibold text-[#121212]"
+                      : "text-[#666666] hover:text-[#121212]"
                   }`}
                 >
                   <span
                     className={`h-3 w-3 rounded-none border ${
-                      active ? "border-[#e85d2a] bg-[#e85d2a]" : "border-gray-300"
+                      active
+                        ? "border-[#e85d2a] bg-[#e85d2a]"
+                        : "border-gray-300"
                     }`}
                   />
                   {c.label}
@@ -116,187 +209,133 @@ export default function ListingFilters({
             })}
           </div>
         </FilterGroup>
-      )}
 
-      {showGender && (
-        <FilterGroup title="Gender">
-          <div className="flex flex-col gap-2">
-            {GENDER_FILTERS.map((g) => {
-              const active = gender === g.value;
+        {showBrands && (
+          <FilterGroup title="Brand">
+            <div className="flex flex-col gap-2.5">
+              {brandFacets.map((brand) => {
+                const checked = brands.includes(brand.slug);
+                return (
+                  <label
+                    key={brand.slug}
+                    className="flex cursor-pointer items-center gap-2.5 text-sm text-[#333333]"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() =>
+                        navigate({
+                          brand: toggleCsv(searchParams.get("brand"), brand.slug),
+                        })
+                      }
+                      className="h-4 w-4 shrink-0 cursor-pointer accent-[#e85d2a]"
+                    />
+                    <span className="flex-1">{brand.name}</span>
+                    <span className="text-xs text-[#999999]">{brand.count}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </FilterGroup>
+        )}
+
+        <FilterGroup title="Size (EU)">
+          <div className="flex flex-wrap gap-2">
+            {SIZE_FILTERS.map((size) => (
+              <SizeButton
+                key={size}
+                size={size}
+                available
+                selected={activeSizes.includes(size)}
+                onClick={() =>
+                  navigate({ size: toggleCsv(searchParams.get("size"), size) })
+                }
+              />
+            ))}
+          </div>
+        </FilterGroup>
+
+        <FilterGroup title="Color">
+          <div className="flex flex-wrap gap-3">
+            {COLOR_FILTERS.map((color) => {
+              const active = colors.includes(color.family);
               return (
                 <button
-                  key={g.value}
+                  key={color.family}
                   type="button"
                   onClick={() =>
-                    navigate({ gender: active ? null : g.value })
+                    navigate({
+                      color: toggleCsv(searchParams.get("color"), color.family),
+                    })
                   }
-                  className={`flex cursor-pointer items-center gap-2 text-left text-sm transition-colors ${
-                    active ? "font-semibold text-[#121212]" : "text-[#666666] hover:text-[#121212]"
+                  aria-label={color.label}
+                  aria-pressed={active}
+                  title={color.label}
+                  className={`h-7 w-7 cursor-pointer rounded-none border border-black/15 transition-transform hover:scale-110 ${
+                    active ? "ring-2 ring-[#121212] ring-offset-2" : ""
                   }`}
-                >
-                  <span
-                    className={`h-3 w-3 rounded-none border ${
-                      active ? "border-[#e85d2a] bg-[#e85d2a]" : "border-gray-300"
-                    }`}
-                  />
-                  {g.label}
-                </button>
-              );
-            })}
-          </div>
-        </FilterGroup>
-      )}
-
-      <FilterGroup title="Category">
-        <div className="flex flex-col gap-2">
-          {CATEGORY_FILTERS.map((c) => {
-            const active = category === c.value;
-            return (
-              <button
-                key={c.value}
-                type="button"
-                onClick={() =>
-                  navigate({ category: active ? null : c.value })
-                }
-                className={`flex cursor-pointer items-center gap-2 text-left text-sm transition-colors ${
-                  active ? "font-semibold text-[#121212]" : "text-[#666666] hover:text-[#121212]"
-                }`}
-              >
-                <span
-                  className={`h-3 w-3 rounded-none border ${
-                    active ? "border-[#e85d2a] bg-[#e85d2a]" : "border-gray-300"
-                  }`}
+                  style={{ backgroundColor: color.hex }}
                 />
-                {c.label}
-              </button>
-            );
-          })}
-        </div>
-      </FilterGroup>
-
-      {showBrands && (
-        <FilterGroup title="Brand">
-          <div className="flex flex-col gap-2.5">
-            {brandFacets.map((brand) => {
-              const checked = brands.includes(brand.slug);
-              return (
-                <label
-                  key={brand.slug}
-                  className="flex cursor-pointer items-center gap-2.5 text-sm text-[#333333]"
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() =>
-                      navigate({ brand: toggleCsv(searchParams.get("brand"), brand.slug) })
-                    }
-                    className="h-4 w-4 shrink-0 cursor-pointer accent-[#e85d2a]"
-                  />
-                  <span className="flex-1">{brand.name}</span>
-                  <span className="text-xs text-[#999999]">{brand.count}</span>
-                </label>
               );
             })}
           </div>
         </FilterGroup>
-      )}
 
-      <FilterGroup title="Size (EU)">
-        <div className="flex flex-wrap gap-2">
-          {SIZE_FILTERS.map((size) => (
-            <SizeButton
-              key={size}
-              size={size}
-              available
-              selected={activeSizes.includes(size)}
-              onClick={() =>
-                navigate({ size: toggleCsv(searchParams.get("size"), size) })
-              }
+        <FilterGroup title="Price range">
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              inputMode="numeric"
+              min={PRICE_BOUNDS.min}
+              max={PRICE_BOUNDS.max}
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              onBlur={applyPrice}
+              onKeyDown={(e) => e.key === "Enter" && applyPrice()}
+              placeholder={`€${PRICE_BOUNDS.min}`}
+              aria-label="Minimum price"
+              className="w-full rounded-none border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
             />
-          ))}
-        </div>
-      </FilterGroup>
+            <span className="text-gray-400">—</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={PRICE_BOUNDS.min}
+              max={PRICE_BOUNDS.max}
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              onBlur={applyPrice}
+              onKeyDown={(e) => e.key === "Enter" && applyPrice()}
+              placeholder={`€${PRICE_BOUNDS.max}`}
+              aria-label="Maximum price"
+              className="w-full rounded-none border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+            />
+          </div>
+        </FilterGroup>
 
-      <FilterGroup title="Color">
-        <div className="flex flex-wrap gap-3">
-          {COLOR_FILTERS.map((color) => {
-            const active = colors.includes(color.family);
-            return (
-              <button
-                key={color.family}
-                type="button"
-                onClick={() =>
-                  navigate({ color: toggleCsv(searchParams.get("color"), color.family) })
-                }
-                aria-label={color.label}
-                aria-pressed={active}
-                title={color.label}
-                className={`h-7 w-7 cursor-pointer rounded-none border border-black/15 transition-transform hover:scale-110 ${
-                  active ? "ring-2 ring-[#121212] ring-offset-2" : ""
-                }`}
-                style={{ backgroundColor: color.hex }}
-              />
-            );
-          })}
-        </div>
-      </FilterGroup>
+        <FilterGroup title="Availability">
+          <label className="flex cursor-pointer items-center gap-2.5 text-sm text-[#333333]">
+            <input
+              type="checkbox"
+              checked={showOutOfStock}
+              onChange={() => navigate({ oos: showOutOfStock ? null : "1" })}
+              className="h-4 w-4 shrink-0 cursor-pointer accent-[#e85d2a]"
+            />
+            <span>Show out of stock</span>
+          </label>
+        </FilterGroup>
 
-      <FilterGroup title="Price range">
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            inputMode="numeric"
-            min={PRICE_BOUNDS.min}
-            max={PRICE_BOUNDS.max}
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-            onBlur={applyPrice}
-            onKeyDown={(e) => e.key === "Enter" && applyPrice()}
-            placeholder={`€${PRICE_BOUNDS.min}`}
-            aria-label="Minimum price"
-            className="w-full rounded-none border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
-          <span className="text-gray-400">—</span>
-          <input
-            type="number"
-            inputMode="numeric"
-            min={PRICE_BOUNDS.min}
-            max={PRICE_BOUNDS.max}
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-            onBlur={applyPrice}
-            onKeyDown={(e) => e.key === "Enter" && applyPrice()}
-            placeholder={`€${PRICE_BOUNDS.max}`}
-            aria-label="Maximum price"
-            className="w-full rounded-none border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
-        </div>
-      </FilterGroup>
-
-      <FilterGroup title="Availability">
-        <label className="flex cursor-pointer items-center gap-2.5 text-sm text-[#333333]">
-          <input
-            type="checkbox"
-            checked={showOutOfStock}
-            onChange={() =>
-              navigate({ oos: showOutOfStock ? null : "1" })
-            }
-            className="h-4 w-4 shrink-0 cursor-pointer accent-[#e85d2a]"
-          />
-          <span>Show out of stock</span>
-        </label>
-      </FilterGroup>
-
-      {hasActiveFilters && (
-        <button
-          type="button"
-          onClick={clearAll}
-          className="mt-2 cursor-pointer text-xs font-semibold uppercase tracking-[0.14em] text-[#e85d2a] transition-opacity hover:opacity-70"
-        >
-          Clear all filters
-        </button>
-      )}
-    </aside>
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearAll}
+            className="mt-2 cursor-pointer text-xs font-semibold uppercase tracking-[0.14em] text-[#e85d2a] transition-opacity hover:opacity-70"
+          >
+            Clear all filters
+          </button>
+        )}
+      </aside>
+    </div>
   );
 }
 

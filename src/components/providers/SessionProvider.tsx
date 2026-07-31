@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { SessionProvider } from 'next-auth/react';
+import { SessionProvider } from "next-auth/react";
 
 type AuthSessionProviderProps = {
   children: React.ReactNode;
@@ -9,5 +9,13 @@ type AuthSessionProviderProps = {
 export default function AuthSessionProvider({
   children,
 }: AuthSessionProviderProps) {
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <SessionProvider
+      basePath="/api/auth"
+      refetchOnWindowFocus={false}
+      refetchInterval={0}
+    >
+      {children}
+    </SessionProvider>
+  );
 }

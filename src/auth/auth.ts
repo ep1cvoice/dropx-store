@@ -4,9 +4,14 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/utils/password";
 
+const authSecret =
+  process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET;
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  secret: process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET,
+  secret: authSecret,
+  // Needed in local/dev so /api/auth/session returns JSON instead of an HTML error page.
+  trustHost: true,
   session: {
     strategy: "jwt",
   },

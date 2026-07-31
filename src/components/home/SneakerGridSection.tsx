@@ -12,6 +12,8 @@ type SneakerGridSectionProps = {
   showBottomCta?: boolean;
   bottomCtaHref?: string;
   bottomCtaLabel?: string;
+  /** How many cards to show from `lg` up. Extra cards stay visible below `lg`. */
+  desktopCount?: number;
 };
 
 export default function SneakerGridSection({
@@ -22,6 +24,7 @@ export default function SneakerGridSection({
   showBottomCta = false,
   bottomCtaHref = viewAllHref,
   bottomCtaLabel = "Browse all",
+  desktopCount,
 }: SneakerGridSectionProps) {
   if (products.length === 0) {
     return null;
@@ -45,9 +48,18 @@ export default function SneakerGridSection({
           </Link>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-2.5">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+        <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-2.5">
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              className={
+                desktopCount != null && index >= desktopCount
+                  ? "lg:hidden"
+                  : undefined
+              }
+            >
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
 

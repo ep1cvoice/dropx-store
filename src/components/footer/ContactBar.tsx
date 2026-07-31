@@ -57,12 +57,7 @@ const contactItems = [
     label: CONTACT_EMAIL,
     icon: <Mail className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />,
   },
-  {
-    label: "CHAT",
-    icon: (
-      <MessagesSquare className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
-    ),
-  },
+  
 ] as const;
 
 const socialItems = [

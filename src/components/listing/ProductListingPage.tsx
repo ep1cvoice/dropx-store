@@ -115,9 +115,9 @@ export default async function ProductListingPage({
           <ListingSort />
         </div>
 
-        <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">
-          {/* Sidebar */}
-          <div className="lg:w-60 lg:shrink-0">
+        <div className="flex flex-col gap-8 min-[1200px]:flex-row min-[1200px]:gap-10">
+          {/* Filters: collapsed behind a button below 1200px, sidebar from 1200px up */}
+          <div className="min-[1200px]:w-60 min-[1200px]:shrink-0">
             <ListingFilters
               brandFacets={brandFacets}
               showCollections={!lockedCollection}
@@ -126,7 +126,7 @@ export default async function ProductListingPage({
             />
           </div>
 
-          {/* Results */}
+          {/* Results — fixed 10 per page, 2 cols until 1200px */}
           <div className="flex-1">
             {products.length === 0 ? (
               <div
@@ -135,7 +135,7 @@ export default async function ProductListingPage({
                 No products match your filters. Try clearing some.
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-2 gap-4 min-[1200px]:grid-cols-3">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
