@@ -1,16 +1,27 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 
-import { auth } from "@/auth/auth";
 import AccountSidebar from "@/components/account/AccountSidebar";
+import { getCurrentUserId } from "@/lib/current-user";
+import { prisma } from "@/lib/prisma";
 
 export default async function AccountLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  const session = await auth();
-  const name = session?.user?.name?.trim() || "Your account";
-  const email = session?.user?.email ?? "";
+  const userId = await getCurrentUserId();
+  if (!userId) redirect("/login");
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, name: true, lastName: true },
+  });
+
+  if (!user) redirect("/login");
+
+  const name = `${user.name} ${user.lastName}`.trim() || "Your account";
+  const email = user.email;
 
   return (
     <div className="min-h-[70vh] bg-white">

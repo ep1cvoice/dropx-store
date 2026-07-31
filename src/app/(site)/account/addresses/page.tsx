@@ -1,22 +1,6 @@
-import type { Metadata } from "next";
-import { MapPin } from "lucide-react";
+import { redirect } from "next/navigation";
 
-import AccountPageHeader from "@/components/account/AccountPageHeader";
-import AccountPlaceholder from "@/components/account/AccountPlaceholder";
-
-export const metadata: Metadata = {
-  title: "Addresses — DROPX",
-};
-
+/** Legacy route — profile data lives at /account/profile-data. */
 export default function AccountAddressesPage() {
-  return (
-    <>
-      <AccountPageHeader title="Addresses" />
-      <AccountPlaceholder
-        icon={MapPin}
-        title="No saved addresses yet"
-        description="Saved shipping and billing addresses will appear here so checkout is one tap away."
-      />
-    </>
-  );
+  redirect("/account/profile-data");
 }

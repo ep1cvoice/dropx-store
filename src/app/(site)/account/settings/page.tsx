@@ -15,7 +15,7 @@ export default function AccountSettingsPage() {
       <AccountPlaceholder
         icon={Settings}
         title="Settings coming soon"
-        description="Profile details, password, and notification preferences will be managed here."
+        description="Notification preferences and other account options will appear here."
       />
     </>
   );

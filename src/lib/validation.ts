@@ -59,6 +59,54 @@ const checkoutNameField = (label: string) =>
     .min(1, `${label} is required`)
     .min(2, `${label} must be at least 2 characters`);
 
+export const profileDataSchema = z.object({
+  firstName: checkoutNameField("First name"),
+  lastName: checkoutNameField("Last name"),
+  phone: z
+    .string()
+    .trim()
+    .refine((val) => !val || /^[+\d\s()-]{6,20}$/.test(val), {
+      message: "Enter a valid phone number",
+    }),
+  address: z
+    .string()
+    .trim()
+    .min(1, "Address is required")
+    .min(5, "Enter a full street address"),
+  city: z.string().trim().min(1, "City is required"),
+  postalCode: z
+    .string()
+    .trim()
+    .min(1, "Postal code is required")
+    .min(3, "Enter a valid postal code"),
+  country: z.string().trim().min(1, "Country is required"),
+});
+
+export type ProfileDataValues = z.infer<typeof profileDataSchema>;
+
+const passwordRules = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Must contain at least one number");
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: passwordRules,
+    confirmPassword: z.string().min(1, "Please confirm your new password"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "New password must be different from the current one",
+    path: ["newPassword"],
+  });
+
+export type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
+
 export const checkoutInformationSchema = z.object({
   email: z
     .string()

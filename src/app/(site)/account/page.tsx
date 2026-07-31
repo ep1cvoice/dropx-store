@@ -1,20 +1,30 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { auth } from "@/auth/auth";
 import AccountMobileHub from "@/components/account/AccountMobileHub";
 import AccountPageHeader from "@/components/account/AccountPageHeader";
 import OrdersPanel from "@/components/account/OrdersPanel";
+import { getCurrentUserId } from "@/lib/current-user";
 import { inter } from "@/lib/fonts";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Account — DROPX",
 };
 
 export default async function AccountPage() {
-  const session = await auth();
-  const name = session?.user?.name?.trim() || "Your account";
-  const email = session?.user?.email ?? "";
+  const userId = await getCurrentUserId();
+  const user = userId
+    ? await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true, name: true, lastName: true },
+      })
+    : null;
+
+  const name = user
+    ? `${user.name} ${user.lastName}`.trim()
+    : "Your account";
+  const email = user?.email ?? "";
 
   return (
     <>
