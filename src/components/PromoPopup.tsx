@@ -10,7 +10,7 @@ const PROMO_SESSION_KEY = 'dropx_promo_sb_dunk';
 /** Local storage for the cookie consent. */
 const COOKIE_CONSENT_KEY = 'dropx_cookie_consent';
 /** Shop href for the promo popup. */
-const SHOP_HREF = '/browse-all?brand=nike';
+const SHOP_HREF = '/products/nike-sb-dunk-low-limited-colorways';
 
 export default function PromoPopup() {
 	const [visible, setVisible] = useState(false);

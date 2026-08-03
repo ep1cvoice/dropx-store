@@ -185,6 +185,7 @@ dropx-store/
 - Node.js 20+
 - npm (or pnpm / yarn)
 - A [Supabase](https://supabase.com) project (for the database)
+- Optional: a [Cloudinary](https://cloudinary.com) free account (product images CDN)
 
 ### Install & run
 
@@ -211,7 +212,26 @@ AUTH_SECRET="your-secret-here"
 # OAuth providers — buttons exist in the UI but are not wired yet (planned)
 # GOOGLE_CLIENT_ID="..."
 # GOOGLE_CLIENT_SECRET="..."
+
+# Cloudinary (optional — product images). Only cloud name is needed for delivery.
+# Create a free account → Dashboard → copy "Cloud name".
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your_cloud_name"
 ```
+
+### Cloudinary (product images)
+
+1. Sign up at [cloudinary.com](https://cloudinary.com/users/register/free) (Free ≈ 1 GB).
+2. Dashboard → copy **Cloud name** into `.env` as `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`.
+3. Media Library → create folders:
+   - `dropx/products` — variant / card images
+   - `dropx/heroes` — PDP campaign banners
+4. Upload WebP/JPG; note the **public_id** (e.g. `dropx/products/nike-dunk-low-panda`).
+5. In seed / DB set `imageUrl` to either:
+   - full URL from Cloudinary, or
+   - just the public_id — use `resolveProductImage()` / `cloudinaryUrl()` from `src/lib/cloudinary.ts`.
+6. Restart `npm run dev` after changing `.env`.
+
+You do **not** need API Key/Secret for dashboard uploads + public delivery. Keep those only if you later add server-side upload.
 
 ### Scripts
 

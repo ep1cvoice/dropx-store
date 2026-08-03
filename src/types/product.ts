@@ -65,6 +65,9 @@ export type Product = {
   badge: BadgeVariant | null;
   discountValue: number | null;
   currency: string;
+  /** ISO string when set — future date means not yet purchasable. */
+  availableAt: string | null;
+  heroImageUrl: string | null;
   variants: ProductVariant[];
   createdAt: Date;
   updatedAt: Date;
@@ -119,4 +122,6 @@ export type ProductCardData = {
   outOfStock: boolean;
   /** Short low-stock message shown beside price, e.g. "Only 3 left" */
   stockText?: string | null;
+  /** ISO drop date when the product is upcoming / not yet buyable. */
+  availableAt?: string | null;
 };

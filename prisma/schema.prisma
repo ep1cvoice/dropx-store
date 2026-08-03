@@ -157,6 +157,11 @@ model Product {
   currency      String        @default("EUR")
   featured      Boolean       @default(false) // "Featured Picks" collection
 
+  /** When set in the future, product is visible but not purchasable until then. */
+  availableAt DateTime? @map("available_at")
+  /** Optional PDP / campaign hero (placeholder until real assets land). */
+  heroImageUrl String? @map("hero_image_url")
+
   variants ProductVariant[]
 
   createdAt DateTime @default(now())
@@ -165,6 +170,7 @@ model Product {
   @@index([brandId])
   @@index([category])
   @@index([gender])
+  @@index([availableAt])
   @@map("products")
 }
 

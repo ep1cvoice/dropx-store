@@ -5,11 +5,15 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Check, Heart, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 
+import Link from "next/link";
+
 import { addToCart } from "@/actions/cart";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import SizeButton from "@/components/ui/SizeButton";
+import ProductDropCountdown from "@/components/product/ProductDropCountdown";
 import { useStoreBag } from "@/components/providers/StoreBagProvider";
+import { isUpcoming } from "@/lib/availability";
 import { anton, inter } from "@/lib/fonts";
 import type { ProductDetail } from "@/types/product";
 
@@ -67,7 +71,10 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
         ? `Only ${relevantStock} left in stock — order soon`
         : null;
 
-  const canAddToCart = Boolean(selectedSize && selectedSize.stock > 0);
+  const upcoming = isUpcoming(product.availableAt);
+  const canAddToCart = Boolean(
+    !upcoming && selectedSize && selectedSize.stock > 0,
+  );
 
   const wishlisted = selectedVariant
     ? isWishlisted(selectedVariant.id)
@@ -109,58 +116,81 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
       {/* ---------------------------------------------------------------- */}
       {/* Gallery */}
       {/* ---------------------------------------------------------------- */}
-      <div className="flex gap-3 md:gap-4">
-        {product.variants.length > 1 && (
-          <div className="flex flex-col gap-3">
-            {product.variants.map((variant) => {
-              const active = variant.id === selectedVariant?.id;
-              return (
-                <button
-                  key={variant.id}
-                  type="button"
-                  onClick={() => selectVariant(variant.id)}
-                  aria-label={`View ${variant.color}`}
-                  aria-pressed={active}
-                  className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-none bg-[#f5f5f5] ring-1 transition-colors md:h-20 md:w-20 ${
-                    active ? "ring-2 ring-[#121212]" : "ring-black/10 hover:ring-black/30"
-                  }`}
-                >
-                  {variant.imageUrl && (
-                    <Image
-                      src={variant.imageUrl}
-                      alt={variant.color}
-                      fill
-                      sizes="80px"
-                      className="object-cover"
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        <div className="relative aspect-square flex-1 overflow-hidden rounded-none bg-[#f5f5f5]">
-          {selectedVariant?.imageUrl && (
+      <div className="flex flex-col gap-3">
+        {product.heroImageUrl && (
+          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-none bg-[#f5f5f5]">
             <Image
-              src={selectedVariant.imageUrl}
-              alt={`${product.name} — ${selectedVariant.color}`}
+              src={product.heroImageUrl}
+              alt={`${product.brand} ${product.name} campaign`}
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
-          )}
+          </div>
+        )}
 
-          {product.badge && (
-            <div className="absolute left-3 top-3">
-              {product.badge === "discount" && product.discountValue != null ? (
-                <Badge variant="discount" discountValue={product.discountValue} />
-              ) : product.badge !== "discount" ? (
-                <Badge variant={product.badge} />
-              ) : null}
+        <div className="flex gap-3 md:gap-4">
+          {product.variants.length > 1 && (
+            <div className="flex flex-col gap-3">
+              {product.variants.map((variant) => {
+                const active = variant.id === selectedVariant?.id;
+                return (
+                  <button
+                    key={variant.id}
+                    type="button"
+                    onClick={() => selectVariant(variant.id)}
+                    aria-label={`View ${variant.color}`}
+                    aria-pressed={active}
+                    className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-none bg-white ring-1 transition-colors md:h-20 md:w-20 ${
+                      active
+                        ? "ring-2 ring-[#121212]"
+                        : "ring-black/10 hover:ring-black/25"
+                    }`}
+                  >
+                    {variant.imageUrl && (
+                      <Image
+                        src={variant.imageUrl}
+                        alt={variant.color}
+                        fill
+                        sizes="80px"
+                        className="object-contain p-1"
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
+
+          <div className="relative aspect-square flex-1 overflow-hidden rounded-none border border-black/10 bg-white">
+            {selectedVariant?.imageUrl && (
+              <Image
+                src={selectedVariant.imageUrl}
+                alt={`${product.name} — ${selectedVariant.color}`}
+                fill
+                priority={!product.heroImageUrl}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-contain p-4"
+              />
+            )}
+
+            {(upcoming || product.badge) && (
+              <div className="absolute left-3 top-3">
+                {upcoming ? (
+                  <Badge variant="limited" label="Upcoming" />
+                ) : product.badge === "discount" &&
+                  product.discountValue != null ? (
+                  <Badge
+                    variant="discount"
+                    discountValue={product.discountValue}
+                  />
+                ) : product.badge && product.badge !== "discount" ? (
+                  <Badge variant={product.badge} />
+                ) : null}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -197,7 +227,12 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           )}
         </div>
 
-        {stockMessage && (
+        {upcoming && product.availableAt ? (
+          <ProductDropCountdown
+            availableAt={product.availableAt}
+            variant="detail"
+          />
+        ) : stockMessage ? (
           <p
             className={`${inter.className} mt-2 text-sm font-medium ${
               relevantStock === 0 ? "text-[#666666]" : "text-[#e85d2a]"
@@ -205,7 +240,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           >
             {stockMessage}
           </p>
-        )}
+        ) : null}
 
         {product.description && (
           <p
@@ -215,7 +250,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           </p>
         )}
 
-        {/* Size selector */}
+        {/* Size selector — locked for upcoming drops */}
         <div className="mt-8">
           <div className="flex items-center justify-between">
             <span
@@ -236,9 +271,12 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               <SizeButton
                 key={size.id}
                 size={size.size.replace(/^EU\s*/i, "")}
-                available={size.stock > 0}
+                available={!upcoming && size.stock > 0}
                 selected={size.id === selectedSizeId}
-                onClick={() => setSelectedSizeId(size.id)}
+                onClick={() => {
+                  if (upcoming) return;
+                  setSelectedSizeId(size.id);
+                }}
               />
             ))}
           </div>
@@ -276,29 +314,40 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
 
         {/* Actions */}
         <div className="mt-8 flex items-stretch gap-3">
-          <Button
-            variant="accent"
-            onClick={handleAddToCart}
-            disabled={!canAddToCart || isPending}
-            className="h-14 flex-1 cursor-pointer rounded-none text-sm font-semibold uppercase tracking-[0.14em]"
-          >
-            {added ? (
-              <>
-                <Check size={18} /> Added to cart
-              </>
-            ) : isPending ? (
-              "Adding…"
-            ) : selectedSize ? (
-              "Add to cart"
-            ) : (
-              "Select a size"
-            )}
-          </Button>
+          {upcoming ? (
+            <Link href="/#newsletter" className="flex-1">
+              <Button
+                variant="accent"
+                className="h-14 w-full cursor-pointer rounded-none text-sm font-semibold uppercase tracking-[0.14em]"
+              >
+                Notify me
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              variant="accent"
+              onClick={handleAddToCart}
+              disabled={!canAddToCart || isPending}
+              className="h-14 flex-1 cursor-pointer rounded-none text-sm font-semibold uppercase tracking-[0.14em]"
+            >
+              {added ? (
+                <>
+                  <Check size={18} /> Added to cart
+                </>
+              ) : isPending ? (
+                "Adding…"
+              ) : selectedSize ? (
+                "Add to cart"
+              ) : (
+                "Select a size"
+              )}
+            </Button>
+          )}
 
           <button
             type="button"
             onClick={handleWishlist}
-            disabled={isPending}
+            disabled={isPending || upcoming}
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
             aria-pressed={wishlisted}
             className="flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-none border border-gray-200 transition-colors hover:border-gray-400 disabled:cursor-not-allowed disabled:opacity-60"

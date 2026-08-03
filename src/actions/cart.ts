@@ -25,10 +25,26 @@ export async function addToCart(
 
   const size = await prisma.variantSize.findUnique({
     where: { id: sizeId },
-    select: { stock: true },
+    select: {
+      stock: true,
+      variant: {
+        select: {
+          product: { select: { availableAt: true, name: true } },
+        },
+      },
+    },
   });
 
   if (!size) return { ok: false, error: "This size is no longer available." };
+
+  const availableAt = size.variant.product.availableAt;
+  if (availableAt && availableAt.getTime() > Date.now()) {
+    return {
+      ok: false,
+      error: `${size.variant.product.name} is an upcoming drop — not for sale yet.`,
+    };
+  }
+
   if (size.stock <= 0) return { ok: false, error: "This size is out of stock." };
 
   const cart = await prisma.cart.upsert({

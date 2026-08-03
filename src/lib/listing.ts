@@ -52,6 +52,8 @@ export const COLOR_FILTERS: { family: string; label: string; hex: string }[] = [
   { family: "blue", label: "Blue", hex: "#2563EB" },
   { family: "green", label: "Green", hex: "#16A34A" },
   { family: "orange", label: "Orange", hex: "#EA580C" },
+  { family: "purple", label: "Purple", hex: "#7B6B9B" },
+  { family: "brown", label: "Brown", hex: "#8B5E3C" },
 ];
 
 /** EU sizes offered as filter chips (bare numbers; stored as "EU 40"). */
@@ -68,7 +70,7 @@ export const SIZE_FILTERS = [
   "47",
 ];
 
-export const PRICE_BOUNDS = { min: 0, max: 300 };
+export const PRICE_BOUNDS = { min: 0, max: 450 };
 
 export function isCollectionSlug(
   value: string | undefined,

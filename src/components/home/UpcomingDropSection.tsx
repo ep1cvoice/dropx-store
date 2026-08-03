@@ -77,25 +77,34 @@ export default function UpcomingDropSection() {
               </Button>
             </Link>
           ) : (
-            <Link
-              href="/#newsletter"
-              scroll={false}
-              onClick={(event) => {
-                event.preventDefault();
-                document
-                  .getElementById("newsletter")
-                  ?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-              className="mx-auto mt-6 inline-block md:mx-0 md:mt-7"
-            >
-              <Button
-                variant="accent"
-                className="cursor-pointer rounded-none px-8 py-3 text-sm font-semibold uppercase tracking-[0.14em] md:px-10 md:py-3.5"
+            <div className="mx-auto mt-6 flex flex-col items-center gap-3 md:mx-0 md:mt-7 md:items-start sm:flex-row">
+              <Link href={UPCOMING_DROP.shopHref}>
+                <Button
+                  variant="outline"
+                  className="cursor-pointer rounded-none border-[#121212] px-8 py-3 text-sm font-semibold uppercase tracking-[0.14em] md:px-10 md:py-3.5"
+                >
+                  View product
+                </Button>
+              </Link>
+              <Link
+                href="/#newsletter"
+                scroll={false}
+                onClick={(event) => {
+                  event.preventDefault();
+                  document
+                    .getElementById("newsletter")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
               >
-                Notify Me
-                <BellIcon className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+                <Button
+                  variant="accent"
+                  className="cursor-pointer rounded-none px-8 py-3 text-sm font-semibold uppercase tracking-[0.14em] md:px-10 md:py-3.5"
+                >
+                  Notify Me
+                  <BellIcon className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
 

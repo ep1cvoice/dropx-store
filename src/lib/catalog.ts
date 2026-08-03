@@ -14,6 +14,7 @@ import type {
   ProductListingResult,
   SortOption,
 } from "@/lib/listing";
+import { isUpcoming, toIsoOrNull } from "@/lib/availability";
 
 /** At or below this remaining stock, cards show a "Only N left" nudge. */
 const LOW_STOCK_THRESHOLD = 5;
@@ -27,6 +28,7 @@ const productCardSelect = {
   badge: true,
   discountValue: true,
   currency: true,
+  availableAt: true,
   brand: { select: { name: true } },
   variants: {
     orderBy: { createdAt: "asc" },
@@ -43,6 +45,8 @@ type ProductCardRow = Prisma.ProductGetPayload<{ select: typeof productCardSelec
 
 function toProductCardData(product: ProductCardRow): ProductCardData {
   const { variants } = product;
+  const availableAt = toIsoOrNull(product.availableAt);
+  const upcoming = isUpcoming(availableAt);
 
   const priceFrom = variants.length
     ? Math.min(...variants.map((v) => v.price))
@@ -60,7 +64,9 @@ function toProductCardData(product: ProductCardRow): ProductCardData {
   );
 
   let stockText: string | null = null;
-  if (totalStock === 0) {
+  if (upcoming) {
+    stockText = "Upcoming";
+  } else if (totalStock === 0) {
     stockText = "Sold out";
   } else if (totalStock <= LOW_STOCK_THRESHOLD) {
     stockText = `Only ${totalStock} left`;
@@ -77,8 +83,9 @@ function toProductCardData(product: ProductCardRow): ProductCardData {
     currency: product.currency,
     imageUrl,
     priceFrom,
-    outOfStock: totalStock === 0,
+    outOfStock: !upcoming && totalStock === 0,
     stockText,
+    availableAt,
   };
 }
 
@@ -134,6 +141,8 @@ const productDetailSelect = {
   badge: true,
   discountValue: true,
   currency: true,
+  availableAt: true,
+  heroImageUrl: true,
   createdAt: true,
   updatedAt: true,
   brand: { select: { name: true } },
@@ -172,6 +181,8 @@ function toProductDetail(product: ProductDetailRow): ProductDetail {
     badge: product.badge as BadgeVariant | null,
     discountValue: product.discountValue,
     currency: product.currency,
+    availableAt: toIsoOrNull(product.availableAt),
+    heroImageUrl: product.heroImageUrl,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
     variants: product.variants.map((variant) => ({
