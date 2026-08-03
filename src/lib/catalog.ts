@@ -313,7 +313,7 @@ export async function getAllBrandSlugs(): Promise<string[]> {
 // Listing page — collections, filters, facets
 // ---------------------------------------------------------------------------
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 12;
 
 function collectionWhere(collection: CollectionSlug): Prisma.ProductWhereInput {
   switch (collection) {
@@ -323,6 +323,8 @@ function collectionWhere(collection: CollectionSlug): Prisma.ProductWhereInput {
       return { featured: true };
     case "limited":
       return { badge: "limited" };
+    case "upcoming":
+      return { availableAt: { gt: new Date() } };
     case "sale":
       return { discountValue: { not: null } };
     default:

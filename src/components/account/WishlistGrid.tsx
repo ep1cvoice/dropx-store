@@ -68,7 +68,7 @@ export default function WishlistGrid({
 
           <Link
             href={`/products/${item.slug}`}
-            className="relative block aspect-square w-full overflow-hidden rounded-none bg-[#f5f5f5]"
+            className="relative block aspect-[4/3] w-full overflow-hidden rounded-none bg-white"
           >
             {item.imageUrl && (
               <Image
@@ -76,7 +76,7 @@ export default function WishlistGrid({
                 alt={item.name}
                 fill
                 sizes="(max-width: 640px) 50vw, 33vw"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
               />
             )}
           </Link>

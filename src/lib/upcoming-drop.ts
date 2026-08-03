@@ -19,8 +19,8 @@ export const UPCOMING_DROP = {
 export const UPCOMING_OFFSETS_DAYS = {
   "nike-sb-dunk-low-tokyo-nights": 3,
   "adidas-samba-wales-bonner-cream": 7,
-  "puma-palermo-ami-paris": 10,
-  "new-balance-990v6-jjjjound": 14,
+  "puma-speedcat-porsche": 10,
+  "new-balance-990v6-joe-freshgoods": 14,
   "asics-gel-kayano-14-kith": 18,
 } as const;
 

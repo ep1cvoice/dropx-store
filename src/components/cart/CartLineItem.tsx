@@ -53,7 +53,7 @@ export default function CartLineItem({ item }: CartLineItemProps) {
     >
       <Link
         href={`/products/${item.slug}`}
-        className="relative h-20 w-20 shrink-0 overflow-hidden rounded-none bg-[#eef4ff]"
+        className="relative h-20 w-20 shrink-0 overflow-hidden rounded-none bg-white ring-1 ring-black/5"
       >
         {item.imageUrl && (
           <Image
@@ -61,7 +61,7 @@ export default function CartLineItem({ item }: CartLineItemProps) {
             alt={item.name}
             fill
             sizes="80px"
-            className="object-cover"
+            className="object-contain p-1"
           />
         )}
       </Link>

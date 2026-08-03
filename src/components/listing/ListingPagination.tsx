@@ -41,7 +41,6 @@ export default function ListingPagination({
       {page > 1 ? (
         <Link
           href={hrefFor(page - 1)}
-          scroll={false}
           aria-label="Previous page"
           className={`${baseItem} border-gray-200 text-[#121212] hover:border-gray-400`}
         >
@@ -62,7 +61,6 @@ export default function ListingPagination({
           <Link
             key={p}
             href={hrefFor(p)}
-            scroll={false}
             aria-current={active ? "page" : undefined}
             className={`${baseItem} ${
               active
@@ -78,7 +76,6 @@ export default function ListingPagination({
       {page < totalPages ? (
         <Link
           href={hrefFor(page + 1)}
-          scroll={false}
           aria-label="Next page"
           className={`${baseItem} border-gray-200 text-[#121212] hover:border-gray-400`}
         >

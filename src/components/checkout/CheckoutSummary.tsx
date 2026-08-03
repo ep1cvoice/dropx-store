@@ -36,14 +36,14 @@ export default function CheckoutSummary({
       <ul className="mt-5 space-y-4">
         {items.map((item) => (
           <li key={item.id} className="flex items-center gap-3">
-            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-none bg-[#eef4ff]">
+            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-none bg-white ring-1 ring-black/5">
               {item.imageUrl && (
                 <Image
                   src={item.imageUrl}
                   alt={item.name}
                   fill
                   sizes="48px"
-                  className="object-cover"
+                  className="object-contain p-0.5"
                 />
               )}
             </div>

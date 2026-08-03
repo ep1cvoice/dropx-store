@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { Check, Heart, RotateCcw, ShieldCheck, Truck } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { Check, Heart, RotateCcw, ShieldCheck, Truck, X } from "lucide-react";
 
 import Link from "next/link";
 
@@ -14,21 +14,11 @@ import SizeButton from "@/components/ui/SizeButton";
 import ProductDropCountdown from "@/components/product/ProductDropCountdown";
 import { useStoreBag } from "@/components/providers/StoreBagProvider";
 import { isUpcoming } from "@/lib/availability";
+import { formatPrice, listPriceFromSale } from "@/lib/currency";
 import { anton, inter } from "@/lib/fonts";
 import type { ProductDetail } from "@/types/product";
 
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  EUR: "€",
-  USD: "$",
-  GBP: "£",
-};
-
 const LOW_STOCK_THRESHOLD = 5;
-
-function formatPrice(price: number, currency: string): string {
-  const symbol = CURRENCY_SYMBOLS[currency] ?? currency;
-  return `${symbol}${price.toFixed(2)}`;
-}
 
 const TRUST_POINTS = [
   { icon: Truck, label: "Free shipping on orders over €200" },
@@ -49,7 +39,22 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
   const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (!sizeGuideOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSizeGuideOpen(false);
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [sizeGuideOpen]);
 
   const selectedVariant =
     product.variants.find((v) => v.id === selectedVariantId) ??
@@ -75,6 +80,12 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
   const canAddToCart = Boolean(
     !upcoming && selectedSize && selectedSize.stock > 0,
   );
+  const onSale =
+    product.badge === "discount" && product.discountValue != null;
+  const compareAt =
+    onSale && product.discountValue != null
+      ? listPriceFromSale(price, product.discountValue)
+      : null;
 
   const wishlisted = selectedVariant
     ? isWishlisted(selectedVariant.id)
@@ -178,7 +189,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             {(upcoming || product.badge) && (
               <div className="absolute left-3 top-3">
                 {upcoming ? (
-                  <Badge variant="limited" label="Upcoming" />
+                  <Badge variant="upcoming" />
                 ) : product.badge === "discount" &&
                   product.discountValue != null ? (
                   <Badge
@@ -210,12 +221,23 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           {product.name}
         </h1>
 
-        <div className="mt-4 flex items-center gap-3">
-          <span
-            className={`${inter.className} text-2xl font-bold text-[#121212]`}
-          >
-            {formatPrice(price, product.currency)}
-          </span>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-baseline gap-2.5">
+            {compareAt != null && (
+              <span
+                className={`${inter.className} text-lg font-medium text-[#999999] line-through`}
+              >
+                {formatPrice(compareAt, product.currency)}
+              </span>
+            )}
+            <span
+              className={`${inter.className} text-2xl font-bold ${
+                compareAt != null ? "text-[#e85d2a]" : "text-[#121212]"
+              }`}
+            >
+              {formatPrice(price, product.currency)}
+            </span>
+          </div>
           {product.badge && (
             <>
               {product.badge === "discount" && product.discountValue != null ? (
@@ -260,7 +282,8 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             </span>
             <button
               type="button"
-              className={`${inter.className} text-xs font-semibold uppercase tracking-[0.16em] text-[#e85d2a] transition-opacity hover:opacity-70`}
+              onClick={() => setSizeGuideOpen(true)}
+              className={`${inter.className} cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-[#e85d2a] underline-offset-4 transition-all hover:underline hover:opacity-80`}
             >
               Size guide
             </button>
@@ -301,7 +324,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                     aria-label={variant.color}
                     aria-pressed={active}
                     title={variant.color}
-                    className={`h-7 w-7 rounded-none border border-black/15 transition-transform hover:scale-110 ${
+                    className={`h-7 w-7 cursor-pointer rounded-none border border-black/15 transition-transform hover:scale-110 hover:ring-2 hover:ring-[#121212]/40 hover:ring-offset-1 ${
                       active ? "ring-2 ring-[#121212] ring-offset-2" : ""
                     }`}
                     style={{ backgroundColor: variant.colorHex }}
@@ -384,6 +407,43 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           ))}
         </ul>
       </div>
+
+      {sizeGuideOpen && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 sm:p-6">
+          <button
+            type="button"
+            aria-label="Close size guide"
+            onClick={() => setSizeGuideOpen(false)}
+            className="absolute inset-0 cursor-pointer bg-black/70"
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="size-guide-title"
+            className="relative z-10 max-h-[90vh] w-full max-w-3xl overflow-auto bg-white shadow-[0_24px_80px_rgba(0,0,0,0.35)]"
+          >
+            <button
+              type="button"
+              onClick={() => setSizeGuideOpen(false)}
+              aria-label="Close"
+              className="absolute right-2 top-2 z-20 flex h-9 w-9 cursor-pointer items-center justify-center bg-black/80 text-white transition-colors hover:bg-black"
+            >
+              <X className="h-4 w-4" strokeWidth={2.2} />
+            </button>
+            <h2 id="size-guide-title" className="sr-only">
+              Size guide
+            </h2>
+            <Image
+              src="/size-guide.jpg"
+              alt="Mens and womens sneaker size conversion chart"
+              width={1200}
+              height={1600}
+              className="h-auto w-full"
+              sizes="(max-width: 768px) 92vw, 768px"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

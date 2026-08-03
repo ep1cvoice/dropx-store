@@ -9,7 +9,7 @@ import Badge from "@/components/ui/Badge";
 import ProductDropCountdown from "@/components/product/ProductDropCountdown";
 import { useStoreBag } from "@/components/providers/StoreBagProvider";
 import { isUpcoming } from "@/lib/availability";
-import { formatPrice } from "@/lib/currency";
+import { formatPrice, listPriceFromSale } from "@/lib/currency";
 import { inter } from "@/lib/fonts";
 import type { ProductCardData } from "@/types/product";
 
@@ -25,6 +25,12 @@ export default function ProductCard({ product }: ProductCardProps) {
   );
   const upcoming = isUpcoming(product.availableAt);
   const soldOut = product.outOfStock && !upcoming;
+  const onSale =
+    product.badge === "discount" && product.discountValue != null;
+  const compareAt =
+    onSale && product.discountValue != null
+      ? listPriceFromSale(product.priceFrom, product.discountValue)
+      : null;
 
   function handleWishlist(event: React.MouseEvent) {
     event.preventDefault();
@@ -96,7 +102,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {upcoming && (
           <div className="absolute left-2 top-2">
-            <Badge variant="limited" label="Upcoming" />
+            <Badge variant="upcoming" />
           </div>
         )}
       </Link>
@@ -136,9 +142,22 @@ export default function ProductCard({ product }: ProductCardProps) {
         </span>
 
         <div className="mt-1 flex items-center justify-between gap-1">
-          <span className={`${inter.className} text-sm font-bold text-[#1A1A1A]`}>
-            {formatPrice(product.priceFrom, product.currency)}
-          </span>
+          <div className="flex flex-wrap items-baseline gap-1.5">
+            {compareAt != null && (
+              <span
+                className={`${inter.className} text-xs font-medium text-[#999999] line-through`}
+              >
+                {formatPrice(compareAt, product.currency)}
+              </span>
+            )}
+            <span
+              className={`${inter.className} text-sm font-bold ${
+                compareAt != null ? "text-[#e85d2a]" : "text-[#1A1A1A]"
+              }`}
+            >
+              {formatPrice(product.priceFrom, product.currency)}
+            </span>
+          </div>
           {soldOut ? (
             <span className={`${inter.className} text-[10px] font-medium text-[#888888]`}>
               Sold out

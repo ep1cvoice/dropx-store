@@ -12,6 +12,18 @@ export function formatPrice(price: number, currency: string): string {
   return `${currencySymbol(currency)}${price.toFixed(2)}`;
 }
 
+/**
+ * Variant `price` is what the customer pays. When `discountValue` is set
+ * (percent off), recover the pre-sale list price for strikethrough UI.
+ */
+export function listPriceFromSale(
+  salePrice: number,
+  discountPercent: number,
+): number {
+  if (discountPercent <= 0 || discountPercent >= 100) return salePrice;
+  return salePrice / (1 - discountPercent / 100);
+}
+
 /** Free shipping kicks in at/above this subtotal. */
 export const FREE_SHIPPING_THRESHOLD = 200;
 
