@@ -15,6 +15,7 @@ import type {
   SortOption,
 } from "@/lib/listing";
 import { isUpcoming, toIsoOrNull } from "@/lib/availability";
+import { sizesFitGender } from "@/lib/sizes";
 
 /** At or below this remaining stock, cards show a "Only N left" nudge. */
 const LOW_STOCK_THRESHOLD = 5;
@@ -125,6 +126,139 @@ export async function getProductCards(
   });
 
   return products.map(toProductCardData);
+}
+
+/** Fisher–Yates shuffle — fresh order on every request. */
+function shuffle<T>(items: T[]): T[] {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = arr[i]!;
+    arr[i] = arr[j]!;
+    arr[j] = tmp;
+  }
+  return arr;
+}
+
+/**
+ * Round-robin across brands after shuffling each brand's queue,
+ * so home grids stay mixed and change on refresh.
+ */
+function diversifyByBrand(
+  rows: ProductCardRow[],
+  take: number,
+): ProductCardRow[] {
+  const queues = new Map<string, ProductCardRow[]>();
+  for (const row of shuffle(rows)) {
+    const key = row.brand.name;
+    const list = queues.get(key);
+    if (list) list.push(row);
+    else queues.set(key, [row]);
+  }
+
+  const brandQueues = shuffle([...queues.values()].map((queue) => shuffle(queue)));
+  const picked: ProductCardRow[] = [];
+  let guard = 0;
+
+  while (
+    picked.length < take &&
+    brandQueues.some((queue) => queue.length > 0) &&
+    guard < take * brandQueues.length + 1
+  ) {
+    for (const queue of brandQueues) {
+      if (picked.length >= take) break;
+      const next = queue.shift();
+      if (next) picked.push(next);
+    }
+    guard++;
+  }
+
+  return shuffle(picked);
+}
+
+function availableNowWhere(now = new Date()): Prisma.ProductWhereInput {
+  return {
+    OR: [{ availableAt: null }, { availableAt: { lte: now } }],
+  };
+}
+
+export type HomeProductRails = {
+  newDrops: ProductCardData[];
+  featured: ProductCardData[];
+  browseAll: ProductCardData[];
+};
+
+/**
+ * Homepage product rails — randomized each request, distinct intents, no overlap:
+ * - New Drops → badge "new"
+ * - Featured → featured flag (topped up with limited if needed)
+ * - Browse All → brand-mixed catalog sampler
+ */
+export async function getHomeProductRails(): Promise<HomeProductRails> {
+  const now = new Date();
+  const available = availableNowWhere(now);
+
+  const newDropPool = await prisma.product.findMany({
+    where: { badge: "new", AND: [available] },
+    select: productCardSelect,
+  });
+  const newDropRows = diversifyByBrand(newDropPool, 6);
+  const newDropIds = newDropRows.map((row) => row.id);
+
+  const featuredExclude = newDropIds;
+  const featuredPool = await prisma.product.findMany({
+    where: {
+      featured: true,
+      ...(featuredExclude.length > 0
+        ? { id: { notIn: featuredExclude } }
+        : {}),
+      AND: [available],
+    },
+    select: productCardSelect,
+  });
+  let featuredRows = diversifyByBrand(featuredPool, 6);
+
+  if (featuredRows.length < 6) {
+    const need = 6 - featuredRows.length;
+    const topUpExclude = [
+      ...newDropIds,
+      ...featuredRows.map((row) => row.id),
+    ];
+    const topUpPool = await prisma.product.findMany({
+      where: {
+        badge: "limited",
+        ...(topUpExclude.length > 0
+          ? { id: { notIn: topUpExclude } }
+          : {}),
+        AND: [available],
+      },
+      select: productCardSelect,
+    });
+    featuredRows = shuffle([
+      ...featuredRows,
+      ...diversifyByBrand(topUpPool, need),
+    ]);
+  }
+
+  const excludeIds = [
+    ...newDropIds,
+    ...featuredRows.map((row) => row.id),
+  ];
+
+  const browsePool = await prisma.product.findMany({
+    where: {
+      ...(excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {}),
+      AND: [available],
+    },
+    select: productCardSelect,
+  });
+  const browseRows = diversifyByBrand(browsePool, 12);
+
+  return {
+    newDrops: newDropRows.map(toProductCardData),
+    featured: featuredRows.map(toProductCardData),
+    browseAll: browseRows.map(toProductCardData),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -265,7 +399,17 @@ export type BrandCard = {
   imageUrl: string | null;
 };
 
-/** All brands with product counts and a representative image (for /brands grid). */
+/** Classic GR models used as hero images on the /brands grid. */
+const BRAND_CARD_PRODUCT_SLUGS: Record<string, string> = {
+  nike: "nike-air-force-1-low",
+  adidas: "adidas-samba-og",
+  "new-balance": "new-balance-550",
+  asics: "asics-gel-kayano-14",
+  puma: "puma-suede-classic",
+  converse: "converse-chuck-70-hi",
+};
+
+/** All brands with product counts and a classic product image (for /brands grid). */
 export async function getBrands(): Promise<BrandCard[]> {
   const brands = await prisma.brand.findMany({
     orderBy: { name: "asc" },
@@ -273,25 +417,66 @@ export async function getBrands(): Promise<BrandCard[]> {
       name: true,
       slug: true,
       _count: { select: { products: true } },
-      products: {
+    },
+  });
+
+  const preferredSlugs = Object.values(BRAND_CARD_PRODUCT_SLUGS);
+  const preferredProducts = await prisma.product.findMany({
+    where: { slug: { in: preferredSlugs } },
+    select: {
+      slug: true,
+      brand: { select: { slug: true } },
+      variants: {
         take: 1,
-        orderBy: { createdAt: "desc" },
-        select: {
-          variants: {
-            take: 1,
-            orderBy: { createdAt: "asc" },
-            select: { imageUrl: true },
-          },
-        },
+        orderBy: { createdAt: "asc" },
+        select: { imageUrl: true },
       },
     },
   });
+
+  const imageByBrand = new Map(
+    preferredProducts.map((product) => [
+      product.brand.slug,
+      product.variants[0]?.imageUrl ?? null,
+    ]),
+  );
+
+  // Fallback: newest product image for any brand without a classic pick.
+  const missingSlugs = brands
+    .map((b) => b.slug)
+    .filter((slug) => !imageByBrand.get(slug));
+
+  if (missingSlugs.length > 0) {
+    const fallbacks = await prisma.brand.findMany({
+      where: { slug: { in: missingSlugs } },
+      select: {
+        slug: true,
+        products: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          select: {
+            variants: {
+              take: 1,
+              orderBy: { createdAt: "asc" },
+              select: { imageUrl: true },
+            },
+          },
+        },
+      },
+    });
+    for (const brand of fallbacks) {
+      imageByBrand.set(
+        brand.slug,
+        brand.products[0]?.variants[0]?.imageUrl ?? null,
+      );
+    }
+  }
 
   return brands.map((brand) => ({
     slug: brand.slug,
     name: brand.name,
     productCount: brand._count.products,
-    imageUrl: brand.products[0]?.variants[0]?.imageUrl ?? null,
+    imageUrl: imageByBrand.get(brand.slug) ?? null,
   }));
 }
 
@@ -369,11 +554,21 @@ export async function getProductListing(
   const base = collectionWhere(collection);
   const and: Prisma.ProductWhereInput[] = [];
 
-  // Men / women listings also include unisex; Unisex is exact-match only.
+  // Men / women normally include unisex. When a size outside that gender's
+  // run is selected (e.g. men + EU 38), drop unisex so women's/shared sizes
+  // don't leak into the men's results.
   if (gender === "men") {
-    and.push({ gender: { in: ["men", "unisex"] } });
+    and.push({
+      gender: sizesFitGender("men", sizeFilters)
+        ? { in: ["men", "unisex"] }
+        : "men",
+    });
   } else if (gender === "women") {
-    and.push({ gender: { in: ["women", "unisex"] } });
+    and.push({
+      gender: sizesFitGender("women", sizeFilters)
+        ? { in: ["women", "unisex"] }
+        : "women",
+    });
   } else if (gender === "unisex") {
     and.push({ gender: "unisex" });
   }

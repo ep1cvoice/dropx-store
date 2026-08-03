@@ -1,6 +1,9 @@
 export {
   BRANDS,
+  buildStock,
   img,
+  resolveVariantStock,
+  SIZE_RUNS,
   stockFull,
   stockLimited,
   stockOos,
@@ -11,6 +14,7 @@ export {
   type Gender,
   type SeedProduct,
   type SeedVariant,
+  type StockKind,
 } from "./types";
 
 export { CLASSICS } from "./classics";

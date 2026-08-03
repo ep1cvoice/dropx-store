@@ -1,7 +1,10 @@
 /**
  * Shared seed types, brands, stock helpers, and Unsplash fallback images.
  */
+import { SIZE_RUNS } from "../../src/lib/sizes";
 import { UPCOMING_DROP, UPCOMING_OFFSETS_DAYS } from "../../src/lib/upcoming-drop";
+
+export { SIZE_RUNS };
 
 const IMAGE_POOL = [
   "photo-1542291026-7eec264c27ff",
@@ -27,6 +30,7 @@ export const img = (idx: number) =>
 export type Category = "running" | "basketball" | "lifestyle" | "skateboarding";
 export type Badge = "new" | "limited" | "discount" | null;
 export type Gender = "men" | "women" | "unisex";
+export type StockKind = "classic" | "drop" | "oos";
 
 export type SeedVariant = {
   color: string;
@@ -34,6 +38,10 @@ export type SeedVariant = {
   colorFamily: string;
   price: number;
   image: number;
+  /**
+   * Legacy marker only — real size runs are built by `buildStock` from gender.
+   * Pass `stockOos()` to force a sold-out product.
+   */
   stock: Record<number, number>;
   /** Cloudinary public_id — when set, seed stores a Cloudinary URL instead of Unsplash. */
   cloudinaryId?: string;
@@ -63,7 +71,94 @@ export const BRANDS = [
   { name: "Converse", slug: "converse" },
 ] as const;
 
-/** EU 38–45 with varying stock counts. */
+/** Deterministic 32-bit hash — same seed always yields the same stock pattern. */
+function hashSeed(input: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function isAllZero(stock: Record<number, number>): boolean {
+  const values = Object.values(stock);
+  return values.length > 0 && values.every((n) => n === 0);
+}
+
+/**
+ * Build a gender-correct size run with catalog-appropriate availability.
+ * Classics: fuller stock, 0–2 random mid sizes OOS.
+ * Drops: sparse low stock, several sizes OOS.
+ */
+export function buildStock(options: {
+  gender: Gender;
+  kind: StockKind;
+  seed: string;
+}): Record<number, number> {
+  const { gender, kind, seed } = options;
+  const sizes = SIZE_RUNS[gender];
+  const h = hashSeed(seed);
+  const stock: Record<number, number> = {};
+
+  if (kind === "oos") {
+    for (const eu of sizes) stock[eu] = 0;
+    return stock;
+  }
+
+  for (let i = 0; i < sizes.length; i++) {
+    const eu = sizes[i];
+    const roll = (h + i * 17) % 100;
+
+    if (kind === "classic") {
+      // Base 5–12 units; zero ~1–2 mid sizes; occasional low stock.
+      let qty = 5 + ((h + i * 13) % 8);
+      if (i > 0 && i < sizes.length - 1 && roll < 18) qty = 0;
+      else if (roll >= 18 && roll < 30) qty = Math.min(qty, 2);
+      stock[eu] = qty;
+    } else {
+      // Drops: 0–3 units; many sizes empty.
+      let qty = (h + i * 11) % 4; // 0–3
+      if (roll < 45) qty = 0;
+      else if (qty === 0) qty = 1;
+      stock[eu] = qty;
+    }
+  }
+
+  // Never leave a buyable classic/drop with zero available sizes.
+  const inStock = sizes.filter((eu) => stock[eu] > 0);
+  if (inStock.length === 0) {
+    stock[sizes[h % sizes.length]] = kind === "classic" ? 6 : 2;
+    stock[sizes[(h + 2) % sizes.length]] = kind === "classic" ? 4 : 1;
+  } else if (kind === "drop" && inStock.length < 2) {
+    const extra = sizes[(h + 3) % sizes.length];
+    if (stock[extra] === 0) stock[extra] = 1;
+  }
+
+  return stock;
+}
+
+/** Resolve stock for a seeded variant (honours explicit sold-out markers). */
+export function resolveVariantStock(
+  product: SeedProduct,
+  variant: SeedVariant,
+  kind: Exclude<StockKind, "oos">,
+): Record<number, number> {
+  if (isAllZero(variant.stock)) {
+    return buildStock({
+      gender: product.gender,
+      kind: "oos",
+      seed: `${product.slug}:${variant.color}`,
+    });
+  }
+  return buildStock({
+    gender: product.gender,
+    kind,
+    seed: `${product.slug}:${variant.color}`,
+  });
+}
+
+/** @deprecated Prefer `buildStock` — kept so existing seed files still typecheck. */
 export function stockFull(base = 8): Record<number, number> {
   const stock: Record<number, number> = {};
   for (let eu = 38; eu <= 45; eu++) {
@@ -73,12 +168,12 @@ export function stockFull(base = 8): Record<number, number> {
   return stock;
 }
 
-/** Sparse low stock — some sizes at zero. */
+/** @deprecated Prefer `buildStock` — kept so existing seed files still typecheck. */
 export function stockLimited(): Record<number, number> {
   return { 40: 1, 41: 2, 42: 1, 43: 1, 44: 0, 45: 0 };
 }
 
-/** All zero for sizes 41–44. */
+/** Explicit sold-out marker — `resolveVariantStock` turns this into a full zero run. */
 export function stockOos(): Record<number, number> {
   return { 41: 0, 42: 0, 43: 0, 44: 0 };
 }

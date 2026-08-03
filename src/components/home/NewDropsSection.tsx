@@ -1,9 +1,11 @@
 import SneakerGridSection from "@/components/home/SneakerGridSection";
-import { getProductCards } from "@/lib/catalog";
+import type { ProductCardData } from "@/types/product";
 
-export default async function NewDropsSection() {
-  const products = await getProductCards({ take: 6 });
+type NewDropsSectionProps = {
+  products: ProductCardData[];
+};
 
+export default function NewDropsSection({ products }: NewDropsSectionProps) {
   return (
     <SneakerGridSection
       title="New Drops"

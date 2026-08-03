@@ -8,6 +8,7 @@ import {
   CLASSICS,
   DROPS,
   img,
+  resolveVariantStock,
   type SeedProduct,
   type SeedVariant,
 } from "./seed/index";
@@ -36,6 +37,7 @@ function variantImageUrl(variant: SeedVariant): string {
 async function createProduct(
   product: SeedProduct,
   brandId: string,
+  kind: "classic" | "drop",
 ) {
   await prisma.product.create({
     data: {
@@ -60,7 +62,9 @@ async function createProduct(
           colorFamily: variant.colorFamily,
           price: variant.price,
           imageUrl: variantImageUrl(variant),
-          sizes: { create: sizes(variant.stock) },
+          sizes: {
+            create: sizes(resolveVariantStock(product, variant, kind)),
+          },
         })),
       },
     },
@@ -110,11 +114,15 @@ async function main() {
   }
 
   // Classics first (older createdAt), then drops — newest drops surface in New Drops.
-  const catalog = [...CLASSICS, ...DROPS];
-  for (const product of catalog) {
+  for (const product of CLASSICS) {
     const brandId = brandByName.get(product.brand);
     if (!brandId) throw new Error(`Unknown brand: ${product.brand}`);
-    await createProduct(product, brandId);
+    await createProduct(product, brandId, "classic");
+  }
+  for (const product of DROPS) {
+    const brandId = brandByName.get(product.brand);
+    if (!brandId) throw new Error(`Unknown brand: ${product.brand}`);
+    await createProduct(product, brandId, "drop");
   }
 
   const [brands, products, variants, sizeRows, upcoming] = await Promise.all([

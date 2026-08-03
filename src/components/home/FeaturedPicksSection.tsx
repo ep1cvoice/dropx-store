@@ -1,10 +1,13 @@
 import SneakerGridSection from "@/components/home/SneakerGridSection";
-import { getProductCards } from "@/lib/catalog";
+import type { ProductCardData } from "@/types/product";
 
-export default async function TrendingNowSection() {
-  // Show a different slice than New Drops so the two grids don't repeat.
-  const products = await getProductCards({ take: 6, skip: 6 });
+type FeaturedPicksSectionProps = {
+  products: ProductCardData[];
+};
 
+export default function FeaturedPicksSection({
+  products,
+}: FeaturedPicksSectionProps) {
   return (
     <SneakerGridSection
       title="Featured Picks"

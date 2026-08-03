@@ -41,19 +41,19 @@ export default async function BrandsPage() {
             <Link
               key={brand.slug}
               href={`/browse-all?brand=${brand.slug}`}
-              className="group flex flex-col overflow-hidden rounded-none bg-white ring-1 ring-black/5 transition-shadow hover:shadow-md"
+              className="group flex flex-col overflow-hidden rounded-none bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md"
             >
-              <div className="relative aspect-[4/3] overflow-hidden bg-[#f5f5f5]">
+              <div className="relative aspect-[4/3] overflow-hidden bg-white">
                 {brand.imageUrl ? (
                   <Image
                     src={brand.imageUrl}
                     alt={brand.name}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="object-contain p-3 transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center">
+                  <div className="flex h-full w-full items-center justify-center bg-white">
                     <span
                       className={`${anton.className} text-2xl uppercase tracking-wide text-[#c4c4c4]`}
                     >
@@ -62,7 +62,7 @@ export default async function BrandsPage() {
                   </div>
                 )}
               </div>
-              <div className="flex items-center justify-between px-4 py-3">
+              <div className="flex items-center justify-between border-t border-black/5 px-4 py-3">
                 <span
                   className={`${anton.className} text-lg uppercase tracking-wide text-[#121212]`}
                 >

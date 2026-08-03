@@ -72,6 +72,8 @@ export const COLOR_FILTERS: { family: string; label: string; hex: string }[] = [
 
 /** EU sizes offered as filter chips (bare numbers; stored as "EU 40"). */
 export const SIZE_FILTERS = [
+  "36",
+  "37",
   "38",
   "39",
   "40",
@@ -81,7 +83,6 @@ export const SIZE_FILTERS = [
   "44",
   "45",
   "46",
-  "47",
 ];
 
 export const PRICE_BOUNDS = { min: 0, max: 450 };

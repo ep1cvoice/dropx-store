@@ -6,25 +6,31 @@ import BrandPartnersSection from "@/components/home/BrandPartnersSection";
 import StoreBenefitsSection from "@/components/home/StoreBenefitsSection";
 import NewDropsSection from "@/components/home/NewDropsSection";
 import GenderShopSection from "@/components/home/GenderShopSection";
-import TrendingNowSection from "@/components/home/FeaturedPicksSection";
+import FeaturedPicksSection from "@/components/home/FeaturedPicksSection";
 import CultureHeroSection from "@/components/home/CultureHeroSection";
 import HottestDropsPromoSection from "@/components/home/HottestDropsPromoSection";
 import BrowseAllSneakersSection from "@/components/home/BrowseAllSneakersSection";
+import { getHomeProductRails } from "@/lib/catalog";
 
-export default function Home() {
+/** Fresh random product rails on every request. */
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const { newDrops, featured, browseAll } = await getHomeProductRails();
+
   return (
     <>
       <HomeHeroDesktop />
       <UpcomingDropSection />
       <BrandPartnersSection />
       <StoreBenefitsSection />
-      <NewDropsSection />
+      <NewDropsSection products={newDrops} />
       <HottestDropsPromoSection />
       <GenderShopSection />
-      <TrendingNowSection />
+      <FeaturedPicksSection products={featured} />
       <CultureHeroSection />
       <ShopByCategorySection />
-      <BrowseAllSneakersSection />
+      <BrowseAllSneakersSection products={browseAll} />
       <DropListSection />
     </>
   );

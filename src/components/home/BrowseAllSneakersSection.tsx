@@ -1,9 +1,13 @@
 import SneakerGridSection from "@/components/home/SneakerGridSection";
-import { getProductCards } from "@/lib/catalog";
+import type { ProductCardData } from "@/types/product";
 
-export default async function BrowseAllSneakersSection() {
-  const products = await getProductCards({ take: 12 });
+type BrowseAllSneakersSectionProps = {
+  products: ProductCardData[];
+};
 
+export default function BrowseAllSneakersSection({
+  products,
+}: BrowseAllSneakersSectionProps) {
   return (
     <SneakerGridSection
       title="Browse All Sneakers"
