@@ -417,13 +417,34 @@ export async function getProductListing(
   const where: Prisma.ProductWhereInput =
     and.length > 0 ? { ...base, AND: and } : base;
 
-  // Fetch all matching rows, then sort/paginate in memory. The catalog is
-  // small, and priceFrom is derived from variants (not directly sortable in SQL).
-  const rows = await prisma.product.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    select: productCardSelect,
-  });
+  // Brand facets stay scoped to the collection (+ stock rule), not other filters,
+  // so counts remain stable while toggling brand/size/color.
+  const facetWhere: Prisma.ProductWhereInput = !includeOutOfStock
+    ? {
+        ...base,
+        AND: [
+          { variants: { some: { sizes: { some: { stock: { gt: 0 } } } } } },
+        ],
+      }
+    : base;
+
+  // Products + brand facets in parallel — avoids waiting on a second round-trip.
+  const [rows, allBrands, grouped] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      select: productCardSelect,
+    }),
+    prisma.brand.findMany({
+      select: { id: true, name: true, slug: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.product.groupBy({
+      by: ["brandId"],
+      where: facetWhere,
+      _count: { _all: true },
+    }),
+  ]);
 
   let products = rows.map(toProductCardData);
 
@@ -445,20 +466,6 @@ export async function getProductListing(
   const safePage = Math.min(Math.max(1, page), totalPages);
   const start = (safePage - 1) * pageSize;
   const paged = products.slice(start, start + pageSize);
-
-  // Brand facets are scoped to the collection only (not narrowed by the other
-  // active filters), so counts stay stable as the user toggles brands.
-  const [allBrands, grouped] = await Promise.all([
-    prisma.brand.findMany({
-      select: { id: true, name: true, slug: true },
-      orderBy: { name: "asc" },
-    }),
-    prisma.product.groupBy({
-      by: ["brandId"],
-      where: base,
-      _count: { _all: true },
-    }),
-  ]);
 
   const countByBrand = new Map(grouped.map((g) => [g.brandId, g._count._all]));
   const brandFacets: BrandFacet[] = allBrands

@@ -1,15 +1,14 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import { inter } from "@/lib/fonts";
 import { SORT_OPTIONS } from "@/lib/listing";
-import { buildHref } from "./params";
+import { useListingNav } from "./ListingNav";
 
 export default function ListingSort() {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { navigate } = useListingNav();
 
   const current = searchParams.get("sort") ?? "newest";
 
@@ -20,13 +19,9 @@ export default function ListingSort() {
         value={current}
         onChange={(e) => {
           const value = e.target.value;
-          router.push(
-            buildHref(pathname, searchParams, {
-              sort: value === "newest" ? null : value,
-              page: null,
-            }),
-            { scroll: false },
-          );
+          navigate({
+            sort: value === "newest" ? null : value,
+          });
         }}
         className="cursor-pointer rounded-none border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-[#121212] outline-none focus:border-gray-400"
       >

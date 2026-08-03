@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import SizeButton from "@/components/ui/SizeButton";
@@ -14,7 +14,8 @@ import {
   SIZE_FILTERS,
   type BrandFacet,
 } from "@/lib/listing";
-import { buildHref, parseCsv, toggleCsv } from "./params";
+import { useListingNav } from "./ListingNav";
+import { parseCsv, toggleCsv } from "./params";
 
 type ListingFiltersProps = {
   brandFacets: BrandFacet[];
@@ -32,9 +33,8 @@ export default function ListingFilters({
   showBrands = true,
   showGender = true,
 }: ListingFiltersProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { navigate } = useListingNav();
 
   const collection = searchParams.get("collection") ?? "browse-all";
   const gender = searchParams.get("gender");
@@ -69,13 +69,6 @@ export default function ListingFilters({
 
   const hasActiveFilters = activeFilterCount > 0;
 
-  function navigate(updates: Record<string, string | null>) {
-    // Any filter change resets pagination.
-    router.push(buildHref(pathname, searchParams, { page: null, ...updates }), {
-      scroll: false,
-    });
-  }
-
   function applyPrice() {
     navigate({
       min: minPrice.trim() === "" ? null : minPrice.trim(),
@@ -85,9 +78,20 @@ export default function ListingFilters({
 
   function clearAll() {
     // Preserve the current collection, drop every other filter.
-    const keep = showCollections && collection !== "browse-all" ? collection : null;
-    router.push(buildHref(pathname, new URLSearchParams(), { collection: keep }), {
-      scroll: false,
+    const keep =
+      showCollections && collection !== "browse-all" ? collection : null;
+    navigate({
+      collection: keep,
+      gender: null,
+      category: null,
+      brand: null,
+      size: null,
+      color: null,
+      min: null,
+      max: null,
+      oos: null,
+      sort: null,
+      page: null,
     });
   }
 

@@ -1,11 +1,9 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { inter } from "@/lib/fonts";
-import { buildHref } from "./params";
+import { useListingNav } from "./ListingNav";
 
 type ListingPaginationProps = {
   page: number;
@@ -16,17 +14,14 @@ export default function ListingPagination({
   page,
   totalPages,
 }: ListingPaginationProps) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { navigate } = useListingNav();
 
   if (totalPages <= 1) {
     return null;
   }
 
-  const hrefFor = (target: number) =>
-    buildHref(pathname, searchParams, {
-      page: target === 1 ? null : String(target),
-    });
+  const goTo = (target: number) =>
+    navigate({ page: target === 1 ? null : String(target) });
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
@@ -39,13 +34,14 @@ export default function ListingPagination({
       className={`${inter.className} mt-12 flex items-center justify-center gap-2`}
     >
       {page > 1 ? (
-        <Link
-          href={hrefFor(page - 1)}
+        <button
+          type="button"
+          onClick={() => goTo(page - 1)}
           aria-label="Previous page"
-          className={`${baseItem} border-gray-200 text-[#121212] hover:border-gray-400`}
+          className={`${baseItem} cursor-pointer border-gray-200 text-[#121212] hover:border-gray-400`}
         >
           <ChevronLeft size={16} />
-        </Link>
+        </button>
       ) : (
         <span
           aria-hidden="true"
@@ -58,29 +54,31 @@ export default function ListingPagination({
       {pages.map((p) => {
         const active = p === page;
         return (
-          <Link
+          <button
             key={p}
-            href={hrefFor(p)}
+            type="button"
+            onClick={() => goTo(p)}
             aria-current={active ? "page" : undefined}
-            className={`${baseItem} ${
+            className={`${baseItem} cursor-pointer ${
               active
                 ? "border-[#121212] bg-[#121212] font-semibold text-white"
                 : "border-gray-200 text-[#121212] hover:border-gray-400"
             }`}
           >
             {p}
-          </Link>
+          </button>
         );
       })}
 
       {page < totalPages ? (
-        <Link
-          href={hrefFor(page + 1)}
+        <button
+          type="button"
+          onClick={() => goTo(page + 1)}
           aria-label="Next page"
-          className={`${baseItem} border-gray-200 text-[#121212] hover:border-gray-400`}
+          className={`${baseItem} cursor-pointer border-gray-200 text-[#121212] hover:border-gray-400`}
         >
           <ChevronRight size={16} />
-        </Link>
+        </button>
       ) : (
         <span
           aria-hidden="true"
