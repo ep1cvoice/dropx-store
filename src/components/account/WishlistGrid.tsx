@@ -36,14 +36,14 @@ export default function WishlistGrid({
 
   if (list.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-5 py-16 text-center">
-        <p className={`${inter.className} text-base text-[#666666]`}>
-          Your wishlist is empty.
+      <div className="flex flex-col items-center gap-4 rounded-none border border-dashed border-black/15 px-6 py-12 text-center">
+        <p className={`${inter.className} text-sm text-[#666666]`}>
+          You haven&apos;t saved any sneakers yet.
         </p>
         <Link href="/browse-all">
           <Button
             variant="accent"
-            className="h-12 rounded-none px-8 text-sm font-semibold uppercase tracking-[0.12em]"
+            className="h-11 cursor-pointer rounded-none px-6 text-sm font-semibold uppercase tracking-[0.12em]"
           >
             Discover sneakers
           </Button>

@@ -6,23 +6,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { changePassword } from "@/actions/profile";
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 import { inter } from "@/lib/fonts";
 import {
   changePasswordSchema,
   type ChangePasswordValues,
 } from "@/lib/validation";
 
-const labelClass = `${inter.className} mb-1.5 block text-sm text-[#666666]`;
-const inputBaseClass = `${inter.className} w-full rounded-none border bg-white px-3.5 py-3 text-sm text-[#121212] placeholder:text-[#aaaaaa] focus:outline-none`;
 const sectionHeadingClass = `${inter.className} text-xs font-bold uppercase tracking-[0.16em] text-[#121212]`;
-
-function fieldClass(hasError: boolean) {
-  return `${inputBaseClass} ${
-    hasError
-      ? "border-red-400 focus:border-red-400"
-      : "border-black/15 focus:border-[#121212]"
-  }`;
-}
 
 export default function ChangePasswordForm() {
   const [isPending, startTransition] = useTransition();
@@ -84,65 +75,38 @@ export default function ChangePasswordForm() {
         </p>
 
         <div className="mt-4 space-y-4">
-          <div>
-            <label className={labelClass} htmlFor="currentPassword">
-              Current password
-            </label>
-            <input
-              id="currentPassword"
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              className={fieldClass(Boolean(errors.currentPassword))}
-              aria-invalid={errors.currentPassword ? "true" : undefined}
-              {...register("currentPassword")}
-            />
-            {errors.currentPassword && (
-              <p role="alert" className="mt-1.5 text-xs text-red-500">
-                {errors.currentPassword.message}
-              </p>
-            )}
-          </div>
+          <Input
+            id="currentPassword"
+            label="Current password"
+            type="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            error={errors.currentPassword?.message}
+            className="border-black/15 px-3.5 focus:border-[#121212]"
+            {...register("currentPassword")}
+          />
 
-          <div>
-            <label className={labelClass} htmlFor="newPassword">
-              New password
-            </label>
-            <input
-              id="newPassword"
-              type="password"
-              autoComplete="new-password"
-              placeholder="••••••••"
-              className={fieldClass(Boolean(errors.newPassword))}
-              aria-invalid={errors.newPassword ? "true" : undefined}
-              {...register("newPassword")}
-            />
-            {errors.newPassword && (
-              <p role="alert" className="mt-1.5 text-xs text-red-500">
-                {errors.newPassword.message}
-              </p>
-            )}
-          </div>
+          <Input
+            id="newPassword"
+            label="New password"
+            type="password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            error={errors.newPassword?.message}
+            className="border-black/15 px-3.5 focus:border-[#121212]"
+            {...register("newPassword")}
+          />
 
-          <div>
-            <label className={labelClass} htmlFor="confirmPassword">
-              Confirm new password
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              placeholder="••••••••"
-              className={fieldClass(Boolean(errors.confirmPassword))}
-              aria-invalid={errors.confirmPassword ? "true" : undefined}
-              {...register("confirmPassword")}
-            />
-            {errors.confirmPassword && (
-              <p role="alert" className="mt-1.5 text-xs text-red-500">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
+          <Input
+            id="confirmPassword"
+            label="Confirm new password"
+            type="password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            error={errors.confirmPassword?.message}
+            className="border-black/15 px-3.5 focus:border-[#121212]"
+            {...register("confirmPassword")}
+          />
         </div>
       </section>
 
