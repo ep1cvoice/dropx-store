@@ -11,7 +11,7 @@ export default function NewDropsSection({ products }: NewDropsSectionProps) {
       title="New Drops"
       viewAllHref="/browse-all?collection=new-drops"
       products={products}
-      desktopCount={5}
+      desktopCount={10}
     />
   );
 }

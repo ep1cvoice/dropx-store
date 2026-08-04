@@ -13,7 +13,7 @@ export default function FeaturedPicksSection({
       title="Featured Picks"
       viewAllHref="/browse-all?collection=featured"
       products={products}
-      desktopCount={5}
+      desktopCount={10}
     />
   );
 }

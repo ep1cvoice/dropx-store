@@ -13,7 +13,7 @@ export default function BrowseAllSneakersSection({
       title="Browse All Sneakers"
       viewAllHref="/browse-all"
       products={products}
-      desktopCount={10}
+      desktopCount={15}
       showBottomCta
       bottomCtaLabel="Browse all"
     />

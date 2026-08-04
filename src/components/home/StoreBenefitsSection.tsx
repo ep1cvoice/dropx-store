@@ -46,7 +46,7 @@ export default function StoreBenefitsSection() {
       aria-label="Store benefits"
       className={`${inter.className} bg-[#f1f1f1]`}
     >
-      <div className="mx-auto grid max-w-[1600px] gap-8 px-6 py-10 md:grid-cols-3 md:gap-6 md:py-12 lg:gap-10 lg:px-10">
+      <div className="mx-auto grid max-w-[1600px] gap-8 px-6 py-10 md:grid-cols-3 md:gap-6 md:py-12 lg:gap-10 lg:px-10 lg:pt-0">
         {benefits.map((benefit) => (
           <div
             key={benefit.title}

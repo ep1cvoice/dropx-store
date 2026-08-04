@@ -207,7 +207,7 @@ export const getHomeProductRails = cache(
       where: { badge: "new", AND: [available] },
       select: productCardSelect,
     });
-    const newDropRows = diversifyByBrand(newDropPool, 6);
+    const newDropRows = diversifyByBrand(newDropPool, 12);
     const newDropIds = newDropRows.map((row) => row.id);
 
     const featuredExclude = newDropIds;
@@ -221,10 +221,10 @@ export const getHomeProductRails = cache(
       },
       select: productCardSelect,
     });
-    let featuredRows = diversifyByBrand(featuredPool, 6);
+    let featuredRows = diversifyByBrand(featuredPool, 12);
 
-    if (featuredRows.length < 6) {
-      const need = 6 - featuredRows.length;
+    if (featuredRows.length < 12) {
+      const need = 12 - featuredRows.length;
       const topUpExclude = [
         ...newDropIds,
         ...featuredRows.map((row) => row.id),
@@ -257,7 +257,7 @@ export const getHomeProductRails = cache(
       },
       select: productCardSelect,
     });
-    const browseRows = diversifyByBrand(browsePool, 12);
+    const browseRows = diversifyByBrand(browsePool, 18);
 
     return {
       newDrops: newDropRows.map(toProductCardData),
