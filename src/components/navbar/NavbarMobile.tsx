@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Menu, ShoppingBag, User, X } from "lucide-react";
+import { Heart, LogOut, Menu, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import Button from "@/components/ui/Button";
 import { signOut, useSession } from "next-auth/react";
@@ -36,28 +36,32 @@ export default function NavbarMobile() {
 
   return (
     <>
-      <div className="grid h-14 grid-cols-3 items-center px-6 md:h-[68px]">
-        <button
-          type="button"
-          aria-label="Open menu"
-          aria-expanded={open}
-          aria-controls={menuId}
-          onClick={() => setOpen(true)}
-          className={navbarIconClassName + " justify-self-start"}
-        >
-          <Menu className={navIconClassName} strokeWidth={1.75} />
-        </button>
+      <div className="flex h-14 items-center justify-between px-6 md:h-[68px]">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={open}
+            aria-controls={menuId}
+            onClick={() => setOpen(true)}
+            className={navbarIconClassName}
+          >
+            <Menu className={navIconClassName} strokeWidth={1.75} />
+          </button>
+          <Logo />
+        </div>
 
-        <Logo className="justify-self-center" />
-
-        <Link
-          href="/cart"
-          aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
-          className={navbarIconClassName + " relative justify-self-end"}
-        >
-          <ShoppingBag className={navIconClassName} strokeWidth={1.75} />
-          <NavCountBadge count={cartCount} />
-        </Link>
+        <div className="flex items-center gap-4">
+          <NavSearch triggerClassName={navbarIconClassName} />
+          <Link
+            href="/cart"
+            aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
+            className={navbarIconClassName + " relative"}
+          >
+            <ShoppingBag className={navIconClassName} strokeWidth={1.75} />
+            <NavCountBadge count={cartCount} />
+          </Link>
+        </div>
       </div>
 
       {open && (
@@ -74,7 +78,7 @@ export default function NavbarMobile() {
             className="relative flex h-full w-full max-w-xs flex-col bg-[#121212] p-6 shadow-xl"
           >
             <div className="mb-8 flex items-center justify-between">
-              <Logo />
+              <Logo onClick={closeMenu} />
               <button
                 type="button"
                 aria-label="Close menu"
@@ -102,51 +106,37 @@ export default function NavbarMobile() {
               ))}
             </ul>
 
-            <div className="mt-auto space-y-5 border-t border-white/10 pt-6">
-              <div className="flex items-center justify-center gap-10">
-                <NavSearch
-                  onOpen={closeMenu}
-                  triggerClassName={
-                    iconButtonClassName +
-                    " rounded-none p-2 hover:bg-white/5 active:bg-white/10"
-                  }
-                />
-                <Link
-                  href="/account/wishlist"
-                  aria-label={
-                    wishlistCount > 0
-                      ? `Wishlist, ${wishlistCount} items`
-                      : "Wishlist"
-                  }
-                  onClick={closeMenu}
-                  className={
-                    iconButtonClassName +
-                    " relative rounded-none p-2 hover:bg-white/5 active:bg-white/10"
-                  }
+            <div className="mt-auto space-y-3 border-t border-white/10 pt-6">
+              <Link href="/cart" onClick={closeMenu} className="block">
+                <Button
+                  type="button"
+                  variant="accent"
+                  className="w-full cursor-pointer"
                 >
-                  <Heart className={navIconClassName} strokeWidth={1.75} />
-                  <NavCountBadge count={wishlistCount} />
-                </Link>
-                <Link
-                  href="/cart"
-                  aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
-                  onClick={closeMenu}
-                  className={
-                    iconButtonClassName +
-                    " relative rounded-none p-2 hover:bg-white/5 active:bg-white/10"
-                  }
+                  <ShoppingBag size={18} strokeWidth={1.75} />
+                  Cart
+                  {cartCount > 0 ? <span>({cartCount})</span> : null}
+                </Button>
+              </Link>
+              <Link href="/account/wishlist" onClick={closeMenu} className="block">
+                <Button
+                  type="button"
+                  className="w-full cursor-pointer border border-white/20 bg-transparent text-white hover:bg-white/10 active:bg-white/20"
                 >
-                  <ShoppingBag className={navIconClassName} strokeWidth={1.75} />
-                  <NavCountBadge count={cartCount} />
-                </Link>
-              </div>
+                  <Heart size={18} strokeWidth={1.75} />
+                  Wishlist
+                  {wishlistCount > 0 ? (
+                    <span className="text-white/50">({wishlistCount})</span>
+                  ) : null}
+                </Button>
+              </Link>
 
               {status === "authenticated" ? (
-                <div className="space-y-3">
+                <>
                   <Link href="/account" onClick={closeMenu} className="block">
                     <Button
                       type="button"
-                      className="flex w-full cursor-pointer items-center gap-2 border border-white/20 bg-transparent text-white hover:bg-white/10 active:bg-white/20"
+                      className="w-full cursor-pointer border border-white/20 bg-transparent text-white hover:bg-white/10 active:bg-white/20"
                     >
                       <User size={18} strokeWidth={1.75} />
                       My Account
@@ -160,12 +150,13 @@ export default function NavbarMobile() {
                     }}
                     className="w-full cursor-pointer border border-white bg-transparent text-white hover:bg-white/10 active:bg-white/20"
                   >
+                    <LogOut size={18} strokeWidth={1.75} />
                     Log out
                   </Button>
-                </div>
+                </>
               ) : (
                 <Link href="/login" onClick={closeMenu} className="block">
-                  <Button variant="accent" className="w-full cursor-pointer rounded-none">
+                  <Button variant="accent" className="w-full cursor-pointer">
                     Sign in
                   </Button>
                 </Link>

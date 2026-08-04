@@ -18,8 +18,8 @@ export default function CheckoutInformationView({
 }: CheckoutInformationViewProps) {
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_360px] lg:gap-12">
-      <CheckoutInformationForm defaults={defaults} isEditing={isEditing} />
-      <aside className="lg:sticky lg:top-6 lg:self-start">
+      {/* Summary first on mobile; form first (left) on desktop */}
+      <aside className="order-1 lg:order-2 lg:sticky lg:top-6 lg:self-start">
         <CheckoutSummary
           items={cart.items}
           subtotal={cart.subtotal}
@@ -30,6 +30,9 @@ export default function CheckoutInformationView({
           currency={cart.currency}
         />
       </aside>
+      <div className="order-2 lg:order-1">
+        <CheckoutInformationForm defaults={defaults} isEditing={isEditing} />
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { anton, inter } from "@/lib/fonts";
+import FooterMobileAccordion from "./FooterMobileAccordion";
 import {
   footerColumns,
   footerCopyright,
@@ -47,7 +48,7 @@ export default function Footer() {
             {footerDescription}
           </p>
 
-          {/* Columns: 3 columns on tablet, hidden on mobile */}
+          {/* Tablet: 3-column link grid */}
           <div className="mt-10 hidden grid-cols-3 gap-8 md:grid">
             {footerColumns.map((column) => (
               <div key={column.title}>
@@ -67,25 +68,8 @@ export default function Footer() {
             ))}
           </div>
 
-          {/* Mobile: compact 2-col link grid */}
-          <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-6 md:hidden">
-            {footerColumns.map((column) => (
-              <div key={column.title}>
-                <span
-                  className={`${inter.className} block text-xs font-medium uppercase tracking-[0.15em] text-white/40`}
-                >
-                  {column.title}
-                </span>
-                <ul className="mt-3 space-y-2">
-                  {column.links.map((link) => (
-                    <li key={link.label}>
-                      <FooterNavLink link={link} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          {/* Mobile: Sizeer-style accordion */}
+          <FooterMobileAccordion />
         </div>
 
         {/* ── Desktop: original layout ── */}

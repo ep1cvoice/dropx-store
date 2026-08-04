@@ -12,7 +12,12 @@ const CONTACT_EMAIL = "hello@dropx.store";
 
 const iconClassName = "size-3.5 shrink-0 opacity-90 md:size-4";
 
-const promoItems: { label: string; icon: ReactNode }[] = [
+const promoItems: {
+  label: string;
+  icon: ReactNode;
+  /** Hide below this breakpoint (Tailwind prefix), e.g. "lg" = visible from 1024px. */
+  visibleFrom?: "lg";
+}[] = [
   {
     label: `Free shipping over ${FREE_SHIPPING_THRESHOLD}€`,
     icon: <Truck className={iconClassName} strokeWidth={1.75} aria-hidden />,
@@ -20,6 +25,7 @@ const promoItems: { label: string; icon: ReactNode }[] = [
   {
     label: "30 days return policy",
     icon: <RefreshCw className={iconClassName} strokeWidth={1.75} aria-hidden />,
+    visibleFrom: "lg",
   },
 ];
 
@@ -50,7 +56,12 @@ export default function TopBar() {
           <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-2 md:px-6 lg:px-10">
             <ul className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 sm:gap-x-5">
               {promoItems.map((item) => (
-                <li key={item.label} className="flex items-center gap-3 sm:gap-5">
+                <li
+                  key={item.label}
+                  className={`flex items-center gap-3 sm:gap-5${
+                    item.visibleFrom === "lg" ? " hidden lg:flex" : ""
+                  }`}
+                >
                   <span className="inline-flex items-center gap-1.5">
                     {item.icon}
                     <span>{item.label}</span>

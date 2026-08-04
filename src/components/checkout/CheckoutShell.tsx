@@ -37,10 +37,9 @@ export default function CheckoutShell({
             : "grid gap-10 lg:grid-cols-[1fr_360px] lg:gap-12"
         }`}
       >
-        <div>{children}</div>
-
+        {/* Summary first on mobile; form first (left) on desktop */}
         {!hideSummary && (
-          <aside className="lg:sticky lg:top-6 lg:self-start">
+          <aside className="order-1 lg:order-2 lg:sticky lg:top-6 lg:self-start">
             <CheckoutSummary
               items={cart.items}
               subtotal={cart.subtotal}
@@ -52,6 +51,10 @@ export default function CheckoutShell({
             />
           </aside>
         )}
+
+        <div className={hideSummary ? undefined : "order-2 lg:order-1"}>
+          {children}
+        </div>
       </div>
     </div>
   );

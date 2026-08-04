@@ -9,12 +9,12 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 text-white">
       <TopBar />
       <div className="relative bg-[#121212]">
-        <div className="hidden lg:block">
+        <div className="hidden min-[1200px]:block">
           <Suspense fallback={<div className="h-[76px]" />}>
             <NavbarDesktop />
           </Suspense>
         </div>
-        <div className="lg:hidden">
+        <div className="min-[1200px]:hidden">
           <NavbarMobile />
         </div>
         {/* Search dropdown mounts here so it sticks with the nav */}
