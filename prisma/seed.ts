@@ -31,6 +31,7 @@ function variantImageUrl(variant: SeedVariant): string {
       return `https://res.cloudinary.com/${cloud}/image/upload/f_auto,q_auto/${variant.cloudinaryId}`;
     }
   }
+  if (variant.imageUrl) return variant.imageUrl;
   return img(variant.image);
 }
 

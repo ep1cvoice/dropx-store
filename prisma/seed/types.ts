@@ -22,10 +22,23 @@ const IMAGE_POOL = [
   "photo-1465453869711-7e174808ace9",
   "photo-1584735175315-9d5df23860e6",
   "photo-1539185441755-769473a23570",
+  // Loud / colourful fillers for new colourways without Cloudinary assets
+  "photo-1679111513962-762e14317937",
+  "photo-1592962879424-fab5e296b7d9",
+  "photo-1615290642882-6b9501729a27",
+  "photo-1560769629-975ec94e6a86",
+  "photo-1525966222134-fcfa99b8ae77",
+  "photo-1605348532760-6753d2c43329",
+  "photo-1556906781-9a412961c28c",
+  "photo-1600185365926-3a2ce3cdb9eb",
 ];
 
 export const img = (idx: number) =>
   `https://images.unsplash.com/${IMAGE_POOL[idx % IMAGE_POOL.length]}?auto=format&fit=crop&w=800&q=80`;
+
+/** Direct Unsplash (or any HTTPS) URL when Cloudinary public_id is missing. */
+export const unsplash = (photoId: string) =>
+  `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=800&q=80`;
 
 export type Category = "running" | "basketball" | "lifestyle" | "skateboarding";
 export type Badge = "new" | "limited" | "discount" | null;
@@ -47,6 +60,8 @@ export type SeedVariant = {
   stock: Record<number, number>;
   /** Cloudinary public_id — when set, seed stores a Cloudinary URL instead of Unsplash. */
   cloudinaryId?: string;
+  /** Full image URL — used when Cloudinary id is absent (plug holes with Unsplash). */
+  imageUrl?: string;
 };
 
 export type SeedProduct = {
