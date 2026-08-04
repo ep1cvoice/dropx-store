@@ -3,6 +3,20 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Sticky header on first paint: TopBar + nav (mobile / tablet / desktop). */
+  --site-header-height: 6rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --site-header-height: 6.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --site-header-height: 7.25rem;
+  }
 }
 
 @theme inline {
@@ -10,6 +24,20 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --animate-hero-scroll-cue: hero-scroll-cue 1.6s ease-in-out infinite;
+}
+
+@keyframes hero-scroll-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  /* Move up so the cue never clips under overflow / OS taskbars. */
+  50% {
+    transform: translateY(6px);
+    opacity: 0.55;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

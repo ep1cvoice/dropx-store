@@ -3,13 +3,23 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import HeroCountdown from "@/components/home/HeroCountdown";
+import HeroScrollCue from "@/components/home/HeroScrollCue";
+import HeroViewportSync from "@/components/home/HeroViewportSync";
 import { anton, inter } from "@/lib/fonts";
 import { UPCOMING_DROP } from "@/lib/upcoming-drop";
+
+/** Visible viewport minus sticky header — synced by HeroViewportSync. */
+const HERO_HEIGHT =
+  "h-[calc(var(--app-vh,100svh)-var(--site-header-height))]";
 
 export default function HomeHeroDesktop() {
   return (
     <>
-      <section className="relative min-h-[58vh] w-full overflow-hidden bg-[#07090c] md:hidden">
+      <HeroViewportSync />
+
+      <section
+        className={`relative ${HERO_HEIGHT} min-h-[480px] w-full overflow-hidden bg-[#07090c] md:hidden`}
+      >
         <Image
           src="/homeHeroWP.webp"
           alt="Limited sneaker drop hero"
@@ -25,7 +35,7 @@ export default function HomeHeroDesktop() {
 
         <HeroCountdown variant="mobile" />
 
-        <div className="relative z-10 mx-auto flex min-h-[58vh] w-full max-w-[1600px] flex-col justify-end px-4 pb-5 pt-8">
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1600px] flex-col justify-end px-4 pb-28 pt-8">
           <p
             className={`${inter.className} text-[10px] font-medium uppercase tracking-[0.22em] text-[#e85d2a]`}
           >
@@ -50,9 +60,13 @@ export default function HomeHeroDesktop() {
             Shop the drop
           </Link>
         </div>
+
+        <HeroScrollCue />
       </section>
 
-      <section className="relative hidden min-h-[56vh] w-full overflow-hidden bg-[#07090c] md:block lg:min-h-[50vh]">
+      <section
+        className={`relative hidden ${HERO_HEIGHT} min-h-[520px] w-full overflow-hidden bg-[#07090c] md:block`}
+      >
         <Image
           src="/homeHeroWP.webp"
           alt="Limited sneaker drop hero"
@@ -65,8 +79,10 @@ export default function HomeHeroDesktop() {
 
         <div className="pointer-events-none absolute inset-0 bg-[#06080b]/20" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/55 via-black/18 to-black/35" />
+        {/* Soft orange wash on the empty right side (timer zone) — desktop only */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-[#e85d2a]/28 via-[#e85d2a]/10 to-transparent to-[60%]" />
 
-        <div className="relative z-10 mx-auto flex min-h-[56vh] w-full max-w-[1600px] flex-col justify-between px-6 py-8 md:px-8 md:py-10 lg:min-h-[50vh] lg:px-10 lg:py-14 xl:px-14">
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1600px] flex-col justify-between px-6 py-8 pb-32 md:px-8 md:py-10 lg:px-10 lg:py-14 xl:px-14">
           <div>
             <p
               className={`${inter.className} text-[10px] font-medium uppercase tracking-[0.24em] text-[#e85d2a] md:text-xs md:tracking-[0.28em]`}
@@ -95,6 +111,8 @@ export default function HomeHeroDesktop() {
 
           <HeroCountdown variant="desktop" />
         </div>
+
+        <HeroScrollCue />
       </section>
     </>
   );

@@ -384,7 +384,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           <button
             type="button"
             onClick={handleWishlist}
-            disabled={isPending || upcoming}
+            disabled={isPending}
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
             aria-pressed={wishlisted}
             className="flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-none border border-gray-200 transition-colors hover:border-gray-400 disabled:cursor-not-allowed disabled:opacity-60"

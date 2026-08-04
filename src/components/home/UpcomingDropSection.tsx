@@ -17,7 +17,10 @@ export default function UpcomingDropSection() {
   const units = countdownUnits(parts);
 
   return (
-    <section className="bg-[#f5f5f0] px-4 py-10 md:px-6 md:py-14 lg:px-10 lg:py-16 xl:px-14">
+    <section
+      id="upcoming-drop"
+      className="scroll-mt-24 bg-[#f5f5f0] px-4 py-10 md:px-6 md:py-14 md:scroll-mt-28 lg:px-10 lg:py-16 xl:px-14"
+    >
       <div className="mx-auto flex max-w-[1600px] flex-col items-center gap-8 md:flex-row md:gap-10 lg:gap-16">
         <div className="w-full text-center md:flex-1 md:text-left">
           <p

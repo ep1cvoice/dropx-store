@@ -110,7 +110,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <button
         type="button"
         onClick={handleWishlist}
-        disabled={isPending || !product.variantId || soldOut || upcoming}
+        disabled={isPending || !product.variantId || soldOut}
         aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
         aria-pressed={wishlisted}
         className="group/wish absolute right-2 top-2 z-10 cursor-pointer rounded-none p-1 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"

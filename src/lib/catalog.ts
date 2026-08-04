@@ -359,32 +359,43 @@ export async function getAllProductSlugs(): Promise<string[]> {
 }
 
 /**
- * Cards for a "you might also like" rail: same category first, excluding the
- * current product, topped up with other products if needed.
+ * Cards for a "you might also like" rail:
+ * 1. Prefer same category (lifestyle / running / basketball / skate)
+ * 2. Shuffle + diversify brands so the rail feels fresh per visit
+ * 3. Top up from other categories only if the pool is thin
  */
 export async function getRelatedProducts(
   slug: string,
   category: ProductCategory,
   take = 4,
 ): Promise<ProductCardData[]> {
+  // Opt this page into dynamic rendering so shuffle isn't frozen at build time.
+  const { connection } = await import("next/server");
+  await connection();
+
+  const poolSize = Math.max(take * 8, 24);
+
   const sameCategory = await prisma.product.findMany({
     where: { slug: { not: slug }, category },
-    take,
+    take: poolSize,
     orderBy: { createdAt: "desc" },
     select: productCardSelect,
   });
 
-  let rows = sameCategory;
+  let rows = diversifyByBrand(shuffle(sameCategory), take);
 
   if (rows.length < take) {
     const excludeSlugs = [slug, ...rows.map((r) => r.slug)];
     const filler = await prisma.product.findMany({
       where: { slug: { notIn: excludeSlugs } },
-      take: take - rows.length,
+      take: poolSize,
       orderBy: { createdAt: "desc" },
       select: productCardSelect,
     });
-    rows = [...rows, ...filler];
+    rows = [
+      ...rows,
+      ...diversifyByBrand(shuffle(filler), take - rows.length),
+    ];
   }
 
   return rows.map(toProductCardData);

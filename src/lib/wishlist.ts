@@ -1,3 +1,4 @@
+import { toIsoOrNull } from "@/lib/availability";
 import { getCurrentUserId } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
 
@@ -10,6 +11,8 @@ export type WishlistDisplayItem = {
   imageUrl: string | null;
   price: number;
   currency: string;
+  /** ISO drop date when set — used to show countdown for upcoming pairs. */
+  availableAt: string | null;
 };
 
 /** Set of variant ids the current user has wishlisted (empty for guests). */
@@ -45,6 +48,7 @@ export async function getWishlistItems(): Promise<WishlistDisplayItem[]> {
               slug: true,
               name: true,
               currency: true,
+              availableAt: true,
               brand: { select: { name: true } },
             },
           },
@@ -62,5 +66,6 @@ export async function getWishlistItems(): Promise<WishlistDisplayItem[]> {
     imageUrl: variant.imageUrl,
     price: variant.price,
     currency: variant.product.currency,
+    availableAt: toIsoOrNull(variant.product.availableAt),
   }));
 }

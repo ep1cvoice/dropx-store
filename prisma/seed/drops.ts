@@ -19,7 +19,6 @@ export const DROPS: SeedProduct[] = [
 		badge: 'limited',
 		featured: true,
 		availableAt: UPCOMING_DROP.dropsAt,
-		heroImageUrl: '/dropAirMax.jpg',
 		variants: [
 			{
 				color: 'Infrared',
@@ -90,9 +89,9 @@ export const DROPS: SeedProduct[] = [
 		availableAt: upcomingAt('puma-speedcat-porsche'),
 		variants: [
 			{
-				color: 'Archive Green',
-				colorHex: '#2E4A3E',
-				colorFamily: 'green',
+				color: 'Archive Red',
+				colorHex: '#C8102E',
+				colorFamily: 'red',
 				price: 180,
 				image: 3,
 				cloudinaryId: 'puma-speedcat-porsche-fudge_yl0skm',
