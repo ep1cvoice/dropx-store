@@ -33,15 +33,33 @@ const TRUST_POINTS = [
   { icon: ShieldCheck, label: "100% authentic guaranteed" },
 ] as const;
 
+function resolveInitialVariantId(
+  product: ProductDetail,
+  preferredVariantId?: string,
+) {
+  if (
+    preferredVariantId &&
+    product.variants.some((v) => v.id === preferredVariantId)
+  ) {
+    return preferredVariantId;
+  }
+  return product.variants[0]?.id ?? "";
+}
+
 type ProductDetailViewProps = {
   product: ProductDetail;
+  /** Prefill colourway from listing filters (`?variant=`). */
+  initialVariantId?: string;
 };
 
-export default function ProductDetailView({ product }: ProductDetailViewProps) {
+export default function ProductDetailView({
+  product,
+  initialVariantId,
+}: ProductDetailViewProps) {
   const router = useRouter();
   const { isWishlisted, toggleWishlistItem, bumpCartCount } = useStoreBag();
-  const [selectedVariantId, setSelectedVariantId] = useState(
-    product.variants[0]?.id ?? "",
+  const [selectedVariantId, setSelectedVariantId] = useState(() =>
+    resolveInitialVariantId(product, initialVariantId),
   );
   const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
   const [added, setAdded] = useState(false);

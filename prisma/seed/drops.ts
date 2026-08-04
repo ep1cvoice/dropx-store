@@ -118,8 +118,8 @@ export const DROPS: SeedProduct[] = [
 		variants: [
 			{
 				color: 'First in Flight',
-				colorHex: '#C4A882',
-				colorFamily: 'brown',
+				colorHex: '#5B7C99',
+				colorFamily: 'blue',
 				price: 260,
 				image: 4,
 				cloudinaryId: 'new-balance-990v6-joe-freshgoods-prom-blue_j2gngx',
@@ -602,7 +602,8 @@ export const DROPS: SeedProduct[] = [
 	{
 		slug: 'adidas-tokyo-pack-samba',
 		name: "Samba OG 'Tokyo Pack'",
-		description: 'City pack Samba with subtle Tokyo-inspired detailing. Soft leather and the classic gum outsole.',
+		description:
+			'Tokyo Pack Samba with a bold leopard-print upper. Soft suede overlays, classic gum outsole, and city-pack energy.',
 		brand: 'Adidas',
 		category: 'lifestyle',
 		gender: 'unisex',
@@ -612,6 +613,8 @@ export const DROPS: SeedProduct[] = [
 				color: 'Tokyo Night',
 				colorHex: '#6366F1',
 				colorFamily: 'multi',
+				description:
+					'Leopard-print Samba OG from the Tokyo Pack. Soft suede overlays and the classic gum outsole.',
 				price: 180,
 				image: 2,
 				cloudinaryId: 'adidas-tokyo-pack-samba-leopard_waaabh',
@@ -823,8 +826,8 @@ export const DROPS: SeedProduct[] = [
 		variants: [
 			{
 				color: 'Cream / Black',
-				colorHex: '#E8E4DC',
-				colorFamily: 'cream',
+				colorHex: '#1A1A1A',
+				colorFamily: 'black',
 				price: 190,
 				image: 10,
 				cloudinaryId: 'asics-gel-kayano-14-cream-black_pec9jc',
@@ -945,8 +948,8 @@ export const DROPS: SeedProduct[] = [
 		variants: [
 			{
 				color: 'Black / Neon',
-				colorHex: '#39FF14',
-				colorFamily: 'multi',
+				colorHex: '#1A1A1A',
+				colorFamily: 'black',
 				price: 195,
 				image: 2,
 				cloudinaryId: 'asics-gel-quantum-360_h3duwo',

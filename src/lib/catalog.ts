@@ -39,29 +39,58 @@ const productCardSelect = {
       id: true,
       price: true,
       imageUrl: true,
+      colorFamily: true,
       sizes: { select: { stock: true } },
     },
   },
 } satisfies Prisma.ProductSelect;
 
 type ProductCardRow = Prisma.ProductGetPayload<{ select: typeof productCardSelect }>;
+type ProductCardVariant = ProductCardRow["variants"][number];
 
-function toProductCardData(product: ProductCardRow): ProductCardData {
+/**
+ * Prefer a colourway that matches active color filters (filter order wins),
+ * otherwise the first variant by creation order.
+ */
+function pickCardVariant(
+  variants: ProductCardVariant[],
+  preferredColorFamilies?: string[],
+): ProductCardVariant | null {
+  if (variants.length === 0) return null;
+  if (preferredColorFamilies?.length) {
+    for (const family of preferredColorFamilies) {
+      const match = variants.find((v) => v.colorFamily === family);
+      if (match) return match;
+    }
+  }
+  return variants[0] ?? null;
+}
+
+function toProductCardData(
+  product: ProductCardRow,
+  preferredColorFamilies?: string[],
+): ProductCardData {
   const { variants } = product;
   const availableAt = toIsoOrNull(product.availableAt);
   const upcoming = isUpcoming(availableAt);
 
-  const priceFrom = variants.length
-    ? Math.min(...variants.map((v) => v.price))
+  const displayVariants =
+    preferredColorFamilies?.length
+      ? variants.filter((v) => preferredColorFamilies.includes(v.colorFamily))
+      : variants;
+  const stockVariants = displayVariants.length > 0 ? displayVariants : variants;
+  const cardVariant = pickCardVariant(variants, preferredColorFamilies);
+
+  const priceFrom = stockVariants.length
+    ? Math.min(...stockVariants.map((v) => v.price))
     : 0;
 
-  // Default variant = first by creation order; fall back to any variant image.
   const imageUrl =
-    variants[0]?.imageUrl ??
+    cardVariant?.imageUrl ??
     variants.find((v) => v.imageUrl)?.imageUrl ??
     null;
 
-  const totalStock = variants.reduce(
+  const totalStock = stockVariants.reduce(
     (sum, v) => sum + v.sizes.reduce((s, size) => s + size.stock, 0),
     0,
   );
@@ -80,7 +109,7 @@ function toProductCardData(product: ProductCardRow): ProductCardData {
     slug: product.slug,
     name: product.name,
     brand: product.brand.name,
-    variantId: variants[0]?.id ?? "",
+    variantId: cardVariant?.id ?? "",
     badge: product.badge as BadgeVariant | null,
     discountValue: product.discountValue,
     currency: product.currency,
@@ -660,7 +689,7 @@ export async function getProductListing(
     }),
   ]);
 
-  let products = rows.map(toProductCardData);
+  let products = rows.map((row) => toProductCardData(row, colors));
 
   if (sort === "price-asc") {
     products = products.sort((a, b) => a.priceFrom - b.priceFrom);

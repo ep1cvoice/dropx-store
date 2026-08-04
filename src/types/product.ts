@@ -110,14 +110,17 @@ export type ProductCardData = {
   slug: string;
   name: string;
   brand: string;
-  /** Default (first) variant id — used to toggle the wishlist from a card. */
+  /**
+   * Variant shown on the card (first colourway, or the one matching active
+   * color filters on listing pages). Used for wishlist + PDP deep-link.
+   */
   variantId: string;
   badge: BadgeVariant | null;
   discountValue: number | null;
   currency: string;
-  /** Image of the default (first) variant — null until uploaded to Supabase */
+  /** Image of the card variant (colour-filter aware on listing pages). */
   imageUrl: string | null;
-  /** Lowest price across all variants — used for "From €X" display */
+  /** Lowest price across card-relevant variants — used for "From €X" display */
   priceFrom: number;
   /** True when every size across all variants has zero stock. */
   outOfStock: boolean;

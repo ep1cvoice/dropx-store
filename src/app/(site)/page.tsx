@@ -9,7 +9,6 @@ import GenderShopSection from "@/components/home/GenderShopSection";
 import FeaturedPicksSection from "@/components/home/FeaturedPicksSection";
 import CultureHeroSection from "@/components/home/CultureHeroSection";
 import UpcomingDropsPosterSection from "@/components/home/UpcomingDropsPosterSection";
-import HottestDropsPromoSection from "@/components/home/HottestDropsPromoSection";
 import BrowseAllSneakersSection from "@/components/home/BrowseAllSneakersSection";
 import { getHomeProductRails } from "@/lib/catalog";
 
@@ -26,7 +25,6 @@ export default async function Home() {
       <BrandPartnersSection />
       <NewDropsSection products={newDrops} />
       <StoreBenefitsSection />
-      <HottestDropsPromoSection />
       <UpcomingDropsPosterSection />
       <GenderShopSection />
       <FeaturedPicksSection products={featured} />

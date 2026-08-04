@@ -15,6 +15,7 @@ import { anton, inter } from "@/lib/fonts";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ variant?: string }>;
 };
 
 export async function generateStaticParams() {
@@ -40,8 +41,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({
+  params,
+  searchParams,
+}: ProductPageProps) {
   const { slug } = await params;
+  const { variant } = await searchParams;
   const product = await getProductBySlug(slug);
 
   if (!product) {
@@ -74,7 +79,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </span>
       </nav>
 
-      <ProductDetailView product={product} />
+      <ProductDetailView product={product} initialVariantId={variant} />
 
       {/* Related products */}
       {related.length > 0 && (

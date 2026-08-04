@@ -227,8 +227,10 @@ export const CLASSICS: SeedProduct[] = [
 		variants: [
 			{
 				color: 'Forrest Gump',
-				colorHex: '#6366F1',
-				colorFamily: 'multi',
+				colorHex: '#FFFFFF',
+				colorFamily: 'white',
+				description:
+					'Classic Forrest Gump Cortez — white nylon and varsity-red suede with a foam midsole.',
 				price: 99,
 				image: 5,
 				cloudinaryId: 'nike-cortez-forrest-gump_tb1fnv',
@@ -367,11 +369,11 @@ export const CLASSICS: SeedProduct[] = [
 		badge: 'new',
 		variants: [
 			{
-				color: 'Cloud White',
-				colorHex: '#FAFAFA',
-				colorFamily: 'white',
+				color: 'Off White',
+				colorHex: '#EDE6D9',
+				colorFamily: 'beige',
 				description:
-					'Cloud White Samba with suede T-toe and gum sole. Gold foil branding on a terrace classic.',
+					'Warm off-white Samba with a soft beige cast, suede T-toe, gum sole, and gold foil branding.',
 				price: 110,
 				image: 3,
 				cloudinaryId: 'adidas-samba-og-cloude-white_bfavzk',
@@ -790,7 +792,9 @@ export const CLASSICS: SeedProduct[] = [
 			{
 				color: 'Moonbeam',
 				colorHex: '#E8E4DC',
-				colorFamily: 'white',
+				colorFamily: 'beige',
+				description:
+					'327 in soft moonbeam beige — suede and nylon with an oversized N and a wedge-like outsole.',
 				price: 119,
 				image: 8,
 				cloudinaryId: 'new-balance-327-moonbeam_tqtuvj',
@@ -878,7 +882,9 @@ export const CLASSICS: SeedProduct[] = [
 			{
 				color: 'White / Clay Grey',
 				colorHex: '#D9D2C7',
-				colorFamily: 'white',
+				colorFamily: 'cream',
+				description:
+					'GEL-1130 in soft cream and clay tones. Mesh-and-synthetic upper with rearfoot GEL cushioning.',
 				price: 129,
 				image: 10,
 				cloudinaryId: 'asics-gel-1130-white-clay-gray_wtnxqu',
@@ -1114,8 +1120,10 @@ export const CLASSICS: SeedProduct[] = [
 		variants: [
 			{
 				color: 'Black / Yellow',
-				colorHex: '#EAB308',
-				colorFamily: 'yellow',
+				colorHex: '#1A1A1A',
+				colorFamily: 'black',
+				description:
+					'Easy Rider in black with yellow accents. Nylon and suede upper, textured midsole, and bold Formstrip.',
 				price: 110,
 				image: 2,
 				cloudinaryId: 'puma-easy-rider-black_jjnsao',
@@ -1214,7 +1222,8 @@ export const CLASSICS: SeedProduct[] = [
 	{
 		slug: 'converse-chuck-70-low',
 		name: 'Chuck 70 Low',
-		description: 'Low-cut premium canvas. Same upgraded construction as the Hi with a clean, versatile silhouette.',
+		description:
+			'Low-cut premium canvas in a warm parchment tone. Same upgraded Chuck 70 construction with a clean, versatile silhouette.',
 		brand: 'Converse',
 		category: 'lifestyle',
 		gender: 'unisex',
@@ -1223,7 +1232,9 @@ export const CLASSICS: SeedProduct[] = [
 			{
 				color: 'Parchment',
 				colorHex: '#F5F0E8',
-				colorFamily: 'white',
+				colorFamily: 'beige',
+				description:
+					'Chuck 70 Low in parchment beige canvas. Higher foxing, Ortholite sockliner, and vintage finishing.',
 				price: 89,
 				image: 8,
 				cloudinaryId: 'converse-chuck-70-low_drhq04',

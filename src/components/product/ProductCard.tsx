@@ -31,6 +31,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     onSale && product.discountValue != null
       ? listPriceFromSale(product.priceFrom, product.discountValue)
       : null;
+  const href = product.variantId
+    ? `/products/${product.slug}?variant=${product.variantId}`
+    : `/products/${product.slug}`;
 
   function handleWishlist(event: React.MouseEvent) {
     event.preventDefault();
@@ -48,7 +51,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       }`}
     >
       <Link
-        href={`/products/${product.slug}`}
+        href={href}
         className="relative block aspect-[4/3] w-full overflow-hidden rounded-none bg-white"
         tabIndex={-1}
         aria-hidden="true"
@@ -126,7 +129,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </button>
 
       <Link
-        href={`/products/${product.slug}`}
+        href={href}
         className="flex flex-col gap-1 px-2.5 pb-2.5 pt-2.5"
       >
         <span
