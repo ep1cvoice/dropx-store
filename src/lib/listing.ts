@@ -109,6 +109,12 @@ export function isProductCategory(
   return CATEGORY_FILTERS.some((c) => c.value === value);
 }
 
+/** Trim + collapse whitespace; empty string means “no search”. */
+export function normalizeSearchQuery(value: string | null | undefined): string {
+  if (value == null) return "";
+  return value.trim().replace(/\s+/g, " ");
+}
+
 export type BrandFacet = { slug: string; name: string; count: number };
 
 export type ProductListingResult = {

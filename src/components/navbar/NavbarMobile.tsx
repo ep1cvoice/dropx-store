@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { Heart, Menu, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import Button from "@/components/ui/Button";
 import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
 import NavCountBadge from "./NavCountBadge";
+import NavSearch from "./NavSearch";
 import { getNavLinkClassName, navIconClassName, navLinks } from "./nav-links";
 import { useStoreBag } from "@/components/providers/StoreBagProvider";
 
@@ -103,16 +104,13 @@ export default function NavbarMobile() {
 
             <div className="mt-auto space-y-5 border-t border-white/10 pt-6">
               <div className="flex items-center justify-center gap-10">
-                <button
-                  type="button"
-                  aria-label="Search"
-                  className={
+                <NavSearch
+                  onOpen={closeMenu}
+                  triggerClassName={
                     iconButtonClassName +
                     " rounded-none p-2 hover:bg-white/5 active:bg-white/10"
                   }
-                >
-                  <Search className={navIconClassName} strokeWidth={1.75} />
-                </button>
+                />
                 <Link
                   href="/account/wishlist"
                   aria-label={

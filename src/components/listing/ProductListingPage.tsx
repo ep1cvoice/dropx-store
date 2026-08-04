@@ -16,6 +16,7 @@ import {
   isGenderFilter,
   isProductCategory,
   isSortOption,
+  normalizeSearchQuery,
   type CollectionSlug,
   type GenderFilter,
   type SortOption,
@@ -74,6 +75,8 @@ export default async function ProductListingPage({
     ? [lockedBrandSlug]
     : parseCsv(first(searchParams.brand));
 
+  const q = normalizeSearchQuery(first(searchParams.q));
+
   const { products, total, page, totalPages, brandFacets } =
     await getProductListing({
       collection,
@@ -82,12 +85,15 @@ export default async function ProductListingPage({
       brands,
       sizes: parseCsv(first(searchParams.size)),
       colors: parseCsv(first(searchParams.color)),
+      q: q || undefined,
       priceMin: toInt(first(searchParams.min)),
       priceMax: toInt(first(searchParams.max)),
       includeOutOfStock: first(searchParams.oos) === "1",
       sort,
       page: toInt(first(searchParams.page)) ?? 1,
     });
+
+  const heading = q ? `Results for “${q}”` : title;
 
   return (
     <ListingNavProvider>
@@ -102,7 +108,7 @@ export default async function ProductListingPage({
               Home
             </Link>
             <span aria-hidden="true">/</span>
-            <span className="text-[#121212]">{title}</span>
+            <span className="text-[#121212]">{heading}</span>
           </nav>
 
           {/* Header */}
@@ -111,7 +117,7 @@ export default async function ProductListingPage({
               <h1
                 className={`${anton.className} text-4xl uppercase leading-[0.9] tracking-wide text-[#121212] md:text-5xl`}
               >
-                {title}
+                {heading}
               </h1>
               <p className={`${inter.className} mt-2 text-sm text-[#666666]`}>
                 {total} {total === 1 ? "product" : "products"}

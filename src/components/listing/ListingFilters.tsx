@@ -56,6 +56,8 @@ export default function ListingFilters({
     setMaxPrice(maxParam ?? "");
   }, [minParam, maxParam]);
 
+  const searchQuery = searchParams.get("q");
+
   const activeFilterCount =
     (showGender && gender != null ? 1 : 0) +
     (category != null ? 1 : 0) +
@@ -65,7 +67,8 @@ export default function ListingFilters({
     (minParam != null ? 1 : 0) +
     (maxParam != null ? 1 : 0) +
     (showOutOfStock ? 1 : 0) +
-    (showCollections && collection !== "browse-all" ? 1 : 0);
+    (showCollections && collection !== "browse-all" ? 1 : 0) +
+    (searchQuery ? 1 : 0);
 
   const hasActiveFilters = activeFilterCount > 0;
 
@@ -92,6 +95,7 @@ export default function ListingFilters({
       oos: null,
       sort: null,
       page: null,
+      q: null,
     });
   }
 

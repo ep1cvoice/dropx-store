@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart, Search, ShoppingBag, User } from 'lucide-react';
+import { Heart, ShoppingBag, User } from 'lucide-react';
 import Logo from './Logo';
 import Button from '../ui/Button';
 import NavCountBadge from './NavCountBadge';
+import NavSearch from './NavSearch';
 import { getNavLinkClassName, navIconClassName, navLinks, isNavLinkActive } from './nav-links';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
@@ -35,9 +36,7 @@ export default function NavbarDesktop() {
 			</div>
 
 			<div className='flex items-center gap-5'>
-				<button type='button' aria-label='Search' className='cursor-pointer text-white/90 transition-colors hover:text-[#e85d2a]'>
-					<Search className={navIconClassName} strokeWidth={1.75} />
-				</button>
+				<NavSearch />
 				<Link
 					href='/account/wishlist'
 					aria-label={wishlistCount > 0 ? `Wishlist, ${wishlistCount} items` : 'Wishlist'}

@@ -156,7 +156,7 @@ export async function getProductCards(
     select: productCardSelect,
   });
 
-  return products.map(toProductCardData);
+  return products.map((product) => toProductCardData(product));
 }
 
 /** Fisher–Yates shuffle — fresh order on every request. */
@@ -289,9 +289,9 @@ export const getHomeProductRails = cache(
     const browseRows = diversifyByBrand(browsePool, 18);
 
     return {
-      newDrops: newDropRows.map(toProductCardData),
-      featured: featuredRows.map(toProductCardData),
-      browseAll: browseRows.map(toProductCardData),
+      newDrops: newDropRows.map((product) => toProductCardData(product)),
+      featured: featuredRows.map((product) => toProductCardData(product)),
+      browseAll: browseRows.map((product) => toProductCardData(product)),
     };
   },
 );
@@ -433,7 +433,7 @@ export async function getRelatedProducts(
     ];
   }
 
-  return rows.map(toProductCardData);
+  return rows.map((product) => toProductCardData(product));
 }
 
 // ---------------------------------------------------------------------------
@@ -572,6 +572,8 @@ export type ProductListingOptions = {
   brands?: string[]; // brand slugs
   sizes?: string[]; // bare EU numbers, e.g. ["40", "41"]
   colors?: string[]; // color families
+  /** Free-text search (name, slug, brand, colourway). */
+  q?: string;
   priceMin?: number;
   priceMax?: number;
   /** When false (default), products with zero total stock are hidden. */
@@ -580,6 +582,42 @@ export type ProductListingOptions = {
   page?: number;
   pageSize?: number;
 };
+
+function textSearchWhere(q: string): Prisma.ProductWhereInput {
+  return {
+    OR: [
+      { name: { contains: q, mode: "insensitive" } },
+      { slug: { contains: q, mode: "insensitive" } },
+      { brand: { name: { contains: q, mode: "insensitive" } } },
+      { variants: { some: { color: { contains: q, mode: "insensitive" } } } },
+    ],
+  };
+}
+
+/** Lightweight product hits for the navbar live-search overlay. */
+export async function searchProducts(
+  q: string,
+  take = 8,
+): Promise<ProductCardData[]> {
+  const query = q.trim().replace(/\s+/g, " ");
+  if (query.length < 2) return [];
+
+  // Include upcoming drops (availableAt in the future) so colourway searches
+  // like "Infrared" still surface poster / calendar products.
+  const rows = await prisma.product.findMany({
+    where: {
+      AND: [
+        { variants: { some: { sizes: { some: { stock: { gt: 0 } } } } } },
+        textSearchWhere(query),
+      ],
+    },
+    orderBy: { createdAt: "desc" },
+    take,
+    select: productCardSelect,
+  });
+
+  return rows.map((row) => toProductCardData(row));
+}
 
 export async function getProductListing(
   options: ProductListingOptions,
@@ -591,6 +629,7 @@ export async function getProductListing(
     brands = [],
     sizes: sizeFilters = [],
     colors = [],
+    q,
     priceMin,
     priceMax,
     includeOutOfStock = false,
@@ -636,6 +675,10 @@ export async function getProductListing(
   }
   if (colors.length > 0) {
     and.push({ variants: { some: { colorFamily: { in: colors } } } });
+  }
+  const query = q?.trim().replace(/\s+/g, " ") ?? "";
+  if (query.length >= 2) {
+    and.push(textSearchWhere(query));
   }
   if (priceMin != null || priceMax != null) {
     and.push({

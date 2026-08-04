@@ -15,9 +15,9 @@ const tiles = [
   {
     label: "Female",
     href: "/browse-all?gender=women",
-    image: "/pexels-sliceisop-2331103.jpg",
-    alt: "Female streetwear look",
-    objectPosition: "center 80%",
+    image: "/gender-shop-female.jpg",
+    alt: "Woman holding pastel Air Jordan 1 sneakers",
+    objectPosition: "center 25%",
   },
   {
     label: "All",

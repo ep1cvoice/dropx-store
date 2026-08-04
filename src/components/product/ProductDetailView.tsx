@@ -193,7 +193,7 @@ export default function ProductDetailView({
                         alt={variant.color}
                         fill
                         sizes="80px"
-                        className="object-contain p-1"
+                        className="object-contain p-1 cursor-pointer"
                       />
                     )}
                   </button>
