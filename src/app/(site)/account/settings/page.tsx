@@ -1,22 +1,6 @@
-import type { Metadata } from "next";
-import { Settings } from "lucide-react";
+import { redirect } from "next/navigation";
 
-import AccountPageHeader from "@/components/account/AccountPageHeader";
-import AccountPlaceholder from "@/components/account/AccountPlaceholder";
-
-export const metadata: Metadata = {
-  title: "Settings — DROPX",
-};
-
+/** Legacy route — settings live under Profile Data now. */
 export default function AccountSettingsPage() {
-  return (
-    <>
-      <AccountPageHeader title="Settings" />
-      <AccountPlaceholder
-        icon={Settings}
-        title="Settings coming soon"
-        description="Notification preferences and other account options will appear here."
-      />
-    </>
-  );
+  redirect("/account/profile-data");
 }

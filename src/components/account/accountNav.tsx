@@ -1,7 +1,6 @@
 import {
   CreditCard,
   Heart,
-  Settings,
   ShoppingBag,
   TicketPercent,
   User,

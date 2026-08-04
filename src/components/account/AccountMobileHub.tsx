@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { ArrowLeft, ChevronRight, LogOut, Settings, Sparkles, User } from "lucide-react";
+import { ArrowLeft, ChevronRight, LogOut, Sparkles, User } from "lucide-react";
 
 import { ACCOUNT_NAV } from "./accountNav";
 import { anton, inter } from "@/lib/fonts";
@@ -25,13 +25,7 @@ export default function AccountMobileHub({ name, email }: AccountMobileHubProps)
         >
           Profile
         </span>
-        <Link
-          href="/account/settings"
-          aria-label="Settings"
-          className="text-[#121212]"
-        >
-          <Settings size={20} />
-        </Link>
+        <span className="inline-block w-5" aria-hidden />
       </div>
 
       {/* Profile card */}

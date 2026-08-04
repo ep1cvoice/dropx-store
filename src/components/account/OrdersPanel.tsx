@@ -41,14 +41,14 @@ export default async function OrdersPanel() {
           key={order.id}
           className="flex items-center gap-4 rounded-none border border-black/10 p-4"
         >
-          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-none bg-[#eef4ff]">
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-none">
             {order.thumbnailUrl && (
               <Image
                 src={order.thumbnailUrl}
                 alt={`Order ${order.number}`}
                 fill
                 sizes="64px"
-                className="object-cover"
+                className="object-contain"
               />
             )}
           </div>
@@ -58,7 +58,7 @@ export default async function OrdersPanel() {
               Order #{order.number}
             </p>
             <p className="mt-0.5 text-xs text-[#888888]">
-              {dateFormatter.format(order.placedAt)} &nbsp;·&nbsp;{" "}
+              {dateFormatter.format(new Date(order.placedAt))} &nbsp;·&nbsp;{" "}
               {order.itemCount} {order.itemCount === 1 ? "item" : "items"}
             </p>
             {order.previewLabel && (

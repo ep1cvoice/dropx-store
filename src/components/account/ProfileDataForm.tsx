@@ -16,18 +16,15 @@ const labelClass = `${inter.className} mb-1.5 block text-sm text-[#666666]`;
 const inputBaseClass = `${inter.className} w-full rounded-none border bg-white px-3.5 py-3 text-sm text-[#121212] placeholder:text-[#aaaaaa] focus:outline-none`;
 const sectionHeadingClass = `${inter.className} text-xs font-bold uppercase tracking-[0.16em] text-[#121212]`;
 
-function fieldClass(hasError: boolean, disabled = false) {
+function fieldClass(hasError: boolean) {
   return `${inputBaseClass} ${
-    disabled
-      ? "cursor-not-allowed border-black/10 bg-[#f4f4f2] text-[#666666]"
-      : hasError
-        ? "border-red-400 focus:border-red-400"
-        : "border-black/15 focus:border-[#121212]"
+    hasError
+      ? "border-red-400 focus:border-red-400"
+      : "border-black/15 focus:border-[#121212]"
   }`;
 }
 
 export type ProfileDataFormDefaults = {
-  email: string;
   firstName: string;
   lastName: string;
   phone: string;
@@ -93,31 +90,11 @@ export default function ProfileDataForm({ defaults }: ProfileDataFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="max-w-xl">
-      <section>
-        <h2 className={sectionHeadingClass}>Account</h2>
-        <div className="mt-4 space-y-4">
-          <div>
-            <label className={labelClass} htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={defaults.email}
-              disabled
-              readOnly
-              className={fieldClass(false, true)}
-            />
-            <p className={`${inter.className} mt-1.5 text-xs text-[#999999]`}>
-              Email is used to sign in and can&apos;t be changed here.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <hr className="my-8 border-black/10" />
-
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+      className="mt-10 max-w-xl border-t border-black/10 pt-10"
+    >
       <section>
         <h2 className={sectionHeadingClass}>Personal details</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -167,7 +144,7 @@ export default function ProfileDataForm({ defaults }: ProfileDataFormProps) {
         <div className="mt-4 space-y-4">
           <div>
             <label className={labelClass} htmlFor="phone">
-              Phone (optional)
+              Phone
             </label>
             <input
               id="phone"

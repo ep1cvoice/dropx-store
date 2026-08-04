@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import AccountPageHeader from "@/components/account/AccountPageHeader";
+import ChangeEmailForm from "@/components/account/ChangeEmailForm";
 import ChangePasswordForm from "@/components/account/ChangePasswordForm";
 import ProfileDataForm from "@/components/account/ProfileDataForm";
 import { getCurrentUserId } from "@/lib/current-user";
@@ -34,9 +35,9 @@ export default async function AccountProfileDataPage() {
   return (
     <>
       <AccountPageHeader title="Profile Data" />
+      <ChangeEmailForm currentEmail={user.email} />
       <ProfileDataForm
         defaults={{
-          email: user.email,
           firstName: user.name,
           lastName: user.lastName,
           phone: user.phone ?? "",

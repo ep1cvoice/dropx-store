@@ -7,7 +7,8 @@ export type OrderStatus = "processing" | "shipped" | "delivered";
 export type OrderSummary = {
   id: string;
   number: string;
-  placedAt: Date;
+  /** ISO timestamp — plain string so RSC/client boundaries never see a Date. */
+  placedAt: string;
   itemCount: number;
   total: number;
   currency: string;
@@ -55,9 +56,9 @@ export async function getOrders(): Promise<OrderSummary[]> {
     return {
       id: order.id,
       number: order.number,
-      placedAt: order.createdAt,
+      placedAt: order.createdAt.toISOString(),
       itemCount,
-      total: order.total,
+      total: Number(order.total),
       currency: order.currency,
       status: toStatus(order.status),
       thumbnailUrl: first?.imageUrl ?? null,

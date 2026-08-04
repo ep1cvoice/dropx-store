@@ -52,6 +52,16 @@ export const forgotPasswordSchema = z.object({
 
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
+export const changeEmailSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .email("Enter a valid email address"),
+});
+
+export type ChangeEmailValues = z.infer<typeof changeEmailSchema>;
+
 const checkoutNameField = (label: string) =>
   z
     .string()
@@ -59,15 +69,16 @@ const checkoutNameField = (label: string) =>
     .min(1, `${label} is required`)
     .min(2, `${label} must be at least 2 characters`);
 
+const phoneField = z
+  .string()
+  .trim()
+  .min(1, "Phone is required")
+  .regex(/^[+\d\s()-]{6,20}$/, "Enter a valid phone number");
+
 export const profileDataSchema = z.object({
   firstName: checkoutNameField("First name"),
   lastName: checkoutNameField("Last name"),
-  phone: z
-    .string()
-    .trim()
-    .refine((val) => !val || /^[+\d\s()-]{6,20}$/.test(val), {
-      message: "Enter a valid phone number",
-    }),
+  phone: phoneField,
   address: z
     .string()
     .trim()
@@ -113,12 +124,7 @@ export const checkoutInformationSchema = z.object({
     .trim()
     .min(1, "Email is required")
     .email("Enter a valid email address"),
-  phone: z
-    .string()
-    .trim()
-    .refine((val) => !val || /^[+\d\s()-]{6,20}$/.test(val), {
-      message: "Enter a valid phone number",
-    }),
+  phone: phoneField,
   firstName: checkoutNameField("First name"),
   lastName: checkoutNameField("Last name"),
   address: z
@@ -144,5 +150,14 @@ export const checkoutInformationSchema = z.object({
 
 export type CheckoutInformationValues = z.infer<
   typeof checkoutInformationSchema
+>;
+
+/** Checkout form payload — draft fields + optional save-to-profile flag. */
+export const checkoutInformationFormSchema = checkoutInformationSchema.extend({
+  saveToProfile: z.boolean(),
+});
+
+export type CheckoutInformationFormValues = z.infer<
+  typeof checkoutInformationFormSchema
 >;
 

@@ -9,7 +9,8 @@ import Button from "@/components/ui/Button";
 import { SHIPPING_CARRIERS } from "@/lib/currency";
 import { inter } from "@/lib/fonts";
 import {
-  checkoutInformationSchema,
+  checkoutInformationFormSchema,
+  type CheckoutInformationFormValues,
   type CheckoutInformationValues,
 } from "@/lib/validation";
 
@@ -42,8 +43,8 @@ export default function CheckoutInformationForm({
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm<CheckoutInformationValues>({
-    resolver: zodResolver(checkoutInformationSchema),
+  } = useForm<CheckoutInformationFormValues>({
+    resolver: zodResolver(checkoutInformationFormSchema),
     defaultValues: {
       email: defaults?.email ?? "",
       phone: defaults?.phone ?? "",
@@ -54,16 +55,17 @@ export default function CheckoutInformationForm({
       postalCode: defaults?.postalCode ?? "",
       country: defaults?.country ?? "Poland",
       shippingMethod: defaults?.shippingMethod ?? "inpost-paczkomat",
+      saveToProfile: false,
     },
   });
 
-  function onSubmit(data: CheckoutInformationValues) {
+  function onSubmit(data: CheckoutInformationFormValues) {
     startTransition(async () => {
       const result = await saveCheckoutInformation(data);
       if (result && !result.ok) {
         if (result.fieldErrors) {
           for (const [key, messages] of Object.entries(result.fieldErrors)) {
-            setError(key as keyof CheckoutInformationValues, {
+            setError(key as keyof CheckoutInformationFormValues, {
               message: messages[0],
             });
           }
@@ -98,7 +100,7 @@ export default function CheckoutInformationForm({
           </div>
           <div>
             <label className={labelClass} htmlFor="phone">
-              Phone (optional)
+              Phone
             </label>
             <input
               id="phone"
@@ -314,6 +316,19 @@ export default function CheckoutInformationForm({
             ? "Save & continue to payment"
             : "Continue to payment"}
       </Button>
+
+      <label
+        className={`${inter.className} mt-4 flex cursor-pointer items-start gap-2.5 text-sm text-[#666666]`}
+      >
+        <input
+          type="checkbox"
+          className="mt-0.5 size-4 shrink-0 rounded-none border-black/30 accent-[#121212]"
+          {...register("saveToProfile")}
+        />
+        <span>
+          Save my contact details and address to my profile for next time
+        </span>
+      </label>
     </form>
   );
 }
