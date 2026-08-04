@@ -7,6 +7,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Button from '@/components/ui/Button';
+import FullScreenLoader from '@/components/ui/FullScreenLoader';
 import Input from '@/components/ui/Input';
 import { anton, inter } from '@/lib/fonts';
 import { loginSchema, type LoginFormValues } from '@/lib/validation';
@@ -63,6 +64,8 @@ export default function LoginForm({
 
   return (
     <div className={className}>
+      <FullScreenLoader show={isSubmitting} label="Signing in..." />
+
       <h2
         className={`${anton.className} text-2xl uppercase tracking-wide text-gray-900 md:text-3xl ${compact ? 'lg:text-3xl' : 'lg:text-4xl'}`}
       >
@@ -124,9 +127,9 @@ export default function LoginForm({
           type='submit'
           variant='accent'
           disabled={isSubmitting}
-          className='mt-2 w-full py-3.5 text-sm uppercase tracking-wide cursor-pointer'
+          className='mt-2 w-full cursor-pointer py-3.5 text-sm uppercase tracking-wide'
         >
-          {isSubmitting ? 'Signing in…' : 'Sign in'}
+          Sign in
         </Button>
         {serverError && (
           <p role='alert' className={`${inter.className} text-sm text-red-500`}>

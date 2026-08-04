@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import AtomicReveal from "@/components/ui/AtomicReveal";
+import ProductGridSkeleton from "@/components/ui/ProductGridSkeleton";
 import ProductCard from "@/components/product/ProductCard";
 import { anton, inter } from "@/lib/fonts";
 import type { ProductCardData } from "@/types/product";
@@ -48,20 +50,31 @@ export default function SneakerGridSection({
           </Link>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-2.5">
-          {products.map((product, index) => (
-            <div
-              key={product.id}
-              className={
-                desktopCount != null && index >= desktopCount
-                  ? "lg:hidden"
-                  : undefined
-              }
-            >
-              <ProductCard product={product} />
+        <AtomicReveal
+          className="mt-4"
+          fallback={
+            <div className="mt-4">
+              <ProductGridSkeleton
+                count={desktopCount ?? Math.min(products.length, 10)}
+              />
             </div>
-          ))}
-        </div>
+          }
+        >
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-2.5">
+            {products.map((product, index) => (
+              <div
+                key={product.id}
+                className={
+                  desktopCount != null && index >= desktopCount
+                    ? "lg:hidden"
+                    : undefined
+                }
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        </AtomicReveal>
 
         {showBottomCta && (
           <div className="mt-8 flex justify-center">

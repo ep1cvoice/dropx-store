@@ -12,8 +12,12 @@ import {
 
 import { placeMockOrder } from "@/actions/checkout";
 import Button from "@/components/ui/Button";
+import FullScreenLoader from "@/components/ui/FullScreenLoader";
 import { formatPrice } from "@/lib/currency";
 import { inter } from "@/lib/fonts";
+
+/** Brief brand beat so Processing… is visible before the server redirect. */
+const PAYMENT_BEAT_MS = 1400;
 
 type PaymentMethodId =
   | "blik"
@@ -86,12 +90,15 @@ export default function PaymentForm({ total, currency }: PaymentFormProps) {
 
   function handlePay() {
     startTransition(async () => {
+      await new Promise((resolve) => setTimeout(resolve, PAYMENT_BEAT_MS));
       await placeMockOrder(method);
     });
   }
 
   return (
     <div className={inter.className}>
+      <FullScreenLoader show={isPending} label="Processing..." />
+
       <section>
         <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#121212]">
           Payment method
@@ -159,7 +166,9 @@ export default function PaymentForm({ total, currency }: PaymentFormProps) {
         disabled={isPending}
         className="mt-8 h-12 w-full cursor-pointer rounded-none text-sm font-semibold uppercase tracking-[0.12em]"
       >
-        {isPending ? "Processing…" : `Pay ${formatPrice(total, currency)}`}
+        {isPending
+          ? "Processing…"
+          : `Pay ${formatPrice(total, currency)}`}
       </Button>
 
       <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-[#888888]">

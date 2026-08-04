@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 
 import ProductCard from "@/components/product/ProductCard";
 import ProductDetailView from "@/components/product/ProductDetailView";
+import AtomicReveal from "@/components/ui/AtomicReveal";
+import ProductGridSkeleton from "@/components/ui/ProductGridSkeleton";
 import {
   getAllProductSlugs,
   getProductBySlug,
@@ -82,11 +84,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
           >
             You might also like
           </h2>
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {related.map((item) => (
-              <ProductCard key={item.id} product={item} />
-            ))}
-          </div>
+          <AtomicReveal
+            className="mt-6"
+            fallback={
+              <div className="mt-6">
+                <ProductGridSkeleton
+                  count={Math.min(related.length, 4)}
+                  className="grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+                />
+              </div>
+            }
+          >
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {related.map((item) => (
+                <ProductCard key={item.id} product={item} />
+              ))}
+            </div>
+          </AtomicReveal>
         </section>
       )}
       </div>

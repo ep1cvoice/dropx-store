@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import type {
@@ -193,73 +195,77 @@ export type HomeProductRails = {
  * - New Drops → badge "new"
  * - Featured → featured flag (topped up with limited if needed)
  * - Browse All → brand-mixed catalog sampler
+ *
+ * Wrapped in `cache()` so multiple home sections share one fetch per request.
  */
-export async function getHomeProductRails(): Promise<HomeProductRails> {
-  const now = new Date();
-  const available = availableNowWhere(now);
+export const getHomeProductRails = cache(
+  async (): Promise<HomeProductRails> => {
+    const now = new Date();
+    const available = availableNowWhere(now);
 
-  const newDropPool = await prisma.product.findMany({
-    where: { badge: "new", AND: [available] },
-    select: productCardSelect,
-  });
-  const newDropRows = diversifyByBrand(newDropPool, 6);
-  const newDropIds = newDropRows.map((row) => row.id);
+    const newDropPool = await prisma.product.findMany({
+      where: { badge: "new", AND: [available] },
+      select: productCardSelect,
+    });
+    const newDropRows = diversifyByBrand(newDropPool, 6);
+    const newDropIds = newDropRows.map((row) => row.id);
 
-  const featuredExclude = newDropIds;
-  const featuredPool = await prisma.product.findMany({
-    where: {
-      featured: true,
-      ...(featuredExclude.length > 0
-        ? { id: { notIn: featuredExclude } }
-        : {}),
-      AND: [available],
-    },
-    select: productCardSelect,
-  });
-  let featuredRows = diversifyByBrand(featuredPool, 6);
-
-  if (featuredRows.length < 6) {
-    const need = 6 - featuredRows.length;
-    const topUpExclude = [
-      ...newDropIds,
-      ...featuredRows.map((row) => row.id),
-    ];
-    const topUpPool = await prisma.product.findMany({
+    const featuredExclude = newDropIds;
+    const featuredPool = await prisma.product.findMany({
       where: {
-        badge: "limited",
-        ...(topUpExclude.length > 0
-          ? { id: { notIn: topUpExclude } }
+        featured: true,
+        ...(featuredExclude.length > 0
+          ? { id: { notIn: featuredExclude } }
           : {}),
         AND: [available],
       },
       select: productCardSelect,
     });
-    featuredRows = shuffle([
-      ...featuredRows,
-      ...diversifyByBrand(topUpPool, need),
-    ]);
-  }
+    let featuredRows = diversifyByBrand(featuredPool, 6);
 
-  const excludeIds = [
-    ...newDropIds,
-    ...featuredRows.map((row) => row.id),
-  ];
+    if (featuredRows.length < 6) {
+      const need = 6 - featuredRows.length;
+      const topUpExclude = [
+        ...newDropIds,
+        ...featuredRows.map((row) => row.id),
+      ];
+      const topUpPool = await prisma.product.findMany({
+        where: {
+          badge: "limited",
+          ...(topUpExclude.length > 0
+            ? { id: { notIn: topUpExclude } }
+            : {}),
+          AND: [available],
+        },
+        select: productCardSelect,
+      });
+      featuredRows = shuffle([
+        ...featuredRows,
+        ...diversifyByBrand(topUpPool, need),
+      ]);
+    }
 
-  const browsePool = await prisma.product.findMany({
-    where: {
-      ...(excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {}),
-      AND: [available],
-    },
-    select: productCardSelect,
-  });
-  const browseRows = diversifyByBrand(browsePool, 12);
+    const excludeIds = [
+      ...newDropIds,
+      ...featuredRows.map((row) => row.id),
+    ];
 
-  return {
-    newDrops: newDropRows.map(toProductCardData),
-    featured: featuredRows.map(toProductCardData),
-    browseAll: browseRows.map(toProductCardData),
-  };
-}
+    const browsePool = await prisma.product.findMany({
+      where: {
+        ...(excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {}),
+        AND: [available],
+      },
+      select: productCardSelect,
+    });
+    const browseRows = diversifyByBrand(browsePool, 12);
+
+    return {
+      newDrops: newDropRows.map(toProductCardData),
+      featured: featuredRows.map(toProductCardData),
+      browseAll: browseRows.map(toProductCardData),
+    };
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Product detail
