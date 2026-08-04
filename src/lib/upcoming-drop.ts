@@ -10,8 +10,9 @@ export const UPCOMING_DROP = {
   dropsAt: "2026-10-15T10:00:00+02:00",
   displayDate: "October 15, 2026 — 10:00 CET",
   heroEyebrow: "Exclusive Drop — Fall 2026",
-  imageSrc: "/dropAirMax.jpg",
-  imageAlt: "Nike Air Max 90 Infrared OG",
+  /** Forward + reverse bake — seamless native loop, no JS reverse scrubbing. */
+  videoSrc: "/nike-infrared-og-film-loop.mp4",
+  videoAlt: "Nike Air Max 90 Infrared OG rotating product film",
   shopHref: `/products/${FEATURED_UPCOMING_SLUG}`,
 } as const;
 

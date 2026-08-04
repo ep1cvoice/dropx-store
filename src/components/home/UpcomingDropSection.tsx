@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { BellIcon } from "lucide-react";
 
 import Button from "@/components/ui/Button";
+import UpcomingDropSpinVideo from "@/components/home/UpcomingDropSpinVideo";
 import { useCountdown } from "@/hooks/useCountdown";
 import { anton, inter } from "@/lib/fonts";
 import {
@@ -22,7 +22,7 @@ export default function UpcomingDropSection() {
       className="scroll-mt-24 bg-[#f5f5f0] px-4 py-10 md:px-6 md:py-14 md:scroll-mt-28 lg:px-10 lg:py-16 xl:px-14"
     >
       <div className="mx-auto flex max-w-[1600px] flex-col items-center gap-8 md:flex-row md:gap-10 lg:gap-16">
-        <div className="w-full text-center md:flex-1 md:text-left">
+        <div className="w-full text-center md:flex-1 md:text-right">
           <p
             className={`${inter.className} text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e85d2a] md:text-[11px]`}
           >
@@ -46,7 +46,7 @@ export default function UpcomingDropSection() {
           </p>
 
           <div
-            className="mt-5 flex items-start justify-center gap-2.5 md:mt-6 md:justify-start md:gap-3"
+            className="mt-5 flex items-start justify-center gap-2.5 md:mt-6 md:justify-end md:gap-3"
             aria-live="polite"
           >
             {units.map((item) => (
@@ -80,7 +80,7 @@ export default function UpcomingDropSection() {
               </Button>
             </Link>
           ) : (
-            <div className="mx-auto mt-6 flex flex-col items-center gap-3 md:mx-0 md:mt-7 md:items-start sm:flex-row">
+            <div className="mx-auto mt-6 flex flex-col items-center gap-3 sm:flex-row md:mx-0 md:mt-7 md:items-end md:justify-end">
               <Link href={UPCOMING_DROP.shopHref}>
                 <Button
                   variant="outline"
@@ -112,18 +112,15 @@ export default function UpcomingDropSection() {
         </div>
 
         <div className="flex w-full items-center justify-center md:flex-1">
-          <div className="w-full max-w-[480px] overflow-hidden rounded-none bg-[#e9e9e9] md:max-w-full">
+          <Link
+            href={UPCOMING_DROP.shopHref}
+            aria-label={`View ${UPCOMING_DROP.titleLine1} ${UPCOMING_DROP.titleLine2}`}
+            className="block w-full max-w-[480px] overflow-hidden rounded-none transition-opacity hover:opacity-90 md:max-w-full"
+          >
             <div className="relative aspect-[4/3]">
-              <Image
-                src={UPCOMING_DROP.imageSrc}
-                alt={UPCOMING_DROP.imageAlt}
-                fill
-                quality={85}
-                className="scale-[1.20] object-contain drop-shadow-2xl"
-                sizes="(min-width: 768px) 50vw, 90vw"
-              />
+              <UpcomingDropSpinVideo />
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </section>
