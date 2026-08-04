@@ -42,6 +42,7 @@ export type ProductVariant = {
   productId: string;
   color: string;      // e.g. "Triple White"
   colorHex: string;   // e.g. "#F5F5F5" — rendered as the swatch dot
+  description: string | null; // colourway copy; UI falls back to product.description
   imageUrl: string | null;
   price: number;
   sizes: VariantSize[];

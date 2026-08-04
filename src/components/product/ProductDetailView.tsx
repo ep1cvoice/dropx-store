@@ -16,9 +16,16 @@ import { useStoreBag } from "@/components/providers/StoreBagProvider";
 import { isUpcoming } from "@/lib/availability";
 import { formatPrice, listPriceFromSale } from "@/lib/currency";
 import { anton, inter } from "@/lib/fonts";
+import { GENDER_FILTERS } from "@/lib/listing";
 import type { ProductDetail } from "@/types/product";
 
 const LOW_STOCK_THRESHOLD = 5;
+
+const GENDER_LABEL =
+  Object.fromEntries(GENDER_FILTERS.map((g) => [g.value, g.label])) as Record<
+    ProductDetail["gender"],
+    string
+  >;
 
 const TRUST_POINTS = [
   { icon: Truck, label: "Free shipping on orders over €200" },
@@ -90,6 +97,9 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
   const wishlisted = selectedVariant
     ? isWishlisted(selectedVariant.id)
     : false;
+
+  const description =
+    selectedVariant?.description ?? product.description;
 
   function handleWishlist() {
     if (!selectedVariant) return;
@@ -209,11 +219,15 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
       {/* Info panel */}
       {/* ---------------------------------------------------------------- */}
       <div className="flex flex-col">
-        <span
-          className={`${inter.className} text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]`}
+        <div
+          className={`${inter.className} flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]`}
         >
-          {product.brand}
-        </span>
+          <span>{product.brand}</span>
+          <span aria-hidden className="text-[#cccccc]">
+            ·
+          </span>
+          <span>{GENDER_LABEL[product.gender]}</span>
+        </div>
 
         <h1
           className={`${anton.className} mt-2 text-4xl uppercase leading-[0.95] tracking-wide text-[#121212] md:text-5xl`}
@@ -264,11 +278,11 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           </p>
         ) : null}
 
-        {product.description && (
+        {description && (
           <p
             className={`${inter.className} mt-5 max-w-prose text-sm leading-relaxed text-[#555555]`}
           >
-            {product.description}
+            {description}
           </p>
         )}
 

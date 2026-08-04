@@ -60,6 +60,7 @@ async function createProduct(
           color: variant.color,
           colorHex: variant.colorHex,
           colorFamily: variant.colorFamily,
+          description: variant.description ?? undefined,
           price: variant.price,
           imageUrl: variantImageUrl(variant),
           sizes: {

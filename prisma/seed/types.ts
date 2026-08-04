@@ -36,6 +36,8 @@ export type SeedVariant = {
   color: string;
   colorHex: string;
   colorFamily: string;
+  /** Colourway-specific copy; falls back to product.description when omitted. */
+  description?: string;
   price: number;
   image: number;
   /**

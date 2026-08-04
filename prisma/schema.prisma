@@ -175,10 +175,11 @@ model Product {
 }
 
 model ProductVariant {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   color       String // e.g. "Triple White"
   colorHex    String // e.g. "#F5F5F5" — swatch dot
-  colorFamily String @default("multi") // normalized filter bucket — e.g. "white", "black", "red"
+  colorFamily String  @default("multi") // normalized filter bucket — e.g. "white", "black", "red"
+  description String? // optional colourway copy; falls back to product.description
   imageUrl    String?
   price       Float
 
