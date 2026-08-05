@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useSyncExternalStore } from "react";
 
 import Button from "@/components/ui/Button";
@@ -37,11 +38,16 @@ function getServerSnapshot() {
 }
 
 export default function CookieBanner() {
-  const visible = useSyncExternalStore(
+  const pathname = usePathname();
+  const needsConsent = useSyncExternalStore(
     subscribe,
     getSnapshot,
     getServerSnapshot,
   );
+
+  // Let visitors read the policy without the overlay; leaving /privacy
+  // without Accept/Reject brings the banner back (consent not stored).
+  const visible = needsConsent && pathname !== "/privacy";
 
   const save = useCallback((value: ConsentValue) => {
     try {

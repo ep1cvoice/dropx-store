@@ -6,10 +6,8 @@ Beyond a UI showcase: real authentication, PostgreSQL, inventory, and order mana
 
 > Portfolio project — payment is intentionally simulated; orders, stock, and account data are real in Postgres.
 
-<!--
-  LIVE DEMO: add your Vercel URL here after deploy
-  **Live:** https://your-dropx-url.vercel.app
--->
+
+  **LIVE DEMO**: https://dropx-store.vercel.app/
 
 ---
 
