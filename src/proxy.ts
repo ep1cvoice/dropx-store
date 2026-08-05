@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 const guestOnlyRoutes = ["/login", "/register", "/forgot-password"];
-const protectedRoutes = ["/account", "/cart", "/checkout", "/orders"];
+const protectedRoutes = ["/account", "/cart", "/checkout", "/orders", "/wishlist"];
 
 function matchesRoute(pathname: string, route: string): boolean {
   return pathname === route || pathname.startsWith(`${route}/`);
@@ -11,10 +11,18 @@ function matchesRoute(pathname: string, route: string): boolean {
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const token = await getToken({
-    req,
-    secret: process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET,
-  });
+
+  let token = null;
+  try {
+    token = await getToken({
+      req,
+      secret: process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET,
+    });
+  } catch {
+    // Bad/missing secret or corrupt cookie — treat as logged out.
+    token = null;
+  }
+
   const isLoggedIn = Boolean(token);
 
   const isGuestOnlyRoute = guestOnlyRoutes.some((route) =>
@@ -35,6 +43,20 @@ export async function proxy(req: NextRequest) {
   return NextResponse.next();
 }
 
+// Only auth-gated routes — never run on /public assets (jpg, mp4, etc.).
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/account/:path*",
+    "/cart",
+    "/cart/:path*",
+    "/checkout",
+    "/checkout/:path*",
+    "/orders",
+    "/orders/:path*",
+    "/wishlist",
+    "/wishlist/:path*",
+  ],
 };
