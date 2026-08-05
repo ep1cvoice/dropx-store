@@ -53,7 +53,7 @@ export default function HomeHeroDesktop() {
           </h1>
 
           <Link
-            href={UPCOMING_DROP.shopHref}
+            href="/browse-all?collection=new-drops"
             className={`${inter.className} relative z-20 mt-6 inline-flex cursor-pointer items-center justify-center gap-2 rounded-none bg-[#e85d2a] px-8 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#f06d3a] active:bg-[#d45220]`}
           >
             <ArrowRight className="h-4 w-4" strokeWidth={2.1} />
@@ -101,7 +101,7 @@ export default function HomeHeroDesktop() {
             </h1>
 
             <Link
-              href={UPCOMING_DROP.shopHref}
+              href="/browse-all?collection=new-drops"
               className={`${inter.className} relative z-20 mt-6 inline-flex cursor-pointer items-center justify-center gap-2 rounded-none bg-[#e85d2a] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#f06d3a] active:bg-[#d45220] md:mt-7 md:px-8 md:py-3.5 lg:mt-10 lg:px-10 lg:py-4 lg:text-base lg:tracking-[0.18em]`}
             >
               Shop The Drop
