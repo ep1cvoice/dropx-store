@@ -8,8 +8,7 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    // Use process.env (not env()) so `prisma generate` works when DATABASE_URL
-    // is only needed later for migrate/seed — e.g. Vercel install/build.
-    url: process.env.DATABASE_URL!,
+    // Placeholder is fine for `prisma generate`; real URL needed for migrate/seed.
+    url: process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/postgres",
   },
 });
