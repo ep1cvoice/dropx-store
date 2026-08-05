@@ -22,7 +22,7 @@ export default function UpcomingDropSection() {
       className="scroll-mt-24 bg-[#f5f5f0] px-4 py-10 md:px-6 md:py-14 md:scroll-mt-28 lg:px-10 lg:py-16 xl:px-14"
     >
       <div className="mx-auto flex max-w-[1600px] flex-col items-center gap-8 md:flex-row md:gap-10 lg:gap-16">
-        <div className="w-full text-center md:flex-1 md:text-right">
+        <div className="w-full text-center md:flex-1">
           <p
             className={`${inter.className} text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e85d2a] md:text-[11px]`}
           >
@@ -46,7 +46,7 @@ export default function UpcomingDropSection() {
           </p>
 
           <div
-            className="mt-5 flex items-start justify-center gap-2.5 md:mt-6 md:justify-end md:gap-3"
+            className="mt-5 flex items-start justify-center gap-2.5 md:mt-6 md:gap-3"
             aria-live="polite"
           >
             {units.map((item) => (
@@ -70,7 +70,7 @@ export default function UpcomingDropSection() {
           {parts.isExpired ? (
             <Link
               href={UPCOMING_DROP.shopHref}
-              className="mx-auto mt-6 inline-block md:mx-0 md:mt-7"
+              className="mx-auto mt-6 inline-block md:mt-7"
             >
               <Button
                 variant="accent"
@@ -80,7 +80,7 @@ export default function UpcomingDropSection() {
               </Button>
             </Link>
           ) : (
-            <div className="mx-auto mt-6 flex flex-col items-center gap-3 sm:flex-row md:mx-0 md:mt-7 md:items-end md:justify-end">
+            <div className="mx-auto mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row md:mt-7">
               <Link href={UPCOMING_DROP.shopHref}>
                 <Button
                   variant="outline"

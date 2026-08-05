@@ -17,6 +17,7 @@ import type {
   SortOption,
 } from "@/lib/listing";
 import { isUpcoming, toIsoOrNull } from "@/lib/availability";
+import { pickCardVariant } from "@/lib/pick-card-variant";
 import { sizesFitGender } from "@/lib/sizes";
 
 /** At or below this remaining stock, cards show a "Only N left" nudge. */
@@ -46,25 +47,6 @@ const productCardSelect = {
 } satisfies Prisma.ProductSelect;
 
 type ProductCardRow = Prisma.ProductGetPayload<{ select: typeof productCardSelect }>;
-type ProductCardVariant = ProductCardRow["variants"][number];
-
-/**
- * Prefer a colourway that matches active color filters (filter order wins),
- * otherwise the first variant by creation order.
- */
-function pickCardVariant(
-  variants: ProductCardVariant[],
-  preferredColorFamilies?: string[],
-): ProductCardVariant | null {
-  if (variants.length === 0) return null;
-  if (preferredColorFamilies?.length) {
-    for (const family of preferredColorFamilies) {
-      const match = variants.find((v) => v.colorFamily === family);
-      if (match) return match;
-    }
-  }
-  return variants[0] ?? null;
-}
 
 function toProductCardData(
   product: ProductCardRow,
