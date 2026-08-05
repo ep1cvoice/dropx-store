@@ -41,4 +41,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/src/generated/prisma
+# Prisma Client is generated into src/ and committed so Vercel builds
+# always resolve `../generated/prisma/client` even if generate is skipped.
+# Re-run `npx prisma generate` after schema changes, then commit.
