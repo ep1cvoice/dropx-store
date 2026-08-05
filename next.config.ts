@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: process.cwd(),
-  },
+  // Prisma + pg are Node natives — keep them external for the server bundle.
+  serverExternalPackages: ["@prisma/client", "pg"],
   images: {
     qualities: [75, 80, 85],
     remotePatterns: [
