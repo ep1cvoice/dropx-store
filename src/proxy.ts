@@ -1,29 +1,28 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+
+import { auth } from "@/auth/auth";
 
 const guestOnlyRoutes = ["/login", "/register", "/forgot-password"];
-const protectedRoutes = ["/account", "/cart", "/checkout", "/orders", "/wishlist"];
+const protectedRoutes = [
+  "/account",
+  "/cart",
+  "/checkout",
+  "/orders",
+  "/wishlist",
+];
 
 function matchesRoute(pathname: string, route: string): boolean {
   return pathname === route || pathname.startsWith(`${route}/`);
 }
 
-export async function proxy(req: NextRequest) {
+/**
+ * Use Auth.js `auth()` (same session path as RSC), not raw `getToken`.
+ * Previously getToken missed the session cookie → /cart redirected to /login,
+ * then login page saw a valid session and bounced to `/`.
+ */
+export const proxy = auth((req) => {
   const { pathname } = req.nextUrl;
-
-  let token = null;
-  try {
-    token = await getToken({
-      req,
-      secret: process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET,
-    });
-  } catch {
-    // Bad/missing secret or corrupt cookie — treat as logged out.
-    token = null;
-  }
-
-  const isLoggedIn = Boolean(token);
+  const isLoggedIn = Boolean(req.auth);
 
   const isGuestOnlyRoute = guestOnlyRoutes.some((route) =>
     matchesRoute(pathname, route),
@@ -37,13 +36,12 @@ export async function proxy(req: NextRequest) {
   }
 
   if (isProtectedRoute && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/login", req.nextUrl));
+    const loginUrl = new URL("/login", req.nextUrl);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
+});
 
-  return NextResponse.next();
-}
-
-// Only auth-gated routes — never run on /public assets (jpg, mp4, etc.).
 export const config = {
   matcher: [
     "/login",

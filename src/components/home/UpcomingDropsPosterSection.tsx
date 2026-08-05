@@ -13,7 +13,8 @@ export default function UpcomingDropsPosterSection() {
           fill
           sizes="100vw"
           className="object-cover object-center"
-          priority={false}
+          priority
+          unoptimized
         />
 
         {/* Full poster → upcoming collection */}
