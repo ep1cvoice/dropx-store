@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Heart } from "lucide-react";
 
 import Badge from "@/components/ui/Badge";
@@ -20,15 +20,16 @@ export default function WishlistGrid({
   items: WishlistDisplayItem[];
 }) {
   const { removeWishlistItem } = useStoreBag();
-  const [list, setList] = useState(items);
+  const [removedIds, setRemovedIds] = useState(() => new Set<string>());
   const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    setList(items);
-  }, [items]);
+  const list = useMemo(
+    () => items.filter((item) => !removedIds.has(item.variantId)),
+    [items, removedIds],
+  );
 
   function remove(variantId: string) {
-    setList((prev) => prev.filter((i) => i.variantId !== variantId));
+    setRemovedIds((prev) => new Set(prev).add(variantId));
     startTransition(async () => {
       await removeWishlistItem(variantId);
     });

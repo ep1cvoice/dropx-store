@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 
 import { subscribeToNewsletter } from "@/actions/newsletter";
-import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { inter } from "@/lib/fonts";
 

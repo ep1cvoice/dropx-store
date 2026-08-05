@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 import Button from "@/components/ui/Button";
 import { anton, inter } from "@/lib/fonts";
@@ -11,26 +11,46 @@ const CONSENT_KEY = "dropx_cookie_consent";
 
 type ConsentValue = "accepted" | "rejected" | "custom";
 
+const listeners = new Set<() => void>();
+
+function emitConsentChange() {
+  for (const listener of listeners) listener();
+}
+
+function subscribe(onStoreChange: () => void) {
+  listeners.add(onStoreChange);
+  return () => {
+    listeners.delete(onStoreChange);
+  };
+}
+
+function getSnapshot() {
+  try {
+    return window.localStorage.getItem(CONSENT_KEY) == null;
+  } catch {
+    return true;
+  }
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
 export default function CookieBanner() {
-  const [visible, setVisible] = useState(false);
+  const visible = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
 
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(CONSENT_KEY);
-      if (!stored) setVisible(true);
-    } catch {
-      setVisible(true);
-    }
-  }, []);
-
-  function save(value: ConsentValue) {
+  const save = useCallback((value: ConsentValue) => {
     try {
       window.localStorage.setItem(CONSENT_KEY, value);
     } catch {
       // ignore storage errors in mock
     }
-    setVisible(false);
-  }
+    emitConsentChange();
+  }, []);
 
   if (!visible) return null;
 

@@ -35,17 +35,16 @@ export default function NavSearch({
   const inputRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+  const portalRoot =
+    typeof document !== "undefined"
+      ? document.getElementById("nav-search-root")
+      : null;
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<ProductCardData[]>([]);
   const [loading, setLoading] = useState(false);
   const [, startTransition] = useTransition();
   const abortRef = useRef<AbortController | null>(null);
-
-  useEffect(() => {
-    setPortalRoot(document.getElementById("nav-search-root"));
-  }, []);
 
   const close = useCallback(() => {
     setOpen(false);
@@ -82,21 +81,22 @@ export default function NavSearch({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open, close]);
 
+  const trimmedQuery = query.trim();
+  const showResults = trimmedQuery.length >= 2;
+  const visibleResults = showResults ? results : [];
+  const visibleLoading = showResults ? loading : false;
+
   useEffect(() => {
     const q = query.trim();
     abortRef.current?.abort();
 
-    if (q.length < 2) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
+    if (q.length < 2) return;
 
     const controller = new AbortController();
     abortRef.current = controller;
-    setLoading(true);
 
     const timer = window.setTimeout(async () => {
+      setLoading(true);
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`, {
           signal: controller.signal,
@@ -199,13 +199,13 @@ export default function NavSearch({
                 >
                   Type at least 2 characters to search
                 </p>
-              ) : loading ? (
+              ) : visibleLoading ? (
                 <p
                   className={`${inter.className} px-4 py-8 text-center text-sm text-white/40`}
                 >
                   Searching…
                 </p>
-              ) : results.length === 0 ? (
+              ) : visibleResults.length === 0 ? (
                 <p
                   className={`${inter.className} px-4 py-8 text-center text-sm text-white/40`}
                 >
@@ -213,7 +213,7 @@ export default function NavSearch({
                 </p>
               ) : (
                 <ul className="divide-y divide-white/8 py-1">
-                  {results.map((product) => (
+                  {visibleResults.map((product) => (
                     <li key={product.id}>
                       <Link
                         href={`/products/${product.slug}${

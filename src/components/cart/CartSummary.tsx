@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Lock } from "lucide-react";
 
 import { applyPromoCode, clearPromoCode } from "@/actions/promo";
@@ -30,14 +30,11 @@ export default function CartSummary({
   total,
   currency,
 }: CartSummaryProps) {
-  const [code, setCode] = useState(promoCode ?? "");
+  const [draft, setDraft] = useState<string | null>(null);
+  const code = draft !== null ? draft : (promoCode ?? "");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-
-  useEffect(() => {
-    setCode(promoCode ?? "");
-  }, [promoCode]);
 
   const remainingForPromo = Math.max(0, MEMBER_PROMO_MIN_SUBTOTAL - subtotal);
   const promoActive = Boolean(promoCode) && discount > 0;
@@ -52,7 +49,7 @@ export default function CartSummary({
         setError(result.error);
         return;
       }
-      setCode(result.code);
+      setDraft(null);
       setMessage(result.message);
     });
   }
@@ -62,7 +59,7 @@ export default function CartSummary({
     setError(null);
     startTransition(async () => {
       await clearPromoCode();
-      setCode("");
+      setDraft(null);
     });
   }
 
@@ -122,7 +119,7 @@ export default function CartSummary({
             type="text"
             value={code}
             onChange={(e) => {
-              setCode(e.target.value);
+              setDraft(e.target.value);
               if (message) setMessage(null);
               if (error) setError(null);
             }}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import SizeButton from "@/components/ui/SizeButton";
 import { inter } from "@/lib/fonts";
@@ -48,13 +48,19 @@ export default function ListingFilters({
 
   const [minPrice, setMinPrice] = useState(minParam ?? "");
   const [maxPrice, setMaxPrice] = useState(maxParam ?? "");
+  const [prevMinParam, setPrevMinParam] = useState(minParam);
+  const [prevMaxParam, setPrevMaxParam] = useState(maxParam);
   const [open, setOpen] = useState(false);
 
-  // Keep local price inputs in sync when the URL changes (e.g. Clear All).
-  useEffect(() => {
+  // Sync draft inputs when the URL changes (e.g. Clear All).
+  if (minParam !== prevMinParam) {
+    setPrevMinParam(minParam);
     setMinPrice(minParam ?? "");
+  }
+  if (maxParam !== prevMaxParam) {
+    setPrevMaxParam(maxParam);
     setMaxPrice(maxParam ?? "");
-  }, [minParam, maxParam]);
+  }
 
   const searchQuery = searchParams.get("q");
 

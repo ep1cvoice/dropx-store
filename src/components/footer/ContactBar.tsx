@@ -1,4 +1,4 @@
-import { Mail, MessagesSquare, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 
 import { inter } from "@/lib/fonts";
 

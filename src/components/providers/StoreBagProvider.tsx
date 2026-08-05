@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   useTransition,
@@ -47,17 +46,20 @@ export function StoreBagProvider({
   const [wishlistIds, setWishlistIds] = useState(
     () => new Set(initialWishlistIds),
   );
-
-  useEffect(() => {
-    setCartCount(initialCartCount);
-  }, [initialCartCount]);
-
+  const [prevCartCount, setPrevCartCount] = useState(initialCartCount);
   const wishlistKey = initialWishlistIds.join(",");
-  useEffect(() => {
+  const [prevWishlistKey, setPrevWishlistKey] = useState(wishlistKey);
+
+  if (initialCartCount !== prevCartCount) {
+    setPrevCartCount(initialCartCount);
+    setCartCount(initialCartCount);
+  }
+  if (wishlistKey !== prevWishlistKey) {
+    setPrevWishlistKey(wishlistKey);
     setWishlistIds(
       new Set(wishlistKey.length > 0 ? wishlistKey.split(",") : []),
     );
-  }, [wishlistKey]);
+  }
 
   const isWishlisted = useCallback(
     (variantId: string) => wishlistIds.has(variantId),
