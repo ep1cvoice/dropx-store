@@ -17,6 +17,7 @@ import type {
   SortOption,
 } from "@/lib/listing";
 import { isUpcoming, toIsoOrNull } from "@/lib/availability";
+import { interleaveByBrand } from "@/lib/interleave-by-brand";
 import { pickCardVariant } from "@/lib/pick-card-variant";
 import { sizesFitGender } from "@/lib/sizes";
 
@@ -720,6 +721,10 @@ export async function getProductListing(
     products = products.sort((a, b) => a.priceFrom - b.priceFrom);
   } else if (sort === "price-desc") {
     products = products.sort((a, b) => b.priceFrom - a.priceFrom);
+  } else {
+    // Default "newest": seed inserts brand-by-brand, so createdAt clusters
+    // by brand. Round-robin keeps the grid mixed while staying stable for pagination.
+    products = interleaveByBrand(products);
   }
 
   // Keep sold-out items at the end when they're included.
