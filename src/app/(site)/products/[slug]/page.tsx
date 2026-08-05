@@ -6,22 +6,16 @@ import ProductCard from "@/components/product/ProductCard";
 import ProductDetailView from "@/components/product/ProductDetailView";
 import AtomicReveal from "@/components/ui/AtomicReveal";
 import ProductGridSkeleton from "@/components/ui/ProductGridSkeleton";
-import {
-  getAllProductSlugs,
-  getProductBySlug,
-  getRelatedProducts,
-} from "@/lib/catalog";
+import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
 import { anton, inter } from "@/lib/fonts";
+
+/** Render on demand — avoids requiring DB connectivity during `next build` on Vercel. */
+export const dynamic = "force-dynamic";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ variant?: string }>;
 };
-
-export async function generateStaticParams() {
-  const slugs = await getAllProductSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({
   params,
