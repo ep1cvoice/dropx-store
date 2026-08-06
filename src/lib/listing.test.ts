@@ -29,11 +29,23 @@ describe("searchQueryAsSlug", () => {
   it("turns spaces into hyphens", () => {
     expect(searchQueryAsSlug("New Balance")).toBe("new-balance");
   });
+
+  it("lowercases the result", () => {
+    expect(searchQueryAsSlug("Nike Dunk")).toBe("nike-dunk");
+  });
 });
 
 describe("searchQueryTokens", () => {
   it("splits on spaces", () => {
     expect(searchQueryTokens("Nike Dunk")).toEqual(["Nike", "Dunk"]);
+  });
+
+  it("collapses extra whitespace before splitting", () => {
+    expect(searchQueryTokens("  New   Balance  550 ")).toEqual([
+      "New",
+      "Balance",
+      "550",
+    ]);
   });
 });
 
