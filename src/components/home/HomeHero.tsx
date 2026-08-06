@@ -8,9 +8,9 @@ import HeroViewportSync from "@/components/home/HeroViewportSync";
 import { anton, inter } from "@/lib/fonts";
 import { UPCOMING_DROP } from "@/lib/upcoming-drop";
 
-/** Visible viewport minus sticky header — synced by HeroViewportSync. */
+/** One full visible screen under the sticky header — synced by HeroViewportSync. */
 const HERO_HEIGHT =
-  "h-[calc(var(--app-vh,100svh)-var(--site-header-height))]";
+  "h-[calc(var(--app-vh,100svh)-var(--site-header-height,0px))] min-h-[calc(var(--app-vh,100svh)-var(--site-header-height,0px))]";
 
 export default function HomeHeroDesktop() {
   return (
@@ -18,7 +18,7 @@ export default function HomeHeroDesktop() {
       <HeroViewportSync />
 
       <section
-        className={`relative ${HERO_HEIGHT} min-h-[480px] w-full overflow-hidden bg-[#07090c] md:hidden`}
+        className={`relative ${HERO_HEIGHT} w-full overflow-hidden bg-[#07090c] md:hidden`}
       >
         <Image
           src="/homeHeroWP.webp"
@@ -65,7 +65,7 @@ export default function HomeHeroDesktop() {
       </section>
 
       <section
-        className={`relative hidden ${HERO_HEIGHT} min-h-[520px] w-full overflow-hidden bg-[#07090c] md:block`}
+        className={`relative hidden ${HERO_HEIGHT} w-full overflow-hidden bg-[#07090c] md:block`}
       >
         <Image
           src="/homeHeroWP.webp"

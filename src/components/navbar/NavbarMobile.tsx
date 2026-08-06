@@ -130,7 +130,7 @@ export default function NavbarMobile() {
               ))}
             </ul>
 
-            <div className="mt-auto space-y-3 border-t border-white/10 pt-6">
+            <div className="mt-auto space-y-3 border-t border-white/10 pt-6\f">
               <Link href="/cart" onClick={closeMenu} className="block">
                 <Button
                   type="button"

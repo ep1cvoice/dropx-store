@@ -5,7 +5,7 @@ import { UPCOMING_DROP } from "@/lib/upcoming-drop";
 
 export default function UpcomingDropsPosterSection() {
   return (
-    <section aria-label="Upcoming drops" className="bg-black">
+    <section aria-label="Upcoming drops" className="bg-black py-10 md:py-0">
       <div className="relative aspect-[1670/742] w-full overflow-hidden">
         <Image
           src="/upcoming-drops-poster-dropx.jpg"

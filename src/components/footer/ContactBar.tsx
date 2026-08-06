@@ -1,9 +1,10 @@
-import { Mail, Phone } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 
 import { inter } from "@/lib/fonts";
 
 const CONTACT_PHONE = "+48 500 284 119";
 const CONTACT_EMAIL = "hello@dropx.store";
+const CONTACT_ADDRESS = "Urban St. 71, Katowice, Poland";
 
 function InstagramCircleIcon() {
   return (
@@ -57,7 +58,6 @@ const contactItems = [
     label: CONTACT_EMAIL,
     icon: <Mail className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />,
   },
-  
 ] as const;
 
 const socialItems = [
@@ -66,29 +66,30 @@ const socialItems = [
   { label: "TikTok", icon: TikTokCircleIcon },
 ] as const;
 
+const itemClass =
+  "inline-flex min-w-0 items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.06em] md:text-sm";
+
 export default function ContactBar() {
   return (
     <section
       aria-label="Contact"
       className={`${inter.className} bg-[#f1f1f1] text-[#121212]`}
     >
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-5 px-6 py-5 md:flex-row md:items-center md:justify-between md:gap-8 lg:px-10">
-        <ul className="flex flex-wrap items-center gap-x-8 gap-y-3 md:gap-x-12 lg:gap-x-16">
-          {contactItems.map((item) => (
-            <li
-              key={item.label}
-              className="inline-flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.06em] md:text-sm"
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </li>
-          ))}
-        </ul>
+      <div className="mx-auto grid max-w-[1600px] grid-cols-2 gap-x-4 gap-y-4 px-6 py-5 md:flex md:flex-wrap md:items-center md:justify-between md:gap-x-8 md:gap-y-3 lg:px-10">
+        {contactItems.map((item) => (
+          <div key={item.label} className={itemClass}>
+            {item.icon}
+            <span className="truncate">{item.label}</span>
+          </div>
+        ))}
 
-        <div className="flex items-center gap-3 md:gap-4">
-          <span className="text-xs font-semibold uppercase tracking-[0.08em] md:text-sm">
-            Find us:
-          </span>
+        <div className={`${itemClass} col-span-2`}>
+          <MapPin className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
+          <span>{CONTACT_ADDRESS}</span>
+        </div>
+
+        <div className={`${itemClass} col-span-2 gap-3 md:ml-auto md:gap-4`}>
+          <span className="shrink-0 tracking-[0.08em]">Find us:</span>
           <ul className="flex items-center gap-2.5">
             {socialItems.map(({ label, icon: Icon }) => (
               <li key={label} aria-label={label}>

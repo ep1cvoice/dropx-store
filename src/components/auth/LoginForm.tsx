@@ -138,15 +138,6 @@ export default function LoginForm({
         )}
       </form>
 
-      <div className={`relative ${compact ? 'my-5 lg:my-4' : 'my-8'}`}>
-        <div className='absolute inset-0 flex items-center'>
-          <div className='w-full border-t border-gray-200' />
-        </div>
-        <div className='relative flex justify-center'>
-          <span className={`${inter.className} bg-white px-3 text-xs uppercase tracking-wider text-gray-400`}>Or</span>
-        </div>
-      </div>
-
       <p
         className={`${inter.className} pt-6 text-center text-sm text-gray-500 md:pt-0 ${compact ? 'lg:pt-4' : 'mt-auto md:mt-10'}`}
       >

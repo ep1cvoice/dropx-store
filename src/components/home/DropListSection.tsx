@@ -4,6 +4,10 @@ import ScrollToNewsletterHash from "@/components/home/ScrollToNewsletterHash";
 import { auth } from "@/auth/auth";
 import { anton, inter } from "@/lib/fonts";
 
+/** Full visible viewport — uses --app-vh from HeroViewportSync on the homepage. */
+const NEWSLETTER_HEIGHT =
+  "min-h-[var(--app-vh,100svh)] h-[var(--app-vh,100svh)]";
+
 export default async function DropListSection() {
   const session = await auth();
   const defaultEmail = session?.user?.email?.trim() ?? "";
@@ -11,10 +15,10 @@ export default async function DropListSection() {
   return (
     <section
       id="newsletter"
-      className="scroll-mt-28 bg-[#121212] px-6 py-16 md:scroll-mt-32 md:py-24 lg:py-28"
+      className={`${NEWSLETTER_HEIGHT} scroll-mt-[var(--site-header-height,7rem)] flex flex-col justify-center bg-[#121212] px-6`}
     >
       <ScrollToNewsletterHash />
-      <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+      <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center">
         <p
           className={`${inter.className} text-xs font-medium uppercase tracking-[0.25em] text-[#e85d2a] md:text-sm`}
         >

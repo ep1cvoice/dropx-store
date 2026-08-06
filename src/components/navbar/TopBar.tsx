@@ -54,7 +54,7 @@ export default function TopBar() {
           className={`${inter.className} border-b border-black/10 bg-[#6b6b6b] text-[11px] text-white/85 md:text-xs`}
         >
           <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-2 md:px-6 lg:px-10">
-            <ul className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 sm:gap-x-5">
+            <ul className="flex w-full min-w-0 items-center justify-between gap-y-1 md:w-auto md:justify-start md:gap-x-5 lg:gap-x-5">
               {promoItems.map((item) => (
                 <li
                   key={item.label}
@@ -66,7 +66,10 @@ export default function TopBar() {
                     {item.icon}
                     <span>{item.label}</span>
                   </span>
-                  <span aria-hidden="true" className="text-white/30">
+                  <span
+                    aria-hidden="true"
+                    className="hidden text-white/30 md:inline"
+                  >
                     |
                   </span>
                 </li>
