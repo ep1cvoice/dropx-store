@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Heart, LogOut, Menu, ShoppingBag, User, X } from "lucide-react";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, type TransitionEvent } from "react";
 import Button from "@/components/ui/Button";
 import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
@@ -17,21 +17,39 @@ const iconButtonClassName =
 const navbarIconClassName =
   "cursor-pointer text-white/90 transition-colors duration-200 hover:text-[#e85d2a] active:text-[#e85d2a]";
 
+const PANEL_MS = 300;
+
 export default function NavbarMobile() {
-  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [entered, setEntered] = useState(false);
   const menuId = useId();
   const { status } = useSession();
   const { cartCount, wishlistCount } = useStoreBag();
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    document.body.style.overflow = mounted ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [open]);
+  }, [mounted]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const id = requestAnimationFrame(() => setEntered(true));
+    return () => cancelAnimationFrame(id);
+  }, [mounted]);
+
+  function openMenu() {
+    setMounted(true);
+  }
 
   function closeMenu() {
-    setOpen(false);
+    setEntered(false);
+  }
+
+  function onPanelTransitionEnd(event: TransitionEvent<HTMLElement>) {
+    if (event.propertyName !== "transform") return;
+    if (!entered) setMounted(false);
   }
 
   return (
@@ -41,9 +59,9 @@ export default function NavbarMobile() {
           <button
             type="button"
             aria-label="Open menu"
-            aria-expanded={open}
+            aria-expanded={entered}
             aria-controls={menuId}
-            onClick={() => setOpen(true)}
+            onClick={openMenu}
             className={navbarIconClassName}
           >
             <Menu className={navIconClassName} strokeWidth={1.75} />
@@ -64,18 +82,24 @@ export default function NavbarMobile() {
         </div>
       </div>
 
-      {open && (
+      {mounted && (
         <div className="fixed inset-0 z-50">
           <button
             type="button"
             aria-label="Close menu"
-            className="absolute inset-0 bg-black/60 transition-opacity duration-300"
+            className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ease-out ${
+              entered ? "opacity-100" : "opacity-0"
+            }`}
             onClick={closeMenu}
           />
 
           <nav
             id={menuId}
-            className="relative flex h-full w-full max-w-xs flex-col bg-[#121212] p-6 shadow-xl"
+            onTransitionEnd={onPanelTransitionEnd}
+            className={`absolute left-0 top-0 flex h-full w-full max-w-xs flex-col bg-[#121212] p-6 shadow-xl transition-transform ease-out motion-reduce:transition-none ${
+              entered ? "translate-x-0" : "-translate-x-full"
+            }`}
+            style={{ transitionDuration: `${PANEL_MS}ms` }}
           >
             <div className="mb-8 flex items-center justify-between">
               <Logo onClick={closeMenu} />
@@ -110,7 +134,7 @@ export default function NavbarMobile() {
               <Link href="/cart" onClick={closeMenu} className="block">
                 <Button
                   type="button"
-                  variant="accent"
+                  variant="outline"
                   className="w-full cursor-pointer"
                 >
                   <ShoppingBag size={18} strokeWidth={1.75} />
@@ -118,7 +142,11 @@ export default function NavbarMobile() {
                   {cartCount > 0 ? <span>({cartCount})</span> : null}
                 </Button>
               </Link>
-              <Link href="/account/wishlist" onClick={closeMenu} className="block">
+              <Link
+                href="/account/wishlist"
+                onClick={closeMenu}
+                className="block"
+              >
                 <Button
                   type="button"
                   className="w-full cursor-pointer border border-white/20 bg-transparent text-white hover:bg-white/10 active:bg-white/20"
