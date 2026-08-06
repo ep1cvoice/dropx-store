@@ -83,7 +83,6 @@ export default function PromoPopup() {
   useEffect(() => {
     if (!show) return;
 
-    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     function onKeyDown(event: KeyboardEvent) {
@@ -92,7 +91,7 @@ export default function PromoPopup() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow = "";
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [show]);

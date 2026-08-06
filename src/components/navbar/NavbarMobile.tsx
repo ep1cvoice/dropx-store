@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { Heart, LogOut, Menu, ShoppingBag, User, X } from "lucide-react";
-import { useEffect, useId, useState, type TransitionEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type TransitionEvent,
+} from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
@@ -19,12 +26,23 @@ const navbarIconClassName =
 
 const PANEL_MS = 300;
 
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 export default function NavbarMobile() {
   const [mounted, setMounted] = useState(false);
   const [entered, setEntered] = useState(false);
   const menuId = useId();
   const { status } = useSession();
   const { cartCount, wishlistCount } = useStoreBag();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const urlKey = `${pathname}?${searchParams.toString()}`;
+  const urlKeyOnOpenRef = useRef(urlKey);
 
   useEffect(() => {
     document.body.style.overflow = mounted ? "hidden" : "";
@@ -39,12 +57,34 @@ export default function NavbarMobile() {
     return () => cancelAnimationFrame(id);
   }, [mounted]);
 
+  // Male/Female keep pathname /browse-all — only the query changes. Always
+  // tear the drawer down on any URL change so the overlay can't stick.
+  useEffect(() => {
+    if (!mounted) return;
+    if (urlKey === urlKeyOnOpenRef.current) return;
+    setEntered(false);
+    setMounted(false);
+  }, [urlKey, mounted]);
+
+  // Backup if transitionend never fires (reduced motion, interrupted nav).
+  useEffect(() => {
+    if (!mounted || entered) return;
+    if (prefersReducedMotion()) {
+      setMounted(false);
+      return;
+    }
+    const t = window.setTimeout(() => setMounted(false), PANEL_MS + 50);
+    return () => window.clearTimeout(t);
+  }, [mounted, entered]);
+
   function openMenu() {
+    urlKeyOnOpenRef.current = urlKey;
     setMounted(true);
   }
 
   function closeMenu() {
     setEntered(false);
+    if (prefersReducedMotion()) setMounted(false);
   }
 
   function onPanelTransitionEnd(event: TransitionEvent<HTMLElement>) {
@@ -83,11 +123,14 @@ export default function NavbarMobile() {
       </div>
 
       {mounted && (
-        <div className="fixed inset-0 z-50">
+        <div
+          className={`fixed inset-0 z-50 ${entered ? "" : "pointer-events-none"}`}
+        >
           <button
             type="button"
             aria-label="Close menu"
-            className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ease-out ${
+            tabIndex={entered ? 0 : -1}
+            className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ease-out motion-reduce:transition-none ${
               entered ? "opacity-100" : "opacity-0"
             }`}
             onClick={closeMenu}
@@ -130,7 +173,7 @@ export default function NavbarMobile() {
               ))}
             </ul>
 
-            <div className="mt-auto space-y-3 border-t border-white/10 pt-6\f">
+            <div className="mt-auto space-y-3 border-t border-white/10 pt-6">
               <Link href="/cart" onClick={closeMenu} className="block">
                 <Button
                   type="button"

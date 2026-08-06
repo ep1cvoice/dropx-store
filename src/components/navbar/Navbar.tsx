@@ -15,7 +15,9 @@ export default function Navbar() {
           </Suspense>
         </div>
         <div className="min-[1200px]:hidden">
-          <NavbarMobile />
+          <Suspense fallback={<div className="h-14 md:h-[68px]" />}>
+            <NavbarMobile />
+          </Suspense>
         </div>
         {/* Search dropdown mounts here so it sticks with the nav */}
         <div id="nav-search-root" />
