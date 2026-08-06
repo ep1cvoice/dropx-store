@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-
-import { auth } from "@/auth/auth";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 const guestOnlyRoutes = ["/login", "/register", "/forgot-password"];
 const protectedRoutes = [
@@ -16,13 +16,32 @@ function matchesRoute(pathname: string, route: string): boolean {
 }
 
 /**
- * Use Auth.js `auth()` (same session path as RSC), not raw `getToken`.
- * Previously getToken missed the session cookie → /cart redirected to /login,
- * then login page saw a valid session and bounced to `/`.
+ * Lightweight JWT check only — do NOT import `@/auth/auth` here.
+ * That pulls Prisma into the proxy graph and can balloon Turbopack RAM in `next dev`.
  */
-export const proxy = auth((req) => {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const isLoggedIn = Boolean(req.auth);
+  const secret = process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET;
+  const secureCookie =
+    req.nextUrl.protocol === "https:" || process.env.NODE_ENV === "production";
+  const sessionCookie = secureCookie
+    ? "__Secure-authjs.session-token"
+    : "authjs.session-token";
+
+  let token = null;
+  try {
+    token = await getToken({
+      req,
+      secret,
+      secureCookie,
+      cookieName: sessionCookie,
+      salt: sessionCookie,
+    });
+  } catch {
+    token = null;
+  }
+
+  const isLoggedIn = Boolean(token);
 
   const isGuestOnlyRoute = guestOnlyRoutes.some((route) =>
     matchesRoute(pathname, route),
@@ -40,7 +59,9 @@ export const proxy = auth((req) => {
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
-});
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
