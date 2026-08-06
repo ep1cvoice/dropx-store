@@ -3,9 +3,14 @@ import { z } from "zod";
 const nameField = (label: string) =>
   z
     .string()
+    .trim()
     .min(1, `${label} is required`)
     .min(2, `${label} must be at least 2 characters`)
-    .regex(/^[A-Za-z]+$/, `${label} must contain letters only`);
+    // Letters from any language (incl. Polish ąćęłńóśźż), plus hyphen / apostrophe / space.
+    .regex(
+      /^[\p{L}]+(?:[ '\-][\p{L}]+)*$/u,
+      `${label} must contain letters only`,
+    );
 
 export const loginSchema = z.object({
   email: z

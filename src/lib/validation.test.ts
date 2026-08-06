@@ -51,6 +51,32 @@ describe("registerSchema", () => {
     const result = registerSchema.safeParse({ ...valid, terms: false });
     expect(result.success).toBe(false);
   });
+
+  it("accepts Polish diacritics in names", () => {
+    const result = registerSchema.safeParse({
+      ...valid,
+      firstName: "Łukasz",
+      lastName: "Ziółkowski",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts hyphenated names", () => {
+    const result = registerSchema.safeParse({
+      ...valid,
+      firstName: "Anna-Maria",
+      lastName: "Nowak",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects names with digits", () => {
+    const result = registerSchema.safeParse({
+      ...valid,
+      firstName: "Ada2",
+    });
+    expect(result.success).toBe(false);
+  });
 });
 
 describe("phoneField via profileDataSchema", () => {
