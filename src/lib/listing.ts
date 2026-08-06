@@ -115,6 +115,19 @@ export function normalizeSearchQuery(value: string | null | undefined): string {
   return value.trim().replace(/\s+/g, " ");
 }
 
+/** Split a search query into tokens (min length 1 after normalize). */
+export function searchQueryTokens(q: string): string[] {
+  return normalizeSearchQuery(q)
+    .split(" ")
+    .map((t) => t.trim())
+    .filter((t) => t.length > 0);
+}
+
+/** Space form → slug form (`new balance` → `new-balance`). */
+export function searchQueryAsSlug(q: string): string {
+  return normalizeSearchQuery(q).toLowerCase().replace(/\s+/g, "-");
+}
+
 export type BrandFacet = { slug: string; name: string; count: number };
 
 export type ProductListingResult = {

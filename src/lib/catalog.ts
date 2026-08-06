@@ -16,6 +16,11 @@ import type {
   ProductListingResult,
   SortOption,
 } from "@/lib/listing";
+import {
+  normalizeSearchQuery,
+  searchQueryAsSlug,
+  searchQueryTokens,
+} from "@/lib/listing";
 import { isUpcoming, toIsoOrNull } from "@/lib/availability";
 import { interleaveByBrand } from "@/lib/interleave-by-brand";
 import { pickCardVariant } from "@/lib/pick-card-variant";
@@ -566,13 +571,47 @@ export type ProductListingOptions = {
   pageSize?: number;
 };
 
+function fieldMatchesToken(token: string): Prisma.ProductWhereInput[] {
+  const slugToken = searchQueryAsSlug(token);
+  return [
+    { name: { contains: token, mode: "insensitive" } },
+    { slug: { contains: token, mode: "insensitive" } },
+    { slug: { contains: slugToken, mode: "insensitive" } },
+    { brand: { name: { contains: token, mode: "insensitive" } } },
+    { brand: { slug: { contains: slugToken, mode: "insensitive" } } },
+    { variants: { some: { color: { contains: token, mode: "insensitive" } } } },
+  ];
+}
+
+/**
+ * Free-text match across name, slug, brand, and colourway.
+ * Multi-word queries (e.g. "Nike Dunk") match when every token hits at least
+ * one of those fields — brand + model live in different columns.
+ */
 function textSearchWhere(q: string): Prisma.ProductWhereInput {
+  const query = normalizeSearchQuery(q);
+  const tokens = searchQueryTokens(query);
+  const slugQuery = searchQueryAsSlug(query);
+
+  const phraseOr: Prisma.ProductWhereInput[] = [
+    { name: { contains: query, mode: "insensitive" } },
+    { slug: { contains: query, mode: "insensitive" } },
+    { slug: { contains: slugQuery, mode: "insensitive" } },
+    { brand: { name: { contains: query, mode: "insensitive" } } },
+    { brand: { slug: { contains: slugQuery, mode: "insensitive" } } },
+    { variants: { some: { color: { contains: query, mode: "insensitive" } } } },
+  ];
+
+  if (tokens.length <= 1) {
+    return { OR: phraseOr };
+  }
+
   return {
     OR: [
-      { name: { contains: q, mode: "insensitive" } },
-      { slug: { contains: q, mode: "insensitive" } },
-      { brand: { name: { contains: q, mode: "insensitive" } } },
-      { variants: { some: { color: { contains: q, mode: "insensitive" } } } },
+      ...phraseOr,
+      {
+        AND: tokens.map((token) => ({ OR: fieldMatchesToken(token) })),
+      },
     ],
   };
 }
@@ -582,7 +621,7 @@ export async function searchProducts(
   q: string,
   take = 8,
 ): Promise<ProductCardData[]> {
-  const query = q.trim().replace(/\s+/g, " ");
+  const query = normalizeSearchQuery(q);
   if (query.length < 2) return [];
 
   // Include upcoming drops (availableAt in the future) so colourway searches
@@ -659,7 +698,7 @@ export async function getProductListing(
   if (colors.length > 0) {
     and.push({ variants: { some: { colorFamily: { in: colors } } } });
   }
-  const query = q?.trim().replace(/\s+/g, " ") ?? "";
+  const query = normalizeSearchQuery(q);
   if (query.length >= 2) {
     and.push(textSearchWhere(query));
   }

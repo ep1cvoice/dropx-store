@@ -178,7 +178,7 @@ export default function NavSearch({
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search sneakers, brands, colourways…"
+                placeholder="Search sneakers, brands, colors…"
                 autoComplete="off"
                 className={`${inter.className} w-full bg-transparent text-base text-white placeholder:text-white/35 outline-none`}
               />

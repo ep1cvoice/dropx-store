@@ -6,6 +6,8 @@ import {
   isProductCategory,
   isSortOption,
   normalizeSearchQuery,
+  searchQueryAsSlug,
+  searchQueryTokens,
 } from "@/lib/listing";
 
 describe("normalizeSearchQuery", () => {
@@ -20,6 +22,18 @@ describe("normalizeSearchQuery", () => {
 
   it("preserves a single trimmed token", () => {
     expect(normalizeSearchQuery("infrared")).toBe("infrared");
+  });
+});
+
+describe("searchQueryAsSlug", () => {
+  it("turns spaces into hyphens", () => {
+    expect(searchQueryAsSlug("New Balance")).toBe("new-balance");
+  });
+});
+
+describe("searchQueryTokens", () => {
+  it("splits on spaces", () => {
+    expect(searchQueryTokens("Nike Dunk")).toEqual(["Nike", "Dunk"]);
   });
 });
 
