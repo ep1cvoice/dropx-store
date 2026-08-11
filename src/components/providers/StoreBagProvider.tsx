@@ -4,11 +4,13 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   useTransition,
   type ReactNode,
 } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -24,42 +26,56 @@ type StoreBagContextValue = {
   toggleWishlistItem: (variantId: string) => Promise<WishlistActionResult>;
   removeWishlistItem: (variantId: string) => Promise<void>;
   bumpCartCount: (delta: number) => void;
+  refreshBag: () => Promise<void>;
   isPending: boolean;
 };
 
 const StoreBagContext = createContext<StoreBagContextValue | null>(null);
 
 type StoreBagProviderProps = {
-  initialCartCount: number;
-  initialWishlistIds: string[];
   children: ReactNode;
 };
 
-export function StoreBagProvider({
-  initialCartCount,
-  initialWishlistIds,
-  children,
-}: StoreBagProviderProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [cartCount, setCartCount] = useState(initialCartCount);
-  const [wishlistIds, setWishlistIds] = useState(
-    () => new Set(initialWishlistIds),
-  );
-  const [prevCartCount, setPrevCartCount] = useState(initialCartCount);
-  const wishlistKey = initialWishlistIds.join(",");
-  const [prevWishlistKey, setPrevWishlistKey] = useState(wishlistKey);
+type BagPayload = {
+  cartCount: number;
+  wishlistIds: string[];
+};
 
-  if (initialCartCount !== prevCartCount) {
-    setPrevCartCount(initialCartCount);
-    setCartCount(initialCartCount);
-  }
-  if (wishlistKey !== prevWishlistKey) {
-    setPrevWishlistKey(wishlistKey);
-    setWishlistIds(
-      new Set(wishlistKey.length > 0 ? wishlistKey.split(",") : []),
-    );
-  }
+async function fetchBag(): Promise<BagPayload> {
+  const res = await fetch("/api/store-bag", { cache: "no-store" });
+  if (!res.ok) return { cartCount: 0, wishlistIds: [] };
+  const data = (await res.json()) as Partial<BagPayload>;
+  return {
+    cartCount: typeof data.cartCount === "number" ? data.cartCount : 0,
+    wishlistIds: Array.isArray(data.wishlistIds) ? data.wishlistIds : [],
+  };
+}
+
+export function StoreBagProvider({ children }: StoreBagProviderProps) {
+  const router = useRouter();
+  const { status } = useSession();
+  const [isPending, startTransition] = useTransition();
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistIds, setWishlistIds] = useState(() => new Set<string>());
+
+  const refreshBag = useCallback(async () => {
+    const bag = await fetchBag();
+    setCartCount(bag.cartCount);
+    setWishlistIds(new Set(bag.wishlistIds));
+  }, []);
+
+  useEffect(() => {
+    if (status === "loading") return;
+    let cancelled = false;
+    fetchBag().then((bag) => {
+      if (cancelled) return;
+      setCartCount(bag.cartCount);
+      setWishlistIds(new Set(bag.wishlistIds));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [status]);
 
   const isWishlisted = useCallback(
     (variantId: string) => wishlistIds.has(variantId),
@@ -114,6 +130,7 @@ export function StoreBagProvider({
       toggleWishlistItem,
       removeWishlistItem,
       bumpCartCount,
+      refreshBag,
       isPending,
     }),
     [
@@ -123,6 +140,7 @@ export function StoreBagProvider({
       toggleWishlistItem,
       removeWishlistItem,
       bumpCartCount,
+      refreshBag,
       isPending,
     ],
   );

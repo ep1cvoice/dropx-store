@@ -3,25 +3,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import ProductCard from "@/components/product/ProductCard";
-import ProductDetailView from "@/components/product/ProductDetailView";
-import ProductReviewsSection from "@/components/product/ProductReviewsSection";
+import ProductPurchaseBlock from "@/components/product/ProductPurchaseBlock";
 import TrackRecentlyViewed from "@/components/product/TrackRecentlyViewed";
 import AtomicReveal from "@/components/ui/AtomicReveal";
 import ProductGridSkeleton from "@/components/ui/ProductGridSkeleton";
 import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
 import { anton, inter } from "@/lib/fonts";
-import {
-  getProductReviews,
-  getProductReviewSummary,
-  getReviewEligibility,
-} from "@/lib/reviews";
+import { getProductReviewSummary } from "@/lib/reviews";
 
-/** Render on demand — avoids requiring DB connectivity during `next build` on Vercel. */
-export const dynamic = "force-dynamic";
+/** Cache public PDP HTML; user bag/reviews load separately. */
+export const revalidate = 60;
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ variant?: string }>;
 };
 
 export async function generateMetadata({
@@ -42,91 +36,74 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductPage({
-  params,
-  searchParams,
-}: ProductPageProps) {
+export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const { variant } = await searchParams;
   const product = await getProductBySlug(slug);
 
   if (!product) {
     notFound();
   }
 
-  const [related, reviewSummary, reviews, eligibility] = await Promise.all([
+  const [related, reviewSummary] = await Promise.all([
     getRelatedProducts(product.slug, product.category),
     getProductReviewSummary(product.id),
-    getProductReviews(product.id),
-    getReviewEligibility(product.id),
   ]);
 
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-[1600px] px-4 py-8 md:px-6 md:py-10 lg:px-10">
-      {/* Breadcrumb */}
-      <nav
-        aria-label="Breadcrumb"
-        className={`${inter.className} mb-6 flex flex-wrap items-center gap-1.5 text-xs uppercase tracking-[0.12em] text-[#999999]`}
-      >
-        <Link href="/" className="transition-colors hover:text-[#121212]">
-          Home
-        </Link>
-        <span aria-hidden="true">/</span>
-        <Link
-          href="/browse-all?collection=new-drops"
-          className="transition-colors hover:text-[#121212]"
+        <nav
+          aria-label="Breadcrumb"
+          className={`${inter.className} mb-6 flex flex-wrap items-center gap-1.5 text-xs uppercase tracking-[0.12em] text-[#999999]`}
         >
-          New Drops
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span className="text-[#121212]">
-          {product.brand} {product.name}
-        </span>
-      </nav>
-
-      <TrackRecentlyViewed productId={product.id} />
-      <ProductDetailView
-        product={product}
-        initialVariantId={variant}
-        reviewSummary={reviewSummary}
-      />
-
-      <ProductReviewsSection
-        productId={product.id}
-        productSlug={product.slug}
-        summary={reviewSummary}
-        reviews={reviews}
-        eligibility={eligibility}
-      />
-
-      {/* Related products */}
-      {related.length > 0 && (
-        <section className="mt-16 md:mt-24">
-          <h2
-            className={`${anton.className} text-3xl uppercase tracking-wide text-[#121212] md:text-4xl`}
+          <Link href="/" className="transition-colors hover:text-[#121212]">
+            Home
+          </Link>
+          <span aria-hidden="true">/</span>
+          <Link
+            href="/browse-all?collection=new-drops"
+            className="transition-colors hover:text-[#121212]"
           >
-            You might also like
-          </h2>
-          <AtomicReveal
-            className="mt-6"
-            fallback={
-              <div className="mt-6">
-                <ProductGridSkeleton
-                  count={Math.min(related.length, 4)}
-                  className="grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
-                />
+            New Drops
+          </Link>
+          <span aria-hidden="true">/</span>
+          <span className="text-[#121212]">
+            {product.brand} {product.name}
+          </span>
+        </nav>
+
+        <TrackRecentlyViewed productId={product.id} />
+        <ProductPurchaseBlock
+          product={product}
+          initialSummary={reviewSummary}
+        />
+
+        {related.length > 0 && (
+          <section className="mt-16 md:mt-24">
+            <h2
+              className={`${anton.className} text-3xl uppercase tracking-wide text-[#121212] md:text-4xl`}
+            >
+              You might also like
+            </h2>
+            <AtomicReveal
+              className="mt-6"
+              fallback={
+                <div className="mt-6">
+                  <ProductGridSkeleton
+                    count={Math.min(related.length, 4)}
+                    className="grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+                  />
+                </div>
+              }
+            >
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {related.map((item) => (
+                  <ProductCard key={item.id} product={item} />
+                ))}
               </div>
-            }
-          >
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {related.map((item) => (
-                <ProductCard key={item.id} product={item} />
-              ))}
-            </div>
-          </AtomicReveal>
-        </section>
-      )}
+            </AtomicReveal>
+          </section>
+        )}
       </div>
     </div>
   );

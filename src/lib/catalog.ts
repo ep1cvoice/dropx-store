@@ -232,7 +232,8 @@ export type HomeProductRails = {
 };
 
 /**
- * Homepage product rails — randomized each request, distinct intents, no overlap:
+ * Homepage product rails — randomized each revalidation window, distinct
+ * intents, no overlap:
  * - New Drops → badge "new"
  * - Featured → featured flag (topped up with limited if needed)
  * - Browse All → brand-mixed catalog sampler
@@ -416,10 +417,6 @@ export async function getRelatedProducts(
   category: ProductCategory,
   take = 4,
 ): Promise<ProductCardData[]> {
-  // Opt this page into dynamic rendering so shuffle isn't frozen at build time.
-  const { connection } = await import("next/server");
-  await connection();
-
   const poolSize = Math.max(take * 8, 24);
 
   const sameCategory = await prisma.product.findMany({

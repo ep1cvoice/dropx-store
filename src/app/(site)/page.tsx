@@ -13,8 +13,8 @@ import BrowseAllSneakersSection from "@/components/home/BrowseAllSneakersSection
 import RecentlyViewedSection from "@/components/home/RecentlyViewedSection";
 import { getHomeProductRails } from "@/lib/catalog";
 
-/** Fresh random product rails on every request. */
-export const dynamic = "force-dynamic";
+/** Revalidate home rails periodically (shuffle refreshes on this window). */
+export const revalidate = 60;
 
 export default async function Home() {
   const { newDrops, featured, browseAll } = await getHomeProductRails();

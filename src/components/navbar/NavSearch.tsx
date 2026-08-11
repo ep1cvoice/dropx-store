@@ -175,11 +175,12 @@ export default function NavSearch({
               <input
                 id={inputId}
                 ref={inputRef}
-                type="search"
+                type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search sneakers, brands, colors…"
                 autoComplete="off"
+                enterKeyHint="search"
                 className={`${inter.className} w-full bg-transparent text-base text-white placeholder:text-white/35 outline-none`}
               />
               <button

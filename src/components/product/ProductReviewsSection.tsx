@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { BadgeCheck, User } from "lucide-react";
 
 import { createReview, deleteReview } from "@/actions/reviews";
@@ -20,6 +19,12 @@ import type {
 type ProductReviewsSectionProps = {
   productId: string;
   productSlug: string;
+  /** Optional cached summary for first paint; refreshed from API. */
+  initialSummary?: ReviewSummary;
+  onSummaryChange?: (summary: ReviewSummary) => void;
+};
+
+type ReviewsPayload = {
   summary: ReviewSummary;
   reviews: ProductReviewItem[];
   eligibility: ReviewEligibility;
@@ -36,16 +41,45 @@ function formatReviewDate(iso: string) {
 export default function ProductReviewsSection({
   productId,
   productSlug,
-  summary,
-  reviews,
-  eligibility,
+  initialSummary,
+  onSummaryChange,
 }: ProductReviewsSectionProps) {
-  const router = useRouter();
+  const [summary, setSummary] = useState<ReviewSummary>(
+    initialSummary ?? { average: 0, count: 0 },
+  );
+  const [reviews, setReviews] = useState<ProductReviewItem[]>([]);
+  const [eligibility, setEligibility] = useState<ReviewEligibility | null>(
+    null,
+  );
   const [rating, setRating] = useState(5);
   const [body, setBody] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [loaded, setLoaded] = useState(false);
+
+  const loadReviews = useCallback(async () => {
+    const res = await fetch(`/api/products/${productSlug}/reviews`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return;
+    const data = (await res.json()) as ReviewsPayload;
+    setSummary(data.summary);
+    setReviews(data.reviews);
+    setEligibility(data.eligibility);
+    onSummaryChange?.(data.summary);
+    setLoaded(true);
+  }, [productSlug, onSummaryChange]);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadReviews().finally(() => {
+      if (!cancelled) setLoaded(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [loadReviews]);
 
   function submitReview() {
     setError(null);
@@ -62,7 +96,7 @@ export default function ProductReviewsSection({
       }
       setBody("");
       setRating(5);
-      router.refresh();
+      await loadReviews();
     });
   }
 
@@ -76,7 +110,7 @@ export default function ProductReviewsSection({
         setError(result.error);
         return;
       }
-      router.refresh();
+      await loadReviews();
     });
   }
 
@@ -106,15 +140,22 @@ export default function ProductReviewsSection({
             </div>
           ) : (
             <p className={`${inter.className} mt-2 text-sm text-[#888888]`}>
-              Be the first to review this product.
+              {loaded
+                ? "Be the first to review this product."
+                : "Loading reviews…"}
             </p>
           )}
         </div>
       </div>
 
-      {/* Write / eligibility */}
       <div className="mt-8 bg-[#f4f4f2] p-5 md:p-6">
-        {eligibility.status === "guest" && (
+        {!eligibility && (
+          <p className={`${inter.className} text-sm text-[#888888]`}>
+            Checking review eligibility…
+          </p>
+        )}
+
+        {eligibility?.status === "guest" && (
           <p className={`${inter.className} text-sm text-[#444444]`}>
             <Link
               href={`/login?callbackUrl=/products/${productSlug}`}
@@ -126,20 +167,20 @@ export default function ProductReviewsSection({
           </p>
         )}
 
-        {eligibility.status === "not_purchased" && (
+        {eligibility?.status === "not_purchased" && (
           <p className={`${inter.className} text-sm text-[#444444]`}>
             Buy this pair and leave a review once your order is delivered.
           </p>
         )}
 
-        {eligibility.status === "already_reviewed" && (
+        {eligibility?.status === "already_reviewed" && (
           <p className={`${inter.className} text-sm text-[#444444]`}>
             Thanks — you already reviewed this product. Delete your review
             below if you want to write a new one.
           </p>
         )}
 
-        {eligibility.status === "eligible" && (
+        {eligibility?.status === "eligible" && (
           <div className="flex flex-col gap-4">
             <p
               className={`${inter.className} text-sm font-semibold text-[#121212]`}
@@ -179,14 +220,13 @@ export default function ProductReviewsSection({
           </div>
         )}
 
-        {eligibility.status !== "eligible" && error && (
+        {eligibility && eligibility.status !== "eligible" && error && (
           <p className={`${inter.className} mt-3 text-sm text-[#e11d48]`}>
             {error}
           </p>
         )}
       </div>
 
-      {/* List */}
       {reviews.length > 0 && (
         <ul className="mt-10 divide-y divide-[#ececec]">
           {reviews.map((review) => (

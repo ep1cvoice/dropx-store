@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Check, Heart, RotateCcw, ShieldCheck, Truck, X } from "lucide-react";
 
@@ -61,9 +61,12 @@ export default function ProductDetailView({
   reviewSummary,
 }: ProductDetailViewProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const variantFromUrl = searchParams.get("variant") ?? undefined;
+  const preferredVariantId = initialVariantId ?? variantFromUrl;
   const { isWishlisted, toggleWishlistItem, bumpCartCount } = useStoreBag();
   const [selectedVariantId, setSelectedVariantId] = useState(() =>
-    resolveInitialVariantId(product, initialVariantId),
+    resolveInitialVariantId(product, preferredVariantId),
   );
   const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
