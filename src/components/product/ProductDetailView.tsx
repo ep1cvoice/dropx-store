@@ -12,12 +12,14 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import SizeButton from "@/components/ui/SizeButton";
 import ProductDropCountdown from "@/components/product/ProductDropCountdown";
+import StarRating from "@/components/product/StarRating";
 import { useStoreBag } from "@/components/providers/StoreBagProvider";
 import { isUpcoming } from "@/lib/availability";
 import { formatPrice, listPriceFromSale } from "@/lib/currency";
 import { anton, inter } from "@/lib/fonts";
 import { GENDER_FILTERS } from "@/lib/listing";
 import type { ProductDetail } from "@/types/product";
+import type { ReviewSummary } from "@/types/review";
 
 const LOW_STOCK_THRESHOLD = 5;
 
@@ -50,11 +52,13 @@ type ProductDetailViewProps = {
   product: ProductDetail;
   /** Prefill colourway from listing filters (`?variant=`). */
   initialVariantId?: string;
+  reviewSummary?: ReviewSummary;
 };
 
 export default function ProductDetailView({
   product,
   initialVariantId,
+  reviewSummary,
 }: ProductDetailViewProps) {
   const router = useRouter();
   const { isWishlisted, toggleWishlistItem, bumpCartCount } = useStoreBag();
@@ -252,6 +256,20 @@ export default function ProductDetailView({
         >
           {product.name}
         </h1>
+
+        {reviewSummary && reviewSummary.count > 0 ? (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <StarRating value={reviewSummary.average} size={16} />
+            <span
+              className={`${inter.className} text-sm font-semibold text-[#121212]`}
+            >
+              {reviewSummary.average.toFixed(1)}
+            </span>
+            <span className={`${inter.className} text-sm text-[#888888]`}>
+              ({reviewSummary.count})
+            </span>
+          </div>
+        ) : null}
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <div className="flex flex-wrap items-baseline gap-2.5">

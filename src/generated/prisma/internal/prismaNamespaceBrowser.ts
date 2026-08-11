@@ -64,7 +64,8 @@ export const ModelName = {
   WishlistItem: 'WishlistItem',
   Order: 'Order',
   OrderItem: 'OrderItem',
-  NewsletterSubscriber: 'NewsletterSubscriber'
+  NewsletterSubscriber: 'NewsletterSubscriber',
+  ProductReview: 'ProductReview'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -281,6 +282,19 @@ export const NewsletterSubscriberScalarFieldEnum = {
 } as const
 
 export type NewsletterSubscriberScalarFieldEnum = (typeof NewsletterSubscriberScalarFieldEnum)[keyof typeof NewsletterSubscriberScalarFieldEnum]
+
+
+export const ProductReviewScalarFieldEnum = {
+  id: 'id',
+  rating: 'rating',
+  body: 'body',
+  verifiedPurchase: 'verifiedPurchase',
+  productId: 'productId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type ProductReviewScalarFieldEnum = (typeof ProductReviewScalarFieldEnum)[keyof typeof ProductReviewScalarFieldEnum]
 
 
 export const SortOrder = {

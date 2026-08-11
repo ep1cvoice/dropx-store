@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,6 +20,11 @@ type LoginFormProps = {
   className?: string;
 };
 
+function safeCallbackUrl(raw: string | null): string {
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/';
+  return raw;
+}
+
 export default function LoginForm({
   showSubtitle = false,
   emailPlaceholder = "you@example.com",
@@ -27,6 +32,8 @@ export default function LoginForm({
   className = '',
 }: LoginFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
   const { data: session, status } = useSession();
   const {
     register,
@@ -50,7 +57,7 @@ export default function LoginForm({
       email: data.email,
       password: data.password,
       redirect: false,
-      callbackUrl: '/',
+      callbackUrl,
     });
 
     if (!result || result.error) {
@@ -58,7 +65,7 @@ export default function LoginForm({
       return;
     }
 
-    router.push(result.url ?? '/');
+    router.push(result.url ?? callbackUrl);
     router.refresh();
   }
 

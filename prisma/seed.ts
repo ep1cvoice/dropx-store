@@ -99,6 +99,7 @@ async function main() {
   });
 
   // Reset catalog (children first to satisfy FKs)
+  await prisma.productReview.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
   await prisma.cartItem.deleteMany();
@@ -127,13 +128,90 @@ async function main() {
     await createProduct(product, brandId, "drop");
   }
 
-  const [brands, products, variants, sizeRows, upcoming] = await Promise.all([
-    prisma.brand.count(),
-    prisma.product.count(),
-    prisma.productVariant.count(),
-    prisma.variantSize.count(),
-    prisma.product.count({ where: { availableAt: { not: null } } }),
-  ]);
+  // Fake reviewers + reviews on ~35% of products (portfolio-ready PDP).
+  const REVIEWERS = [
+    { email: "maya@dropx.store", name: "Maya", lastName: "Chen" },
+    { email: "leo@dropx.store", name: "Leo", lastName: "Kowalski" },
+    { email: "sofia@dropx.store", name: "Sofia", lastName: "Reyes" },
+    { email: "noah@dropx.store", name: "Noah", lastName: "Berg" },
+    { email: "ira@dropx.store", name: "Ira", lastName: "Novak" },
+    { email: "elise@dropx.store", name: "Elise", lastName: "Moreau" },
+    { email: "jake@dropx.store", name: "Jake", lastName: "Miller" },
+    { email: "hana@dropx.store", name: "Hana", lastName: "Park" },
+  ] as const;
+
+  const REVIEW_BODIES = [
+    "True to size and comfortable from day one. Great daily pair.",
+    "Materials feel premium — colourway looks even better in person.",
+    "Solid cushioning for city walks. Would buy again.",
+    "Fit runs a touch snug; sized up half and they are perfect.",
+    "Clean silhouette, easy to style. Shipping was quick too.",
+    "Grip and support exceeded expectations for the price.",
+    "Slight break-in needed, then they disappeared on foot.",
+    "Exact what I wanted from this silhouette. Verified quality.",
+  ];
+
+  const reviewerIds: string[] = [];
+  for (const reviewer of REVIEWERS) {
+    const user = await prisma.user.upsert({
+      where: { email: reviewer.email },
+      update: { name: reviewer.name, lastName: reviewer.lastName },
+      create: {
+        email: reviewer.email,
+        name: reviewer.name,
+        lastName: reviewer.lastName,
+        password: defaultPassword,
+      },
+    });
+    reviewerIds.push(user.id);
+  }
+
+  const allProducts = await prisma.product.findMany({
+    select: { id: true },
+    orderBy: { createdAt: "asc" },
+  });
+
+  // Deterministic ~33% coverage without Math.random (stable seed runs).
+  const reviewProducts = allProducts.filter((_, i) => i % 3 === 0);
+  let reviewCount = 0;
+
+  for (let i = 0; i < reviewProducts.length; i++) {
+    const product = reviewProducts[i]!;
+    const reviewCountForProduct = 2 + (i % 4); // 2–5 reviews
+    const usedReviewers = new Set<string>();
+
+    for (let r = 0; r < reviewCountForProduct; r++) {
+      const reviewerId = reviewerIds[(i + r * 3) % reviewerIds.length]!;
+      if (usedReviewers.has(reviewerId)) continue;
+      usedReviewers.add(reviewerId);
+
+      const rating = ([5, 5, 4, 4, 5, 3, 4, 5] as const)[(i + r) % 8]!;
+      const body = REVIEW_BODIES[(i + r) % REVIEW_BODIES.length]!;
+      const daysAgo = 3 + ((i * 5 + r * 11) % 90);
+
+      await prisma.productReview.create({
+        data: {
+          productId: product.id,
+          userId: reviewerId,
+          rating,
+          body,
+          verifiedPurchase: true,
+          createdAt: new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000),
+        },
+      });
+      reviewCount += 1;
+    }
+  }
+
+  const [brands, products, variants, sizeRows, upcoming, reviews] =
+    await Promise.all([
+      prisma.brand.count(),
+      prisma.product.count(),
+      prisma.productVariant.count(),
+      prisma.variantSize.count(),
+      prisma.product.count({ where: { availableAt: { not: null } } }),
+      prisma.productReview.count(),
+    ]);
 
   console.log("Seeded catalog:", {
     brands,
@@ -143,6 +221,8 @@ async function main() {
     upcoming,
     classics: CLASSICS.length,
     drops: DROPS.length,
+    reviewProducts: reviewProducts.length,
+    reviews: reviewCount || reviews,
   });
 }
 

@@ -4,11 +4,17 @@ import { notFound } from "next/navigation";
 
 import ProductCard from "@/components/product/ProductCard";
 import ProductDetailView from "@/components/product/ProductDetailView";
+import ProductReviewsSection from "@/components/product/ProductReviewsSection";
 import TrackRecentlyViewed from "@/components/product/TrackRecentlyViewed";
 import AtomicReveal from "@/components/ui/AtomicReveal";
 import ProductGridSkeleton from "@/components/ui/ProductGridSkeleton";
 import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
 import { anton, inter } from "@/lib/fonts";
+import {
+  getProductReviews,
+  getProductReviewSummary,
+  getReviewEligibility,
+} from "@/lib/reviews";
 
 /** Render on demand — avoids requiring DB connectivity during `next build` on Vercel. */
 export const dynamic = "force-dynamic";
@@ -48,7 +54,12 @@ export default async function ProductPage({
     notFound();
   }
 
-  const related = await getRelatedProducts(product.slug, product.category);
+  const [related, reviewSummary, reviews, eligibility] = await Promise.all([
+    getRelatedProducts(product.slug, product.category),
+    getProductReviewSummary(product.id),
+    getProductReviews(product.id),
+    getReviewEligibility(product.id),
+  ]);
 
   return (
     <div className="bg-white">
@@ -75,7 +86,19 @@ export default async function ProductPage({
       </nav>
 
       <TrackRecentlyViewed productId={product.id} />
-      <ProductDetailView product={product} initialVariantId={variant} />
+      <ProductDetailView
+        product={product}
+        initialVariantId={variant}
+        reviewSummary={reviewSummary}
+      />
+
+      <ProductReviewsSection
+        productId={product.id}
+        productSlug={product.slug}
+        summary={reviewSummary}
+        reviews={reviews}
+        eligibility={eligibility}
+      />
 
       {/* Related products */}
       {related.length > 0 && (

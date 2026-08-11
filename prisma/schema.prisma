@@ -109,6 +109,7 @@ model User {
   cart     Cart?
   wishlist WishlistItem[]
   orders   Order[]
+  reviews  ProductReview[]
 
   @@map("users")
 }
@@ -163,6 +164,7 @@ model Product {
   heroImageUrl String? @map("hero_image_url")
 
   variants ProductVariant[]
+  reviews  ProductReview[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -340,4 +342,29 @@ model NewsletterSubscriber {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("newsletter_subscribers")
+}
+
+// ---------------------------------------------------------------------------
+// Reviews
+// One review per user per product. Verified purchase is set at write time when
+// the user has a delivered order containing that product.
+// ---------------------------------------------------------------------------
+
+model ProductReview {
+  id               String  @id @default(cuid())
+  rating           Int
+  body             String
+  verifiedPurchase Boolean @default(false) @map("verified_purchase")
+
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, productId])
+  @@index([productId, createdAt])
+  @@map("product_reviews")
 }

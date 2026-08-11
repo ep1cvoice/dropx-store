@@ -111,3 +111,8 @@ export type OrderItem = Prisma.OrderItemModel
  * 
  */
 export type NewsletterSubscriber = Prisma.NewsletterSubscriberModel
+/**
+ * Model ProductReview
+ * 
+ */
+export type ProductReview = Prisma.ProductReviewModel
