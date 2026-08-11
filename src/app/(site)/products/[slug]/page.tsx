@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import ProductCard from "@/components/product/ProductCard";
 import ProductDetailView from "@/components/product/ProductDetailView";
+import TrackRecentlyViewed from "@/components/product/TrackRecentlyViewed";
 import AtomicReveal from "@/components/ui/AtomicReveal";
 import ProductGridSkeleton from "@/components/ui/ProductGridSkeleton";
 import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
@@ -73,6 +74,7 @@ export default async function ProductPage({
         </span>
       </nav>
 
+      <TrackRecentlyViewed productId={product.id} />
       <ProductDetailView product={product} initialVariantId={variant} />
 
       {/* Related products */}

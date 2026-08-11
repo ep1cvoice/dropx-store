@@ -10,6 +10,7 @@ import FeaturedPicksSection from "@/components/home/FeaturedPicksSection";
 import CultureHeroSection from "@/components/home/CultureHeroSection";
 import UpcomingDropsPosterSection from "@/components/home/UpcomingDropsPosterSection";
 import BrowseAllSneakersSection from "@/components/home/BrowseAllSneakersSection";
+import RecentlyViewedSection from "@/components/home/RecentlyViewedSection";
 import { getHomeProductRails } from "@/lib/catalog";
 
 /** Fresh random product rails on every request. */
@@ -23,6 +24,7 @@ export default async function Home() {
       <HomeHeroDesktop />
       <UpcomingDropSection />
       <BrandPartnersSection />
+      <RecentlyViewedSection />
       <NewDropsSection products={newDrops} />
       <StoreBenefitsSection />
       <UpcomingDropsPosterSection />

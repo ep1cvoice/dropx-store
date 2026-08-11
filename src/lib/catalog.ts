@@ -147,6 +147,30 @@ export async function getProductCards(
   return products.map((product) => toProductCardData(product));
 }
 
+/**
+ * Resolve product cards by id, preserving the caller’s order
+ * (used by recently-viewed rails).
+ */
+export async function getProductCardsByIds(
+  ids: string[],
+): Promise<ProductCardData[]> {
+  const unique = [...new Set(ids.filter(Boolean))];
+  if (unique.length === 0) return [];
+
+  const products = await prisma.product.findMany({
+    where: { id: { in: unique } },
+    select: productCardSelect,
+  });
+
+  const byId = new Map(
+    products.map((product) => [product.id, toProductCardData(product)]),
+  );
+
+  return unique
+    .map((id) => byId.get(id))
+    .filter((product): product is ProductCardData => product != null);
+}
+
 /** Fisher–Yates shuffle — fresh order on every request. */
 function shuffle<T>(items: T[]): T[] {
   const arr = [...items];

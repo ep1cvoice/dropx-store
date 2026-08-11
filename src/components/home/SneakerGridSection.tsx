@@ -8,7 +8,7 @@ import type { ProductCardData } from "@/types/product";
 
 type SneakerGridSectionProps = {
   title: string;
-  viewAllHref: string;
+  viewAllHref?: string;
   products: ProductCardData[];
   viewAllLabel?: string;
   showBottomCta?: boolean;
@@ -42,12 +42,14 @@ export default function SneakerGridSection({
             {title}
           </h2>
 
-          <Link
-            href={viewAllHref}
-            className={`${inter.className} text-xs font-semibold uppercase tracking-[0.18em] text-[#e85d2a] transition-opacity hover:opacity-70`}
-          >
-            {viewAllLabel}
-          </Link>
+          {viewAllHref ? (
+            <Link
+              href={viewAllHref}
+              className={`${inter.className} text-xs font-semibold uppercase tracking-[0.18em] text-[#e85d2a] transition-opacity hover:opacity-70`}
+            >
+              {viewAllLabel}
+            </Link>
+          ) : null}
         </div>
 
         <AtomicReveal
@@ -76,7 +78,7 @@ export default function SneakerGridSection({
           </div>
         </AtomicReveal>
 
-        {showBottomCta && (
+        {showBottomCta && bottomCtaHref && (
           <div className="mt-8 flex justify-center">
             <Link href={bottomCtaHref}>
               <Button
