@@ -17,7 +17,7 @@ export default async function AccountPage() {
   const user = userId
     ? await prisma.user.findUnique({
         where: { id: userId },
-        select: { email: true, name: true, lastName: true },
+        select: { email: true, name: true, lastName: true, role: true },
       })
     : null;
 
@@ -30,7 +30,11 @@ export default async function AccountPage() {
     <>
       {/* Mobile: profile hub */}
       <div className="lg:hidden">
-        <AccountMobileHub name={name} email={email} />
+        <AccountMobileHub
+          name={name}
+          email={email}
+          isAdmin={user?.role === "ADMIN"}
+        />
       </div>
 
       {/* Desktop: orders overview beside the sidebar */}

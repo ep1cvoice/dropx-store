@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LogOut, User } from "lucide-react";
+import { LayoutDashboard, LogOut, User } from "lucide-react";
 
 import { ACCOUNT_NAV } from "./accountNav";
 import { inter } from "@/lib/fonts";
@@ -11,9 +11,10 @@ import { inter } from "@/lib/fonts";
 type AccountSidebarProps = {
   name: string;
   email: string;
+  isAdmin?: boolean;
 };
 
-export default function AccountSidebar({ name, email }: AccountSidebarProps) {
+export default function AccountSidebar({ name, email, isAdmin }: AccountSidebarProps) {
   const pathname = usePathname();
 
   const isActive = (href: string) =>
@@ -55,6 +56,16 @@ export default function AccountSidebar({ name, email }: AccountSidebarProps) {
             </Link>
           );
         })}
+
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="flex items-center gap-3 rounded-none px-3 py-2.5 text-sm font-medium text-[#333333] transition-colors hover:bg-black/5"
+          >
+            <LayoutDashboard size={18} strokeWidth={1.75} />
+            Admin
+          </Link>
+        )}
 
         <button
           type="button"

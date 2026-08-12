@@ -245,8 +245,10 @@ export const getHomeProductRails = cache(
     const now = new Date();
     const available = availableNowWhere(now);
 
+    const live = { archived: false } as const;
+
     const newDropPool = await prisma.product.findMany({
-      where: { badge: "new", AND: [available] },
+      where: { badge: "new", AND: [available, live] },
       select: productCardSelect,
     });
     const newDropRows = diversifyByBrand(newDropPool, 12);
@@ -259,7 +261,7 @@ export const getHomeProductRails = cache(
         ...(featuredExclude.length > 0
           ? { id: { notIn: featuredExclude } }
           : {}),
-        AND: [available],
+        AND: [available, live],
       },
       select: productCardSelect,
     });
@@ -277,7 +279,7 @@ export const getHomeProductRails = cache(
           ...(topUpExclude.length > 0
             ? { id: { notIn: topUpExclude } }
             : {}),
-          AND: [available],
+          AND: [available, live],
         },
         select: productCardSelect,
       });
@@ -295,7 +297,7 @@ export const getHomeProductRails = cache(
     const browsePool = await prisma.product.findMany({
       where: {
         ...(excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {}),
-        AND: [available],
+        AND: [available, live],
       },
       select: productCardSelect,
     });
@@ -325,6 +327,7 @@ const productDetailSelect = {
   currency: true,
   availableAt: true,
   heroImageUrl: true,
+  archived: true,
   createdAt: true,
   updatedAt: true,
   brand: { select: { name: true } },
@@ -397,7 +400,8 @@ export async function getProductBySlug(
     select: productDetailSelect,
   });
 
-  return product ? toProductDetail(product) : null;
+  if (!product || product.archived) return null;
+  return toProductDetail(product);
 }
 
 /** Every product slug — used by generateStaticParams to prerender detail pages. */
@@ -420,7 +424,7 @@ export async function getRelatedProducts(
   const poolSize = Math.max(take * 8, 24);
 
   const sameCategory = await prisma.product.findMany({
-    where: { slug: { not: slug }, category },
+    where: { slug: { not: slug }, category, archived: false },
     take: poolSize,
     orderBy: { createdAt: "desc" },
     select: productCardSelect,
@@ -431,7 +435,7 @@ export async function getRelatedProducts(
   if (rows.length < take) {
     const excludeSlugs = [slug, ...rows.map((r) => r.slug)];
     const filler = await prisma.product.findMany({
-      where: { slug: { notIn: excludeSlugs } },
+      where: { slug: { notIn: excludeSlugs }, archived: false },
       take: poolSize,
       orderBy: { createdAt: "desc" },
       select: productCardSelect,
@@ -650,6 +654,7 @@ export async function searchProducts(
   const rows = await prisma.product.findMany({
     where: {
       AND: [
+        { archived: false },
         { variants: { some: { sizes: { some: { stock: { gt: 0 } } } } } },
         textSearchWhere(query),
       ],
@@ -682,7 +687,7 @@ export async function getProductListing(
   } = options;
 
   const base = collectionWhere(collection);
-  const and: Prisma.ProductWhereInput[] = [];
+  const and: Prisma.ProductWhereInput[] = [{ archived: false }];
 
   // Men / women normally include unisex. When a size outside that gender's
   // run is selected (e.g. men + EU 38), drop unisex so women's/shared sizes
@@ -752,10 +757,11 @@ export async function getProductListing(
     ? {
         ...base,
         AND: [
+          { archived: false },
           { variants: { some: { sizes: { some: { stock: { gt: 0 } } } } } },
         ],
       }
-    : base;
+    : { ...base, AND: [{ archived: false }] };
 
   // Products + brand facets in parallel — avoids waiting on a second round-trip.
   const [rows, allBrands, grouped] = await Promise.all([

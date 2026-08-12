@@ -53,6 +53,11 @@ enum PaymentMethod {
   google_pay
 }
 
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
 // ---------------------------------------------------------------------------
 // Auth (NextAuth) + User
 // ---------------------------------------------------------------------------
@@ -94,6 +99,7 @@ model User {
 
   name     String
   lastName String
+  role     UserRole @default(CUSTOMER)
 
   phone      String?
   address    String?
@@ -104,12 +110,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  accounts Account[]
-  sessions Session[]
-  cart     Cart?
-  wishlist WishlistItem[]
-  orders   Order[]
-  reviews  ProductReview[]
+  accounts       Account[]
+  sessions       Session[]
+  cart           Cart?
+  wishlist       WishlistItem[]
+  orders         Order[]
+  reviews        ProductReview[]
+  adminActivities AdminActivity[]
 
   @@map("users")
 }
@@ -162,6 +169,8 @@ model Product {
   availableAt DateTime? @map("available_at")
   /** Optional PDP / campaign hero (placeholder until real assets land). */
   heroImageUrl String? @map("hero_image_url")
+  /** Hidden from storefront listings when true (admin soft-hide). */
+  archived Boolean @default(false)
 
   variants ProductVariant[]
   reviews  ProductReview[]
@@ -173,6 +182,7 @@ model Product {
   @@index([category])
   @@index([gender])
   @@index([availableAt])
+  @@index([archived])
   @@map("products")
 }
 
@@ -367,4 +377,26 @@ model ProductReview {
   @@unique([userId, productId])
   @@index([productId, createdAt])
   @@map("product_reviews")
+}
+
+// ---------------------------------------------------------------------------
+// Admin activity (audit log)
+// ---------------------------------------------------------------------------
+
+model AdminActivity {
+  id         String  @id @default(cuid())
+  action     String // e.g. "stock.update", "order.status", "user.role"
+  entityType String  @map("entity_type") // product | order | user | variant_size
+  entityId   String? @map("entity_id")
+  message    String
+  meta       Json?
+
+  actorId String @map("actor_id")
+  actor   User   @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([actorId])
+  @@map("admin_activities")
 }

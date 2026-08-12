@@ -84,6 +84,7 @@ async function main() {
       name: "Alice",
       lastName: "Doe",
       password: defaultPassword,
+      role: "CUSTOMER",
     },
   });
 
@@ -95,10 +96,24 @@ async function main() {
       name: "Bob",
       lastName: "Stone",
       password: defaultPassword,
+      role: "CUSTOMER",
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "admin@dropx.store" },
+    update: { role: "ADMIN", password: defaultPassword },
+    create: {
+      email: "admin@dropx.store",
+      name: "Dropx",
+      lastName: "Admin",
+      password: defaultPassword,
+      role: "ADMIN",
     },
   });
 
   // Reset catalog (children first to satisfy FKs)
+  await prisma.adminActivity.deleteMany();
   await prisma.productReview.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();

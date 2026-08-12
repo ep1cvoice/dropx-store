@@ -42,6 +42,7 @@ export async function proxy(req: NextRequest) {
   }
 
   const isLoggedIn = Boolean(token);
+  const isAdmin = token?.role === "ADMIN";
 
   const isGuestOnlyRoute = guestOnlyRoutes.some((route) =>
     matchesRoute(pathname, route),
@@ -49,6 +50,7 @@ export async function proxy(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.some((route) =>
     matchesRoute(pathname, route),
   );
+  const isAdminRoute = matchesRoute(pathname, "/admin");
 
   if (isGuestOnlyRoute && isLoggedIn) {
     return NextResponse.redirect(new URL("/", req.nextUrl));
@@ -58,6 +60,17 @@ export async function proxy(req: NextRequest) {
     const loginUrl = new URL("/login", req.nextUrl);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  if (isAdminRoute) {
+    if (!isLoggedIn) {
+      const loginUrl = new URL("/login", req.nextUrl);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL("/", req.nextUrl));
+    }
   }
 
   return NextResponse.next();
@@ -77,5 +90,7 @@ export const config = {
     "/orders/:path*",
     "/wishlist",
     "/wishlist/:path*",
+    "/admin",
+    "/admin/:path*",
   ],
 };

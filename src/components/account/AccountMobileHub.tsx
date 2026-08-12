@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { ArrowLeft, ChevronRight, LogOut, Sparkles, User } from "lucide-react";
+import { ArrowLeft, ChevronRight, LayoutDashboard, LogOut, Sparkles, User } from "lucide-react";
 
 import { ACCOUNT_NAV } from "./accountNav";
 import { anton, inter } from "@/lib/fonts";
@@ -10,9 +10,10 @@ import { anton, inter } from "@/lib/fonts";
 type AccountMobileHubProps = {
   name: string;
   email: string;
+  isAdmin?: boolean;
 };
 
-export default function AccountMobileHub({ name, email }: AccountMobileHubProps) {
+export default function AccountMobileHub({ name, email, isAdmin }: AccountMobileHubProps) {
   return (
     <div className={inter.className}>
       {/* Header */}
@@ -56,6 +57,17 @@ export default function AccountMobileHub({ name, email }: AccountMobileHubProps)
             <ChevronRight size={18} className="text-[#bbbbbb]" />
           </Link>
         ))}
+
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="flex items-center gap-3 border-b border-black/8 py-4 text-[#121212]"
+          >
+            <LayoutDashboard size={20} strokeWidth={1.75} className="text-[#333333]" />
+            <span className="flex-1 text-sm font-medium">Admin</span>
+            <ChevronRight size={18} className="text-[#bbbbbb]" />
+          </Link>
+        )}
 
         <button
           type="button"

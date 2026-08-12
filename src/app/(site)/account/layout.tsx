@@ -15,7 +15,7 @@ export default async function AccountLayout({
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, name: true, lastName: true },
+    select: { email: true, name: true, lastName: true, role: true },
   });
 
   if (!user) redirect("/login");
@@ -28,7 +28,11 @@ export default async function AccountLayout({
       <div className="mx-auto w-full max-w-[1120px] px-4 py-8 lg:px-6 lg:py-10">
         <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-10">
           <aside className="hidden lg:block lg:self-start">
-            <AccountSidebar name={name} email={email} />
+            <AccountSidebar
+              name={name}
+              email={email}
+              isAdmin={user.role === "ADMIN"}
+            />
           </aside>
           <div>{children}</div>
         </div>

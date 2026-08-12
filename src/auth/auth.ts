@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/utils/password";
+import type { UserRole } from "@/generated/prisma/client";
 
 const authSecret =
   process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET;
@@ -48,6 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: user.id,
           email: user.email,
           name: `${user.name} ${user.lastName}`.trim(),
+          role: user.role,
         };
       },
     }),
@@ -58,9 +60,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
+        token.role = user.role as UserRole | undefined;
       }
-      if (trigger === "update" && session && typeof session.email === "string") {
-        token.email = session.email;
+      if (trigger === "update" && session) {
+        if (typeof session.email === "string") {
+          token.email = session.email;
+        }
+        if (typeof session.role === "string") {
+          token.role = session.role as UserRole;
+        }
       }
       return token;
     },
@@ -74,6 +82,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
         if (typeof token.id === "string") {
           session.user.id = token.id;
+        }
+        if (typeof token.role === "string") {
+          session.user.role = token.role as UserRole;
         }
       }
       return session;

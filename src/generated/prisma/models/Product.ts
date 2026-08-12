@@ -48,6 +48,7 @@ export type ProductMinAggregateOutputType = {
   featured: boolean | null
   availableAt: Date | null
   heroImageUrl: string | null
+  archived: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -66,6 +67,7 @@ export type ProductMaxAggregateOutputType = {
   featured: boolean | null
   availableAt: Date | null
   heroImageUrl: string | null
+  archived: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -84,6 +86,7 @@ export type ProductCountAggregateOutputType = {
   featured: number
   availableAt: number
   heroImageUrl: number
+  archived: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -112,6 +115,7 @@ export type ProductMinAggregateInputType = {
   featured?: true
   availableAt?: true
   heroImageUrl?: true
+  archived?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -130,6 +134,7 @@ export type ProductMaxAggregateInputType = {
   featured?: true
   availableAt?: true
   heroImageUrl?: true
+  archived?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -148,6 +153,7 @@ export type ProductCountAggregateInputType = {
   featured?: true
   availableAt?: true
   heroImageUrl?: true
+  archived?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -253,6 +259,7 @@ export type ProductGroupByOutputType = {
   featured: boolean
   availableAt: Date | null
   heroImageUrl: string | null
+  archived: boolean
   createdAt: Date
   updatedAt: Date
   _count: ProductCountAggregateOutputType | null
@@ -294,6 +301,7 @@ export type ProductWhereInput = {
   featured?: Prisma.BoolFilter<"Product"> | boolean
   availableAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
   heroImageUrl?: Prisma.StringNullableFilter<"Product"> | string | null
+  archived?: Prisma.BoolFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
@@ -315,6 +323,7 @@ export type ProductOrderByWithRelationInput = {
   featured?: Prisma.SortOrder
   availableAt?: Prisma.SortOrderInput | Prisma.SortOrder
   heroImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  archived?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   brand?: Prisma.BrandOrderByWithRelationInput
@@ -339,6 +348,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   featured?: Prisma.BoolFilter<"Product"> | boolean
   availableAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
   heroImageUrl?: Prisma.StringNullableFilter<"Product"> | string | null
+  archived?: Prisma.BoolFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
@@ -360,6 +370,7 @@ export type ProductOrderByWithAggregationInput = {
   featured?: Prisma.SortOrder
   availableAt?: Prisma.SortOrderInput | Prisma.SortOrder
   heroImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  archived?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProductCountOrderByAggregateInput
@@ -386,6 +397,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   featured?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   availableAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Product"> | Date | string | null
   heroImageUrl?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
+  archived?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
 }
@@ -403,6 +415,7 @@ export type ProductCreateInput = {
   featured?: boolean
   availableAt?: Date | string | null
   heroImageUrl?: string | null
+  archived?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutProductsInput
@@ -424,6 +437,7 @@ export type ProductUncheckedCreateInput = {
   featured?: boolean
   availableAt?: Date | string | null
   heroImageUrl?: string | null
+  archived?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   variants?: Prisma.ProductVariantUncheckedCreateNestedManyWithoutProductInput
@@ -443,6 +457,7 @@ export type ProductUpdateInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutProductsNestedInput
@@ -464,6 +479,7 @@ export type ProductUncheckedUpdateInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variants?: Prisma.ProductVariantUncheckedUpdateManyWithoutProductNestedInput
@@ -484,6 +500,7 @@ export type ProductCreateManyInput = {
   featured?: boolean
   availableAt?: Date | string | null
   heroImageUrl?: string | null
+  archived?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -501,6 +518,7 @@ export type ProductUpdateManyMutationInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -519,6 +537,7 @@ export type ProductUncheckedUpdateManyInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -547,6 +566,7 @@ export type ProductCountOrderByAggregateInput = {
   featured?: Prisma.SortOrder
   availableAt?: Prisma.SortOrder
   heroImageUrl?: Prisma.SortOrder
+  archived?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -569,6 +589,7 @@ export type ProductMaxOrderByAggregateInput = {
   featured?: Prisma.SortOrder
   availableAt?: Prisma.SortOrder
   heroImageUrl?: Prisma.SortOrder
+  archived?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -587,6 +608,7 @@ export type ProductMinOrderByAggregateInput = {
   featured?: Prisma.SortOrder
   availableAt?: Prisma.SortOrder
   heroImageUrl?: Prisma.SortOrder
+  archived?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -703,6 +725,7 @@ export type ProductCreateWithoutBrandInput = {
   featured?: boolean
   availableAt?: Date | string | null
   heroImageUrl?: string | null
+  archived?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   variants?: Prisma.ProductVariantCreateNestedManyWithoutProductInput
@@ -722,6 +745,7 @@ export type ProductUncheckedCreateWithoutBrandInput = {
   featured?: boolean
   availableAt?: Date | string | null
   heroImageUrl?: string | null
+  archived?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   variants?: Prisma.ProductVariantUncheckedCreateNestedManyWithoutProductInput
@@ -771,6 +795,7 @@ export type ProductScalarWhereInput = {
   featured?: Prisma.BoolFilter<"Product"> | boolean
   availableAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
   heroImageUrl?: Prisma.StringNullableFilter<"Product"> | string | null
+  archived?: Prisma.BoolFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
 }
@@ -788,6 +813,7 @@ export type ProductCreateWithoutVariantsInput = {
   featured?: boolean
   availableAt?: Date | string | null
   heroImageUrl?: string | null
+  archived?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutProductsInput
@@ -808,6 +834,7 @@ export type ProductUncheckedCreateWithoutVariantsInput = {
   featured?: boolean
   availableAt?: Date | string | null
   heroImageUrl?: string | null
+  archived?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   reviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutProductInput
@@ -842,6 +869,7 @@ export type ProductUpdateWithoutVariantsInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutProductsNestedInput
@@ -862,6 +890,7 @@ export type ProductUncheckedUpdateWithoutVariantsInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutProductNestedInput
@@ -880,6 +909,7 @@ export type ProductCreateWithoutReviewsInput = {
   featured?: boolean
   availableAt?: Date | string | null
   heroImageUrl?: string | null
+  archived?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutProductsInput
@@ -900,6 +930,7 @@ export type ProductUncheckedCreateWithoutReviewsInput = {
   featured?: boolean
   availableAt?: Date | string | null
   heroImageUrl?: string | null
+  archived?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   variants?: Prisma.ProductVariantUncheckedCreateNestedManyWithoutProductInput
@@ -934,6 +965,7 @@ export type ProductUpdateWithoutReviewsInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutProductsNestedInput
@@ -954,6 +986,7 @@ export type ProductUncheckedUpdateWithoutReviewsInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variants?: Prisma.ProductVariantUncheckedUpdateManyWithoutProductNestedInput
@@ -972,6 +1005,7 @@ export type ProductCreateManyBrandInput = {
   featured?: boolean
   availableAt?: Date | string | null
   heroImageUrl?: string | null
+  archived?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -989,6 +1023,7 @@ export type ProductUpdateWithoutBrandInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variants?: Prisma.ProductVariantUpdateManyWithoutProductNestedInput
@@ -1008,6 +1043,7 @@ export type ProductUncheckedUpdateWithoutBrandInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variants?: Prisma.ProductVariantUncheckedUpdateManyWithoutProductNestedInput
@@ -1027,6 +1063,7 @@ export type ProductUncheckedUpdateManyWithoutBrandInput = {
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1085,6 +1122,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   featured?: boolean
   availableAt?: boolean
   heroImageUrl?: boolean
+  archived?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
@@ -1107,6 +1145,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   featured?: boolean
   availableAt?: boolean
   heroImageUrl?: boolean
+  archived?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
@@ -1126,6 +1165,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   featured?: boolean
   availableAt?: boolean
   heroImageUrl?: boolean
+  archived?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
@@ -1145,11 +1185,12 @@ export type ProductSelectScalar = {
   featured?: boolean
   availableAt?: boolean
   heroImageUrl?: boolean
+  archived?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "description" | "category" | "gender" | "brandId" | "badge" | "discountValue" | "currency" | "featured" | "availableAt" | "heroImageUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "description" | "category" | "gender" | "brandId" | "badge" | "discountValue" | "currency" | "featured" | "availableAt" | "heroImageUrl" | "archived" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
   variants?: boolean | Prisma.Product$variantsArgs<ExtArgs>
@@ -1190,6 +1231,10 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
      * * Optional PDP / campaign hero (placeholder until real assets land).
      */
     heroImageUrl: string | null
+    /**
+     * * Hidden from storefront listings when true (admin soft-hide).
+     */
+    archived: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["product"]>
@@ -1631,6 +1676,7 @@ export interface ProductFieldRefs {
   readonly featured: Prisma.FieldRef<"Product", 'Boolean'>
   readonly availableAt: Prisma.FieldRef<"Product", 'DateTime'>
   readonly heroImageUrl: Prisma.FieldRef<"Product", 'String'>
+  readonly archived: Prisma.FieldRef<"Product", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Product", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Product", 'DateTime'>
 }

@@ -116,3 +116,8 @@ export type NewsletterSubscriber = Prisma.NewsletterSubscriberModel
  * 
  */
 export type ProductReview = Prisma.ProductReviewModel
+/**
+ * Model AdminActivity
+ * 
+ */
+export type AdminActivity = Prisma.AdminActivityModel
