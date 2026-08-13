@@ -8,10 +8,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { slugify } from "@/lib/admin-slug";
 import { inter } from "@/lib/fonts";
-import {
-  ProductCategory,
-  ProductGender,
-} from "@/generated/prisma/client";
+import { PRODUCT_CATEGORIES, PRODUCT_GENDERS } from "@/types/admin";
 
 type BrandOption = { id: string; name: string };
 
@@ -98,7 +95,7 @@ export default function ProductCreateForm({ brands }: ProductCreateFormProps) {
             Category
           </label>
           <select id="category" name="category" className={selectClass}>
-            {Object.values(ProductCategory).map((c) => (
+            {PRODUCT_CATEGORIES.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
@@ -110,7 +107,7 @@ export default function ProductCreateForm({ brands }: ProductCreateFormProps) {
             Gender
           </label>
           <select id="gender" name="gender" className={selectClass}>
-            {Object.values(ProductGender).map((g) => (
+            {PRODUCT_GENDERS.map((g) => (
               <option key={g} value={g}>
                 {g}
               </option>

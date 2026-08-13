@@ -5,9 +5,9 @@ import { useTransition } from "react";
 
 import { setUserRole } from "@/actions/admin/users";
 import { inter } from "@/lib/fonts";
-import type { UserRole } from "@/generated/prisma/client";
+import { USER_ROLES, type UserRole } from "@/types/admin";
 
-const ROLES: UserRole[] = ["CUSTOMER", "ADMIN"];
+const ROLES = USER_ROLES;
 
 type UserRoleSelectProps = {
   userId: string;

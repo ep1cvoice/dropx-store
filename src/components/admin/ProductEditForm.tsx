@@ -9,10 +9,13 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { inter } from "@/lib/fonts";
 import {
-  ProductBadge,
-  ProductCategory,
-  ProductGender,
-} from "@/generated/prisma/client";
+  PRODUCT_BADGES,
+  PRODUCT_CATEGORIES,
+  PRODUCT_GENDERS,
+  type AdminProductBadge,
+  type AdminProductCategory,
+  type AdminProductGender,
+} from "@/types/admin";
 
 type BrandOption = { id: string; name: string };
 
@@ -35,10 +38,10 @@ type ProductEditFormProps = {
     name: string;
     slug: string;
     brandId: string;
-    category: ProductCategory;
-    gender: ProductGender;
+    category: AdminProductCategory;
+    gender: AdminProductGender;
     description: string | null;
-    badge: ProductBadge | null;
+    badge: AdminProductBadge | null;
     discountValue: number | null;
     featured: boolean;
     availableAt: string | null;
@@ -146,7 +149,7 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
                 Category
               </label>
               <select id="category" name="category" defaultValue={product.category} className={selectClass}>
-                {Object.values(ProductCategory).map((c) => (
+                {PRODUCT_CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
@@ -156,7 +159,7 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
                 Gender
               </label>
               <select id="gender" name="gender" defaultValue={product.gender} className={selectClass}>
-                {Object.values(ProductGender).map((g) => (
+                {PRODUCT_GENDERS.map((g) => (
                   <option key={g} value={g}>{g}</option>
                 ))}
               </select>
@@ -183,7 +186,7 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
               </label>
               <select id="badge" name="badge" defaultValue={product.badge ?? "none"} className={selectClass}>
                 <option value="none">None</option>
-                {Object.values(ProductBadge).map((b) => (
+                {PRODUCT_BADGES.map((b) => (
                   <option key={b} value={b}>{b}</option>
                 ))}
               </select>
