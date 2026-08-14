@@ -57,7 +57,7 @@ export default async function AdminDashboardPage() {
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="font-medium text-[#e85d2a] hover:opacity-80"
+                      className="cursor-pointer font-medium text-[#e85d2a] hover:opacity-80"
                     >
                       {order.number}
                     </Link>

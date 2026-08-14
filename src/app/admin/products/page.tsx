@@ -62,7 +62,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/products/${p.id}/edit`}
-                    className="font-medium text-[#121212] hover:text-[#e85d2a]"
+                    className="cursor-pointer font-medium text-[#121212] hover:text-[#e85d2a]"
                   >
                     {p.name}
                   </Link>
@@ -84,10 +84,10 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                   )}
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-2">
                     <Link
                       href={`/admin/products/${p.id}/edit`}
-                      className={`${inter.className} text-xs font-semibold text-[#e85d2a] hover:opacity-80`}
+                      className={`${inter.className} cursor-pointer text-xs font-semibold text-[#e85d2a] hover:opacity-80`}
                     >
                       Edit
                     </Link>

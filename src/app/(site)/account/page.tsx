@@ -41,14 +41,7 @@ export default async function AccountPage() {
       <div className="hidden lg:block">
         <AccountPageHeader
           title="My Orders"
-          action={
-            <Link
-              href="/account/orders"
-              className={`${inter.className} text-sm font-semibold text-[#e85d2a] transition-opacity hover:opacity-70`}
-            >
-              View All
-            </Link>
-          }
+          
         />
         <OrdersPanel />
       </div>

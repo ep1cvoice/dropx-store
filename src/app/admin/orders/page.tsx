@@ -38,7 +38,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
             <Link
               key={s}
               href={href}
-              className={`rounded-none border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
+              className={`cursor-pointer rounded-none border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
                 active
                   ? "border-[#e85d2a] bg-[#e85d2a] text-white"
                   : "border-black/15 bg-white text-[#333333] hover:border-black/25"
@@ -68,7 +68,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/orders/${o.id}`}
-                    className="font-medium text-[#e85d2a] hover:opacity-80"
+                    className="cursor-pointer font-medium text-[#e85d2a] hover:opacity-80"
                   >
                     {o.number}
                   </Link>

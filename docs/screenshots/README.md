@@ -13,6 +13,7 @@ Filenames must match the root `README.md` links.
 | `05-search-overlay.jpg` | Navbar live search |
 | `06-cart-checkout.jpg` | Cart / checkout |
 | `07-account-orders.jpg` | Account orders |
+| `08-admin-panel.jpg` | Admin — products list / RBAC |
 
 ## Mobile (~375px)
 

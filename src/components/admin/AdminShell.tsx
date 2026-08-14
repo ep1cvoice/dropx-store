@@ -33,7 +33,7 @@ function NavLinks({
             key={href}
             href={href}
             onClick={onNavigate}
-            className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex cursor-pointer items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors ${
               active
                 ? "bg-[#e85d2a] text-white"
                 : "text-[#333333] hover:bg-black/5"
@@ -54,37 +54,49 @@ export default function AdminShell({ adminName, children }: AdminShellProps) {
 
   return (
     <div className="min-h-screen bg-[#f7f7f5] text-[#121212]">
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-black/10 bg-white px-4 py-3 lg:px-6">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            className="cursor-pointer p-1 lg:hidden"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            onClick={() => setMobileOpen((v) => !v)}
+      <header className="sticky top-0 z-30 border-b border-black/10 bg-white">
+        <div className="mx-auto flex max-w-[1600px] items-center">
+          {/* Aligns with sidebar column on desktop */}
+          <div className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 lg:w-56 lg:flex-none lg:px-4">
+            <button
+              type="button"
+              className="cursor-pointer p-1 lg:hidden"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMobileOpen((v) => !v)}
+            >
+              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+            <Link
+              href="/admin"
+              className={`${anton.className} cursor-pointer text-xl tracking-wide`}
+            >
+              DROPX ADMIN
+            </Link>
+          </div>
+
+          {/* Aligns with main content padding on desktop */}
+          <div
+            className={`${inter.className} flex min-w-0 flex-1 items-center justify-end gap-4 px-4 py-3 text-sm md:px-6 lg:px-8`}
           >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-          <Link href="/admin" className={`${anton.className} text-xl tracking-wide`}>
-            DROPX ADMIN
-          </Link>
-        </div>
-        <div className={`${inter.className} flex items-center gap-4 text-sm`}>
-          <span className="hidden text-[#666666] sm:inline">{adminName}</span>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1 font-medium text-[#e85d2a] hover:opacity-80"
-          >
-            Storefront
-            <ExternalLink size={14} />
-          </Link>
-          <button
-            type="button"
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="inline-flex cursor-pointer items-center gap-1 font-medium text-[#e11d48] hover:opacity-80"
-          >
-            <LogOut size={14} />
-            Log out
-          </button>
+            <span className="hidden truncate text-[#666666] sm:inline">
+              {adminName}
+            </span>
+            <Link
+              href="/"
+              className="inline-flex cursor-pointer items-center gap-1 font-medium text-[#e85d2a] hover:opacity-80"
+            >
+              Storefront
+              <ExternalLink size={14} />
+            </Link>
+            <button
+              type="button"
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="inline-flex cursor-pointer items-center gap-1 font-medium text-[#e11d48] hover:opacity-80"
+            >
+              <LogOut size={14} />
+              Log out
+            </button>
+          </div>
         </div>
       </header>
 
@@ -97,7 +109,7 @@ export default function AdminShell({ adminName, children }: AdminShellProps) {
           <div className="fixed inset-0 z-40 lg:hidden">
             <button
               type="button"
-              className="absolute inset-0 bg-black/40"
+              className="absolute inset-0 cursor-pointer bg-black/40"
               aria-label="Close menu"
               onClick={() => setMobileOpen(false)}
             />

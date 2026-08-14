@@ -22,7 +22,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
     <div>
       <Link
         href="/admin/orders"
-        className={`${inter.className} text-sm font-medium text-[#e85d2a] hover:opacity-80`}
+        className={`${inter.className} cursor-pointer text-sm font-medium text-[#e85d2a] hover:opacity-80`}
       >
         ← Back to orders
       </Link>
@@ -67,7 +67,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
               <dd>
                 <Link
                   href={`/admin/customers/${order.user.id}`}
-                  className="text-[#e85d2a] hover:opacity-80"
+                  className="cursor-pointer text-[#e85d2a] hover:opacity-80"
                 >
                   View profile
                 </Link>

@@ -16,7 +16,7 @@ type ProductCreateFormProps = {
   brands: BrandOption[];
 };
 
-const selectClass = `${inter.className} w-full rounded-none border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-gray-400`;
+const selectClass = `${inter.className} w-full cursor-pointer rounded-none border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-gray-400`;
 
 export default function ProductCreateForm({ brands }: ProductCreateFormProps) {
   const router = useRouter();

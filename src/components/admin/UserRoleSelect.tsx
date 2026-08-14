@@ -41,7 +41,7 @@ export default function UserRoleSelect({
       value={currentRole}
       disabled={disabled || pending}
       onChange={handleChange}
-      className={`${inter.className} rounded-none border border-black/15 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-[#e85d2a] disabled:opacity-50`}
+      className={`${inter.className} cursor-pointer rounded-none border border-black/15 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-[#e85d2a] disabled:cursor-not-allowed disabled:opacity-50`}
       aria-label="User role"
     >
       {ROLES.map((r) => (

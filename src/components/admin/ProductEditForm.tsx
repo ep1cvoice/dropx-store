@@ -52,7 +52,8 @@ type ProductEditFormProps = {
   brands: BrandOption[];
 };
 
-const selectClass = `${inter.className} w-full rounded-none border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-gray-400`;
+const fieldClass = `${inter.className} w-full rounded-none border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-gray-400`;
+const selectClass = `${fieldClass} cursor-pointer`;
 
 export default function ProductEditForm({ product, brands }: ProductEditFormProps) {
   const router = useRouter();
@@ -175,7 +176,7 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
               name="description"
               rows={4}
               defaultValue={product.description ?? ""}
-              className={selectClass}
+              className={fieldClass}
             />
           </div>
 
@@ -217,12 +218,12 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
             defaultValue={product.heroImageUrl ?? ""}
           />
 
-          <label className={`${inter.className} flex items-center gap-2 text-sm`}>
-            <input type="checkbox" name="featured" defaultChecked={product.featured} className="rounded-none" />
+          <label className={`${inter.className} flex cursor-pointer items-center gap-2 text-sm`}>
+            <input type="checkbox" name="featured" defaultChecked={product.featured} className="cursor-pointer rounded-none" />
             Featured
           </label>
-          <label className={`${inter.className} flex items-center gap-2 text-sm`}>
-            <input type="checkbox" name="archived" defaultChecked={product.archived} className="rounded-none" />
+          <label className={`${inter.className} flex cursor-pointer items-center gap-2 text-sm`}>
+            <input type="checkbox" name="archived" defaultChecked={product.archived} className="cursor-pointer rounded-none" />
             Archived
           </label>
 

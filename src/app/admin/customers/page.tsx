@@ -31,7 +31,7 @@ export default async function AdminCustomersPage() {
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/customers/${c.id}`}
-                    className="font-medium text-[#e85d2a] hover:opacity-80"
+                    className="cursor-pointer font-medium text-[#e85d2a] hover:opacity-80"
                   >
                     {c.name}
                   </Link>

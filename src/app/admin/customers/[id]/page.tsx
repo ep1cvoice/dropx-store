@@ -19,7 +19,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
     <div>
       <Link
         href="/admin/customers"
-        className={`${inter.className} text-sm font-medium text-[#e85d2a] hover:opacity-80`}
+        className={`${inter.className} cursor-pointer text-sm font-medium text-[#e85d2a] hover:opacity-80`}
       >
         ← Back to customers
       </Link>
@@ -74,7 +74,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/orders/${o.id}`}
-                      className="font-medium text-[#e85d2a] hover:opacity-80"
+                      className="cursor-pointer font-medium text-[#e85d2a] hover:opacity-80"
                     >
                       {o.number}
                     </Link>

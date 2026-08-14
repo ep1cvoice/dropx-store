@@ -22,7 +22,7 @@ export default async function AdminEditProductPage({ params }: PageProps) {
     <div>
       <Link
         href="/admin/products"
-        className={`${inter.className} text-sm font-medium text-[#e85d2a] hover:opacity-80`}
+        className={`${inter.className} cursor-pointer text-sm font-medium text-[#e85d2a] hover:opacity-80`}
       >
         ← Back to products
       </Link>
