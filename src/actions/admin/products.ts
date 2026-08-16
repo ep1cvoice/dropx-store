@@ -39,6 +39,24 @@ function parseBadge(value: FormDataEntryValue | null): ProductBadge | null {
   return raw as ProductBadge;
 }
 
+function parseDiscountValue(raw: string): number | null {
+  if (!raw) return null;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0 || n > 99) {
+    throw new Error("Discount must be a number between 0 and 99.");
+  }
+  return Math.round(n);
+}
+
+function parseAvailableAt(raw: string): string | null {
+  if (!raw) return null;
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) {
+    throw new Error("Available at must be a valid date and time.");
+  }
+  return d.toISOString();
+}
+
 function parseProductFields(formData: FormData): ProductFields {
   const discountRaw = String(formData.get("discountValue") ?? "").trim();
   const availableRaw = String(formData.get("availableAt") ?? "").trim();
@@ -51,11 +69,29 @@ function parseProductFields(formData: FormData): ProductFields {
     gender: String(formData.get("gender") ?? "unisex") as ProductGender,
     description: String(formData.get("description") ?? "").trim() || null,
     badge: parseBadge(formData.get("badge")),
-    discountValue: discountRaw ? Number(discountRaw) : null,
+    discountValue: parseDiscountValue(discountRaw),
     featured: formData.get("featured") === "on",
-    availableAt: availableRaw || null,
+    availableAt: parseAvailableAt(availableRaw),
     heroImageUrl: String(formData.get("heroImageUrl") ?? "").trim() || null,
     archived: formData.get("archived") === "on",
+  };
+}
+
+function isNextRedirect(e: unknown): boolean {
+  return (
+    typeof e === "object" &&
+    e !== null &&
+    "digest" in e &&
+    typeof (e as { digest: unknown }).digest === "string" &&
+    String((e as { digest: string }).digest).startsWith("NEXT_REDIRECT")
+  );
+}
+
+function actionError(e: unknown, fallback: string): ActionResult {
+  if (isNextRedirect(e)) throw e;
+  return {
+    ok: false,
+    error: e instanceof Error ? e.message : fallback,
   };
 }
 
@@ -77,7 +113,13 @@ export async function createProduct(
 ): Promise<ActionResult> {
   const admin = await requireAdmin();
 
-  const fields = parseProductFields(formData);
+  let fields: ProductFields;
+  try {
+    fields = parseProductFields(formData);
+  } catch (e) {
+    return actionError(e, "Invalid product fields.");
+  }
+
   const price = Number(formData.get("price"));
   const color = String(formData.get("color") ?? "").trim();
   const colorHex = String(formData.get("colorHex") ?? "#888888").trim();
@@ -137,10 +179,7 @@ export async function createProduct(
     revalidateProductPaths(product.slug);
     return { ok: true, id: product.id, slug: product.slug };
   } catch (e) {
-    return {
-      ok: false,
-      error: e instanceof Error ? e.message : "Failed to create product.",
-    };
+    return actionError(e, "Failed to create product.");
   }
 }
 
@@ -149,7 +188,13 @@ export async function updateProduct(
   formData: FormData,
 ): Promise<ActionResult> {
   const admin = await requireAdmin();
-  const fields = parseProductFields(formData);
+
+  let fields: ProductFields;
+  try {
+    fields = parseProductFields(formData);
+  } catch (e) {
+    return actionError(e, "Invalid product fields.");
+  }
 
   if (!fields.name || !fields.slug || !fields.brandId) {
     return { ok: false, error: "Name, slug, and brand are required." };
@@ -188,10 +233,7 @@ export async function updateProduct(
     revalidateProductPaths(product.slug);
     return { ok: true, id: product.id, slug: product.slug };
   } catch (e) {
-    return {
-      ok: false,
-      error: e instanceof Error ? e.message : "Failed to update product.",
-    };
+    return actionError(e, "Failed to update product.");
   }
 }
 
@@ -222,32 +264,40 @@ export async function updateVariant(
     return { ok: false, error: "A valid price is required." };
   }
 
-  const existing = await prisma.productVariant.findUnique({
-    where: { id: variantId },
-    select: { price: true, color: true, product: { select: { slug: true, name: true } } },
-  });
-  if (!existing) return { ok: false, error: "Variant not found." };
-
-  const colorFamily = deriveColorFamily(color, colorFamilyRaw);
-
-  await prisma.productVariant.update({
-    where: { id: variantId },
-    data: { color, colorHex, colorFamily, price, imageUrl, description },
-  });
-
-  if (existing.price !== price) {
-    await logAdminActivity({
-      actorId: admin.id,
-      action: "price.update",
-      entityType: "variant",
-      entityId: variantId,
-      message: `Price for "${existing.product.name}" (${existing.color}) changed from ${existing.price} to ${price}`,
-      meta: { from: existing.price, to: price },
+  try {
+    const existing = await prisma.productVariant.findUnique({
+      where: { id: variantId },
+      select: {
+        price: true,
+        color: true,
+        product: { select: { slug: true, name: true } },
+      },
     });
-  }
+    if (!existing) return { ok: false, error: "Variant not found." };
 
-  revalidateProductPaths(existing.product.slug);
-  return { ok: true };
+    const colorFamily = deriveColorFamily(color, colorFamilyRaw);
+
+    await prisma.productVariant.update({
+      where: { id: variantId },
+      data: { color, colorHex, colorFamily, price, imageUrl, description },
+    });
+
+    if (existing.price !== price) {
+      await logAdminActivity({
+        actorId: admin.id,
+        action: "price.update",
+        entityType: "variant",
+        entityId: variantId,
+        message: `Price for "${existing.product.name}" (${existing.color}) changed from ${existing.price} to ${price}`,
+        meta: { from: existing.price, to: price },
+      });
+    }
+
+    revalidateProductPaths(existing.product.slug);
+    return { ok: true };
+  } catch (e) {
+    return actionError(e, "Failed to update variant.");
+  }
 }
 
 export async function addVariant(
@@ -267,37 +317,41 @@ export async function addVariant(
     return { ok: false, error: "A valid price is required." };
   }
 
-  const product = await prisma.product.findUnique({
-    where: { id: productId },
-    select: { slug: true, name: true },
-  });
-  if (!product) return { ok: false, error: "Product not found." };
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      select: { slug: true, name: true },
+    });
+    if (!product) return { ok: false, error: "Product not found." };
 
-  const variant = await prisma.productVariant.create({
-    data: {
-      productId,
-      color,
-      colorHex,
-      colorFamily: deriveColorFamily(color, colorFamilyRaw),
-      price,
-      imageUrl,
-      sizes: {
-        create: DEFAULT_EU_SIZES.map((size) => ({ size, stock: 0 })),
+    const variant = await prisma.productVariant.create({
+      data: {
+        productId,
+        color,
+        colorHex,
+        colorFamily: deriveColorFamily(color, colorFamilyRaw),
+        price,
+        imageUrl,
+        sizes: {
+          create: DEFAULT_EU_SIZES.map((size) => ({ size, stock: 0 })),
+        },
       },
-    },
-    select: { id: true },
-  });
+      select: { id: true },
+    });
 
-  await logAdminActivity({
-    actorId: admin.id,
-    action: "variant.create",
-    entityType: "variant",
-    entityId: variant.id,
-    message: `Added variant "${color}" to "${product.name}"`,
-  });
+    await logAdminActivity({
+      actorId: admin.id,
+      action: "variant.create",
+      entityType: "variant",
+      entityId: variant.id,
+      message: `Added variant "${color}" to "${product.name}"`,
+    });
 
-  revalidateProductPaths(product.slug);
-  return { ok: true, id: variant.id };
+    revalidateProductPaths(product.slug);
+    return { ok: true, id: variant.id };
+  } catch (e) {
+    return actionError(e, "Failed to add variant.");
+  }
 }
 
 export async function updateSizeStock(
@@ -310,39 +364,43 @@ export async function updateSizeStock(
     return { ok: false, error: "Stock must be a non-negative integer." };
   }
 
-  const existing = await prisma.variantSize.findUnique({
-    where: { id: sizeId },
-    select: {
-      stock: true,
-      size: true,
-      variant: {
-        select: {
-          color: true,
-          product: { select: { slug: true, name: true } },
+  try {
+    const existing = await prisma.variantSize.findUnique({
+      where: { id: sizeId },
+      select: {
+        stock: true,
+        size: true,
+        variant: {
+          select: {
+            color: true,
+            product: { select: { slug: true, name: true } },
+          },
         },
       },
-    },
-  });
-  if (!existing) return { ok: false, error: "Size not found." };
+    });
+    if (!existing) return { ok: false, error: "Size not found." };
 
-  if (existing.stock === stock) return { ok: true };
+    if (existing.stock === stock) return { ok: true };
 
-  await prisma.variantSize.update({
-    where: { id: sizeId },
-    data: { stock },
-  });
+    await prisma.variantSize.update({
+      where: { id: sizeId },
+      data: { stock },
+    });
 
-  await logAdminActivity({
-    actorId: admin.id,
-    action: "stock.update",
-    entityType: "variant_size",
-    entityId: sizeId,
-    message: `Stock for "${existing.variant.product.name}" (${existing.variant.color}, ${existing.size}) changed from ${existing.stock} to ${stock}`,
-    meta: { from: existing.stock, to: stock },
-  });
+    await logAdminActivity({
+      actorId: admin.id,
+      action: "stock.update",
+      entityType: "variant_size",
+      entityId: sizeId,
+      message: `Stock for "${existing.variant.product.name}" (${existing.variant.color}, ${existing.size}) changed from ${existing.stock} to ${stock}`,
+      meta: { from: existing.stock, to: stock },
+    });
 
-  revalidateProductPaths(existing.variant.product.slug);
-  return { ok: true };
+    revalidateProductPaths(existing.variant.product.slug);
+    return { ok: true };
+  } catch (e) {
+    return actionError(e, "Failed to update stock.");
+  }
 }
 
 export async function setProductArchived(
@@ -351,22 +409,26 @@ export async function setProductArchived(
 ): Promise<ActionResult> {
   const admin = await requireAdmin();
 
-  const product = await prisma.product.update({
-    where: { id: productId },
-    data: { archived },
-    select: { slug: true, name: true, archived: true },
-  });
+  try {
+    const product = await prisma.product.update({
+      where: { id: productId },
+      data: { archived },
+      select: { slug: true, name: true, archived: true },
+    });
 
-  await logAdminActivity({
-    actorId: admin.id,
-    action: archived ? "product.archive" : "product.unarchive",
-    entityType: "product",
-    entityId: productId,
-    message: archived
-      ? `Archived product "${product.name}"`
-      : `Unarchived product "${product.name}"`,
-  });
+    await logAdminActivity({
+      actorId: admin.id,
+      action: archived ? "product.archive" : "product.unarchive",
+      entityType: "product",
+      entityId: productId,
+      message: archived
+        ? `Archived product "${product.name}"`
+        : `Unarchived product "${product.name}"`,
+    });
 
-  revalidateProductPaths(product.slug);
-  return { ok: true };
+    revalidateProductPaths(product.slug);
+    return { ok: true };
+  } catch (e) {
+    return actionError(e, "Failed to update archive state.");
+  }
 }

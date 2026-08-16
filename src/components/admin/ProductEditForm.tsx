@@ -55,15 +55,22 @@ type ProductEditFormProps = {
 const fieldClass = `${inter.className} w-full rounded-none border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-gray-400`;
 const selectClass = `${fieldClass} cursor-pointer`;
 
+/** Format an ISO timestamp for `<input type="datetime-local">` in local time. */
+function toDatetimeLocalValue(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export default function ProductEditForm({ product, brands }: ProductEditFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
-  const availableAtValue = product.availableAt
-    ? product.availableAt.slice(0, 16)
-    : "";
+  const availableAtValue = toDatetimeLocalValue(product.availableAt);
 
   function handleProductSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -72,13 +79,17 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
     const formData = new FormData(e.currentTarget);
 
     startTransition(async () => {
-      const result = await updateProduct(product.id, formData);
-      if (!result.ok) {
-        setError(result.error);
-        return;
+      try {
+        const result = await updateProduct(product.id, formData);
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        setSaved(true);
+        router.refresh();
+      } catch {
+        setError("Failed to save product. Please try again.");
       }
-      setSaved(true);
-      router.refresh();
     });
   }
 
@@ -87,12 +98,16 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
     const formData = new FormData(form);
 
     startTransition(async () => {
-      const result = await updateVariant(variantId, formData);
-      if (!result.ok) {
-        setError(result.error);
-        return;
+      try {
+        const result = await updateVariant(variantId, formData);
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        router.refresh();
+      } catch {
+        setError("Failed to save variant. Please try again.");
       }
-      router.refresh();
     });
   }
 
@@ -102,13 +117,17 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
     const formData = new FormData(e.currentTarget);
 
     startTransition(async () => {
-      const result = await addVariant(product.id, formData);
-      if (!result.ok) {
-        setError(result.error);
-        return;
+      try {
+        const result = await addVariant(product.id, formData);
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        (e.target as HTMLFormElement).reset();
+        router.refresh();
+      } catch {
+        setError("Failed to add variant. Please try again.");
       }
-      (e.target as HTMLFormElement).reset();
-      router.refresh();
     });
   }
 
@@ -206,7 +225,7 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
           <Input
             id="availableAt"
             name="availableAt"
-            label="Available at (ISO datetime-local)"
+            label="Available at"
             type="datetime-local"
             defaultValue={availableAtValue}
           />
@@ -214,7 +233,9 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
             id="heroImageUrl"
             name="heroImageUrl"
             label="Hero image URL"
-            type="url"
+            type="text"
+            inputMode="url"
+            placeholder="https://…"
             defaultValue={product.heroImageUrl ?? ""}
           />
 
@@ -237,6 +258,9 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
         <h2 className={`${inter.className} mb-4 text-sm font-semibold uppercase tracking-wide text-[#666666]`}>
           Variants & stock
         </h2>
+        <p className={`${inter.className} mb-4 text-sm text-[#666666]`}>
+          Stock saves immediately with the + / − buttons (or when you leave the field). Use “Save product” only for product details above.
+        </p>
         <div className="space-y-8">
           {product.variants.map((variant) => (
             <div key={variant.id} className="border border-black/10 bg-white p-4">
@@ -251,7 +275,16 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
                 <Input id={`hex-${variant.id}`} name="colorHex" label="Color hex" defaultValue={variant.colorHex} required />
                 <Input id={`family-${variant.id}`} name="colorFamily" label="Color family" defaultValue={variant.colorFamily} />
                 <Input id={`price-${variant.id}`} name="price" label="Price" type="number" min="0.01" step="0.01" defaultValue={variant.price} required />
-                <Input id={`img-${variant.id}`} name="imageUrl" label="Image URL" type="url" defaultValue={variant.imageUrl ?? ""} wrapperClassName="md:col-span-2" />
+                <Input
+                  id={`img-${variant.id}`}
+                  name="imageUrl"
+                  label="Image URL"
+                  type="text"
+                  inputMode="url"
+                  placeholder="https://…"
+                  defaultValue={variant.imageUrl ?? ""}
+                  wrapperClassName="md:col-span-2"
+                />
                 <div className="md:col-span-2">
                   <Button type="submit" variant="outline" className="px-4 py-2 text-xs" disabled={pending}>
                     Save variant
@@ -259,7 +292,7 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
                 </div>
               </form>
 
-              <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {variant.sizes.map((sz) => (
                   <StockInput
                     key={sz.id}
@@ -278,7 +311,7 @@ export default function ProductEditForm({ product, brands }: ProductEditFormProp
           <Input id="new-color" name="color" label="Color" required />
           <Input id="new-hex" name="colorHex" label="Color hex" defaultValue="#888888" />
           <Input id="new-price" name="price" label="Price" type="number" min="0.01" step="0.01" required />
-          <Input id="new-image" name="imageUrl" label="Image URL" type="url" />
+          <Input id="new-image" name="imageUrl" label="Image URL" type="text" inputMode="url" placeholder="https://…" />
           <Button type="submit" variant="outline" className="px-4 py-2 text-xs" disabled={pending}>
             Add variant
           </Button>

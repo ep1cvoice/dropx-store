@@ -44,7 +44,14 @@ export default async function AdminEditProductPage({ params }: PageProps) {
             badge: product.badge,
             discountValue: product.discountValue,
             featured: product.featured,
-            availableAt: product.availableAt?.toISOString() ?? null,
+            availableAt: (() => {
+              if (!product.availableAt) return null;
+              const d =
+                product.availableAt instanceof Date
+                  ? product.availableAt
+                  : new Date(product.availableAt);
+              return Number.isNaN(d.getTime()) ? null : d.toISOString();
+            })(),
             heroImageUrl: product.heroImageUrl,
             archived: product.archived,
             variants: product.variants.map((v) => ({

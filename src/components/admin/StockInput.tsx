@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 import { updateSizeStock } from "@/actions/admin/products";
 import { inter } from "@/lib/fonts";
@@ -17,42 +16,103 @@ export default function StockInput({
   initialStock,
   sizeLabel,
 }: StockInputProps) {
-  const router = useRouter();
   const [value, setValue] = useState(String(initialStock));
+  const [saved, setSaved] = useState(initialStock);
+  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  function save() {
-    const stock = Number.parseInt(value, 10);
-    if (!Number.isInteger(stock) || stock < 0) return;
+  useEffect(() => {
+    setValue(String(initialStock));
+    setSaved(initialStock);
+  }, [initialStock]);
 
+  function commit(nextRaw: string | number) {
+    const stock = typeof nextRaw === "number"
+      ? nextRaw
+      : Number.parseInt(nextRaw, 10);
+
+    if (!Number.isInteger(stock) || stock < 0) {
+      setError("Invalid stock");
+      setValue(String(saved));
+      return;
+    }
+
+    setValue(String(stock));
+    if (stock === saved) {
+      setError(null);
+      return;
+    }
+
+    setError(null);
     startTransition(async () => {
-      await updateSizeStock(sizeId, stock);
-      router.refresh();
+      try {
+        const result = await updateSizeStock(sizeId, stock);
+        if (!result.ok) {
+          setError(result.error);
+          setValue(String(saved));
+          return;
+        }
+        setSaved(stock);
+      } catch {
+        setError("Failed to save stock");
+        setValue(String(saved));
+      }
     });
   }
 
+  function bump(delta: number) {
+    const current = Number.parseInt(value, 10);
+    const base = Number.isInteger(current) && current >= 0 ? current : saved;
+    commit(Math.max(0, base + delta));
+  }
+
   return (
-    <div className="flex items-center gap-2">
-      <span className={`${inter.className} w-14 shrink-0 text-xs text-[#666666]`}>
-        {sizeLabel}
-      </span>
-      <input
-        type="number"
-        min={0}
-        step={1}
-        value={value}
-        disabled={pending}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={save}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            save();
-          }
-        }}
-        className={`${inter.className} w-16 rounded-none border border-black/15 bg-white px-2 py-1 text-sm outline-none focus:border-[#e85d2a] disabled:opacity-50`}
-        aria-label={`Stock for ${sizeLabel}`}
-      />
+    <div className="flex flex-col gap-0.5">
+      <div className="flex items-center gap-1.5">
+        <span className={`${inter.className} w-10 shrink-0 text-xs text-[#666666]`}>
+          {sizeLabel}
+        </span>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => bump(-1)}
+          className={`${inter.className} flex h-7 w-7 cursor-pointer items-center justify-center border border-black/15 bg-white text-sm hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-50`}
+          aria-label={`Decrease stock for ${sizeLabel}`}
+        >
+          −
+        </button>
+        <input
+          type="number"
+          min={0}
+          step={1}
+          value={value}
+          disabled={pending}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => commit(value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              commit(value);
+            }
+          }}
+          className={`${inter.className} w-14 rounded-none border border-black/15 bg-white px-1.5 py-1 text-center text-sm outline-none focus:border-[#e85d2a] disabled:opacity-50`}
+          aria-label={`Stock for ${sizeLabel}`}
+        />
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => bump(1)}
+          className={`${inter.className} flex h-7 w-7 cursor-pointer items-center justify-center border border-black/15 bg-white text-sm hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-50`}
+          aria-label={`Increase stock for ${sizeLabel}`}
+        >
+          +
+        </button>
+      </div>
+      {error && (
+        <p className={`${inter.className} text-[10px] text-red-600`} role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

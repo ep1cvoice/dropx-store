@@ -115,19 +115,36 @@ export async function getAdminProducts(q?: string) {
   });
 }
 
+function euSizeSortKey(size: string): number {
+  const n = Number.parseInt(size.replace(/^EU\s*/i, ""), 10);
+  return Number.isFinite(n) ? n : 0;
+}
+
 export async function getAdminProduct(id: string) {
-  return prisma.product.findUnique({
+  const product = await prisma.product.findUnique({
     where: { id },
     include: {
       brand: { select: { id: true, name: true, slug: true } },
       variants: {
         orderBy: { createdAt: "asc" },
         include: {
-          sizes: { orderBy: { size: "asc" } },
+          sizes: true,
         },
       },
     },
   });
+
+  if (!product) return null;
+
+  return {
+    ...product,
+    variants: product.variants.map((v) => ({
+      ...v,
+      sizes: [...v.sizes].sort(
+        (a, b) => euSizeSortKey(a.size) - euSizeSortKey(b.size),
+      ),
+    })),
+  };
 }
 
 export async function getAdminBrands() {
