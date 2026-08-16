@@ -27,9 +27,10 @@ export default function StockInput({
   }, [initialStock]);
 
   function commit(nextRaw: string | number) {
-    const stock = typeof nextRaw === "number"
-      ? nextRaw
-      : Number.parseInt(nextRaw, 10);
+    const stock =
+      typeof nextRaw === "number"
+        ? nextRaw
+        : Number.parseInt(nextRaw, 10);
 
     if (!Number.isInteger(stock) || stock < 0) {
       setError("Invalid stock");
@@ -53,8 +54,12 @@ export default function StockInput({
           return;
         }
         setSaved(stock);
-      } catch {
-        setError("Failed to save stock");
+      } catch (e) {
+        const message =
+          e instanceof Error && e.message
+            ? e.message
+            : "Failed to save stock";
+        setError(message);
         setValue(String(saved));
       }
     });
@@ -109,7 +114,7 @@ export default function StockInput({
         </button>
       </div>
       {error && (
-        <p className={`${inter.className} text-[10px] text-red-600`} role="alert">
+        <p className={`${inter.className} max-w-[14rem] text-[10px] leading-snug text-red-600`} role="alert">
           {error}
         </p>
       )}

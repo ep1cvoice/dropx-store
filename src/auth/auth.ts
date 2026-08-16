@@ -62,6 +62,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.name = user.name;
         token.role = user.role as UserRole | undefined;
       }
+      // Keep id stable across refreshes (Auth.js uses `sub` as the subject).
+      if (!token.id && typeof token.sub === "string") {
+        token.id = token.sub;
+      }
       if (trigger === "update" && session) {
         if (typeof session.email === "string") {
           token.email = session.email;
@@ -80,8 +84,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (typeof token.name === "string") {
           session.user.name = token.name;
         }
-        if (typeof token.id === "string") {
-          session.user.id = token.id;
+        const id =
+          typeof token.id === "string"
+            ? token.id
+            : typeof token.sub === "string"
+              ? token.sub
+              : undefined;
+        if (id) {
+          session.user.id = id;
         }
         if (typeof token.role === "string") {
           session.user.role = token.role as UserRole;

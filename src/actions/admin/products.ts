@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { logAdminActivity, requireAdmin } from "@/lib/admin";
+import { getAdminActor, logAdminActivity } from "@/lib/admin";
 import { deriveColorFamily } from "@/lib/admin-color";
 import { slugify } from "@/lib/admin-slug";
 import { prisma } from "@/lib/prisma";
@@ -12,9 +12,9 @@ import type {
   ProductGender,
 } from "@/generated/prisma/client";
 
-export const DEFAULT_EU_SIZES = Array.from({ length: 9 }, (_, i) => `EU ${38 + i}`);
+const DEFAULT_EU_SIZES = Array.from({ length: 9 }, (_, i) => `EU ${38 + i}`);
 
-export type ProductFields = {
+type ProductFields = {
   name: string;
   slug: string;
   brandId: string;
@@ -29,9 +29,11 @@ export type ProductFields = {
   archived?: boolean;
 };
 
-export type ActionResult =
+type ActionResult =
   | { ok: true; id?: string; slug?: string }
   | { ok: false; error: string };
+
+const ADMIN_REQUIRED = "Admin access required. Sign out and sign back in, then try again.";
 
 function parseBadge(value: FormDataEntryValue | null): ProductBadge | null {
   const raw = String(value ?? "").trim();
@@ -57,6 +59,21 @@ function parseAvailableAt(raw: string): string | null {
   return d.toISOString();
 }
 
+function parseColorHex(raw: string, fallback?: string): string {
+  const value = raw.trim() || fallback?.trim() || "";
+  if (!value) {
+    throw new Error("Color hex is required (e.g. #FACC15).");
+  }
+  if (!/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value)) {
+    throw new Error("Color hex must look like #RGB or #RRGGBB.");
+  }
+  if (value.length === 4) {
+    const [, r, g, b] = value;
+    return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+  }
+  return value.toLowerCase();
+}
+
 function parseProductFields(formData: FormData): ProductFields {
   const discountRaw = String(formData.get("discountValue") ?? "").trim();
   const availableRaw = String(formData.get("availableAt") ?? "").trim();
@@ -77,18 +94,7 @@ function parseProductFields(formData: FormData): ProductFields {
   };
 }
 
-function isNextRedirect(e: unknown): boolean {
-  return (
-    typeof e === "object" &&
-    e !== null &&
-    "digest" in e &&
-    typeof (e as { digest: unknown }).digest === "string" &&
-    String((e as { digest: string }).digest).startsWith("NEXT_REDIRECT")
-  );
-}
-
 function actionError(e: unknown, fallback: string): ActionResult {
-  if (isNextRedirect(e)) throw e;
   return {
     ok: false,
     error: e instanceof Error ? e.message : fallback,
@@ -97,6 +103,7 @@ function actionError(e: unknown, fallback: string): ActionResult {
 
 function revalidateProductPaths(slug?: string) {
   revalidatePath("/admin/products");
+  revalidatePath("/admin/products", "layout");
   revalidatePath("/");
   if (slug) revalidatePath(`/products/${slug}`);
 }
@@ -111,18 +118,20 @@ async function ensureUniqueSlug(slug: string, excludeId?: string) {
 export async function createProduct(
   formData: FormData,
 ): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await getAdminActor();
+  if (!admin) return { ok: false, error: ADMIN_REQUIRED };
 
   let fields: ProductFields;
+  let colorHex: string;
   try {
     fields = parseProductFields(formData);
+    colorHex = parseColorHex(String(formData.get("colorHex") ?? ""), "#888888");
   } catch (e) {
     return actionError(e, "Invalid product fields.");
   }
 
   const price = Number(formData.get("price"));
   const color = String(formData.get("color") ?? "").trim();
-  const colorHex = String(formData.get("colorHex") ?? "#888888").trim();
   const imageUrl = String(formData.get("imageUrl") ?? "").trim() || null;
 
   if (!fields.name || !fields.slug || !fields.brandId) {
@@ -187,7 +196,8 @@ export async function updateProduct(
   productId: string,
   formData: FormData,
 ): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await getAdminActor();
+  if (!admin) return { ok: false, error: ADMIN_REQUIRED };
 
   let fields: ProductFields;
   try {
@@ -231,6 +241,7 @@ export async function updateProduct(
     });
 
     revalidateProductPaths(product.slug);
+    revalidatePath(`/admin/products/${productId}/edit`);
     return { ok: true, id: product.id, slug: product.slug };
   } catch (e) {
     return actionError(e, "Failed to update product.");
@@ -247,18 +258,25 @@ export async function updateVariant(
   variantId: string,
   formData: FormData,
 ): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await getAdminActor();
+  if (!admin) return { ok: false, error: ADMIN_REQUIRED };
 
   const color = String(formData.get("color") ?? "").trim();
-  const colorHex = String(formData.get("colorHex") ?? "").trim();
   const colorFamilyRaw = String(formData.get("colorFamily") ?? "").trim();
   const price = Number(formData.get("price"));
   const imageUrl = String(formData.get("imageUrl") ?? "").trim() || null;
   const description =
     String(formData.get("description") ?? "").trim() || null;
 
-  if (!color || !colorHex) {
-    return { ok: false, error: "Color and color hex are required." };
+  let colorHex: string;
+  try {
+    colorHex = parseColorHex(String(formData.get("colorHex") ?? ""));
+  } catch (e) {
+    return actionError(e, "Invalid color hex.");
+  }
+
+  if (!color) {
+    return { ok: false, error: "Color is required." };
   }
   if (!Number.isFinite(price) || price <= 0) {
     return { ok: false, error: "A valid price is required." };
@@ -270,7 +288,7 @@ export async function updateVariant(
       select: {
         price: true,
         color: true,
-        product: { select: { slug: true, name: true } },
+        product: { select: { id: true, slug: true, name: true } },
       },
     });
     if (!existing) return { ok: false, error: "Variant not found." };
@@ -294,6 +312,7 @@ export async function updateVariant(
     }
 
     revalidateProductPaths(existing.product.slug);
+    revalidatePath(`/admin/products/${existing.product.id}/edit`);
     return { ok: true };
   } catch (e) {
     return actionError(e, "Failed to update variant.");
@@ -304,13 +323,20 @@ export async function addVariant(
   productId: string,
   formData: FormData,
 ): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await getAdminActor();
+  if (!admin) return { ok: false, error: ADMIN_REQUIRED };
 
   const color = String(formData.get("color") ?? "").trim();
-  const colorHex = String(formData.get("colorHex") ?? "#888888").trim();
   const colorFamilyRaw = String(formData.get("colorFamily") ?? "").trim();
   const price = Number(formData.get("price"));
   const imageUrl = String(formData.get("imageUrl") ?? "").trim() || null;
+
+  let colorHex: string;
+  try {
+    colorHex = parseColorHex(String(formData.get("colorHex") ?? ""), "#888888");
+  } catch (e) {
+    return actionError(e, "Invalid color hex.");
+  }
 
   if (!color) return { ok: false, error: "Color is required." };
   if (!Number.isFinite(price) || price <= 0) {
@@ -323,6 +349,20 @@ export async function addVariant(
       select: { slug: true, name: true },
     });
     if (!product) return { ok: false, error: "Product not found." };
+
+    const duplicate = await prisma.productVariant.findFirst({
+      where: {
+        productId,
+        color: { equals: color, mode: "insensitive" },
+      },
+      select: { id: true },
+    });
+    if (duplicate) {
+      return {
+        ok: false,
+        error: `A variant named "${color}" already exists on this product.`,
+      };
+    }
 
     const variant = await prisma.productVariant.create({
       data: {
@@ -348,6 +388,7 @@ export async function addVariant(
     });
 
     revalidateProductPaths(product.slug);
+    revalidatePath(`/admin/products/${productId}/edit`);
     return { ok: true, id: variant.id };
   } catch (e) {
     return actionError(e, "Failed to add variant.");
@@ -356,9 +397,15 @@ export async function addVariant(
 
 export async function updateSizeStock(
   sizeId: string,
-  stock: number,
+  stockInput: number | string,
 ): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await getAdminActor();
+  if (!admin) return { ok: false, error: ADMIN_REQUIRED };
+
+  const stock =
+    typeof stockInput === "number"
+      ? stockInput
+      : Number.parseInt(String(stockInput), 10);
 
   if (!Number.isInteger(stock) || stock < 0) {
     return { ok: false, error: "Stock must be a non-negative integer." };
@@ -373,7 +420,7 @@ export async function updateSizeStock(
         variant: {
           select: {
             color: true,
-            product: { select: { slug: true, name: true } },
+            product: { select: { id: true, slug: true, name: true } },
           },
         },
       },
@@ -397,6 +444,7 @@ export async function updateSizeStock(
     });
 
     revalidateProductPaths(existing.variant.product.slug);
+    revalidatePath(`/admin/products/${existing.variant.product.id}/edit`);
     return { ok: true };
   } catch (e) {
     return actionError(e, "Failed to update stock.");
@@ -407,7 +455,8 @@ export async function setProductArchived(
   productId: string,
   archived: boolean,
 ): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await getAdminActor();
+  if (!admin) return { ok: false, error: ADMIN_REQUIRED };
 
   try {
     const product = await prisma.product.update({
