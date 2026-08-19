@@ -158,7 +158,7 @@ export default function NavSearch({
             role="dialog"
             aria-modal="true"
             aria-label="Search products"
-            className="absolute left-1/2 top-full z-[55] w-[min(100vw-1.5rem,600px)] -translate-x-1/2 bg-[#121212] shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
+            className="absolute left-1/2 top-full z-[55] w-[min(100%-1.5rem,600px)] max-w-[calc(100vw-1.5rem)] -translate-x-1/2 bg-[#121212] shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
           >
             <form
               onSubmit={goToBrowse}

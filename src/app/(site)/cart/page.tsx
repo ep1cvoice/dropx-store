@@ -17,8 +17,8 @@ export default async function CartPage() {
   const isEmpty = cart.items.length === 0;
 
   return (
-    <div className="flex min-h-[70vh] flex-col bg-white">
-      <div className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-8 md:px-6 md:py-10 lg:px-10">
+    <div className="flex min-h-[70vh] w-full min-w-0 flex-col bg-white">
+      <div className="mx-auto w-full min-w-0 max-w-[1600px] flex-1 px-4 py-8 md:px-6 md:py-10 lg:px-10">
         {/* Breadcrumb */}
         <nav
           aria-label="Breadcrumb"
@@ -32,9 +32,9 @@ export default async function CartPage() {
         </nav>
 
         {/* Header */}
-        <div className="flex items-end justify-between gap-4">
+        <div className="flex min-w-0 items-end justify-between gap-3">
           <h1
-            className={`${anton.className} text-4xl uppercase tracking-wide text-[#121212] md:text-5xl`}
+            className={`${anton.className} min-w-0 text-3xl uppercase tracking-wide text-[#121212] sm:text-4xl md:text-5xl`}
           >
             Your cart
           </h1>
@@ -62,14 +62,14 @@ export default async function CartPage() {
             </Link>
           </div>
         ) : (
-          <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_360px] lg:gap-12">
-            <ul>
+          <div className="mt-8 grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-12">
+            <ul className="min-w-0">
               {cart.items.map((item) => (
                 <CartLineItem key={item.id} item={item} />
               ))}
             </ul>
 
-            <aside className="lg:sticky lg:top-6 lg:self-start">
+            <aside className="min-w-0 lg:sticky lg:top-6 lg:self-start">
               <CartSummary
                 subtotal={cart.subtotal}
                 shipping={cart.shipping}

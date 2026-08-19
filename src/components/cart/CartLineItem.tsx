@@ -47,71 +47,89 @@ export default function CartLineItem({ item }: CartLineItemProps) {
 
   return (
     <li
-      className={`flex items-start gap-4 border-b border-black/10 py-5 md:items-center md:gap-6 ${
+      className={`min-w-0 border-b border-black/10 py-5 ${
         isPending ? "pointer-events-none opacity-50" : ""
       }`}
     >
-      <Link
-        href={`/products/${item.slug}`}
-        className="relative h-20 w-20 shrink-0 overflow-hidden rounded-none bg-white ring-1 ring-black/5"
-      >
-        {item.imageUrl && (
-          <Image
-            src={item.imageUrl}
-            alt={item.name}
-            fill
-            sizes="80px"
-            className="object-contain p-1"
-          />
-        )}
-      </Link>
-
-      <div className="min-w-0 flex-1">
-        <p
-          className={`${inter.className} text-[10px] font-semibold uppercase tracking-[0.2em] text-[#999999]`}
+      <div className="flex min-w-0 items-start gap-3 sm:gap-4 md:items-center md:gap-6">
+        <Link
+          href={`/products/${item.slug}`}
+          className="relative h-16 w-16 shrink-0 overflow-hidden rounded-none bg-white ring-1 ring-black/5 sm:h-20 sm:w-20"
         >
-          {item.brand}
-        </p>
-        <p
-          className={`${anton.className} truncate text-base uppercase tracking-wide text-[#121212]`}
-        >
-          {item.name}
-        </p>
-        <p className={`${inter.className} mt-0.5 text-xs text-[#777777]`}>
-          {item.size}&nbsp;·&nbsp;{item.color}
-        </p>
+          {item.imageUrl && (
+            <Image
+              src={item.imageUrl}
+              alt={item.name}
+              fill
+              sizes="80px"
+              className="object-contain p-1"
+            />
+          )}
+        </Link>
 
-        <p
-          className={`${inter.className} mt-2 text-sm font-semibold text-[#121212] md:hidden`}
-        >
-          {lineTotal}
-        </p>
-      </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p
+                className={`${inter.className} text-[10px] font-semibold uppercase tracking-[0.2em] text-[#999999]`}
+              >
+                {item.brand}
+              </p>
+              <p
+                className={`${anton.className} truncate text-sm uppercase tracking-wide text-[#121212] sm:text-base`}
+              >
+                {item.name}
+              </p>
+              <p className={`${inter.className} mt-0.5 truncate text-xs text-[#777777]`}>
+                {item.size}&nbsp;·&nbsp;{item.color}
+              </p>
+            </div>
 
-      <div className="flex flex-col items-end gap-3 md:flex-row md:items-center md:gap-6">
-        <button
-          type="button"
-          onClick={remove}
-          aria-label={`Remove ${item.name} from cart`}
-          className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-none text-[#bbbbbb] transition-colors hover:bg-black/5 hover:text-[#121212] md:order-3"
-        >
-          <X size={16} />
-        </button>
+            <button
+              type="button"
+              onClick={remove}
+              aria-label={`Remove ${item.name} from cart`}
+              className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-none text-[#bbbbbb] transition-colors hover:bg-black/5 hover:text-[#121212] md:hidden"
+            >
+              <X size={16} />
+            </button>
+          </div>
 
-        <div className="md:order-1">
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 md:mt-0 md:hidden">
+            <p className={`${inter.className} text-sm font-semibold text-[#121212]`}>
+              {lineTotal}
+            </p>
+            <QuantitySelector
+              value={item.quantity}
+              onChange={changeQuantity}
+              min={1}
+              max={item.maxStock}
+              size="sm"
+            />
+          </div>
+        </div>
+
+        <div className="hidden shrink-0 items-center gap-6 md:flex">
           <QuantitySelector
             value={item.quantity}
             onChange={changeQuantity}
             min={1}
             max={item.maxStock}
           />
+          <span
+            className={`${inter.className} w-24 text-right text-sm font-semibold text-[#121212]`}
+          >
+            {lineTotal}
+          </span>
+          <button
+            type="button"
+            onClick={remove}
+            aria-label={`Remove ${item.name} from cart`}
+            className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-none text-[#bbbbbb] transition-colors hover:bg-black/5 hover:text-[#121212]"
+          >
+            <X size={16} />
+          </button>
         </div>
-
-        <span
-          className={`${inter.className} hidden w-24 text-right text-sm font-semibold text-[#121212] md:order-2 md:block`}
-        >
-          {lineTotal}
-        </span>
       </div>
     </li>
   );

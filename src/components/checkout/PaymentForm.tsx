@@ -115,7 +115,7 @@ export default function PaymentForm({ total, currency }: PaymentFormProps) {
             return (
               <label
                 key={item.id}
-                className={`flex cursor-pointer items-center gap-3 rounded-none border px-4 py-4 transition-colors ${
+                className={`flex min-w-0 cursor-pointer items-center gap-3 rounded-none border px-3 py-3.5 transition-colors sm:px-4 sm:py-4 ${
                   active
                     ? "border-[#121212]"
                     : "border-black/15 hover:border-black/30"

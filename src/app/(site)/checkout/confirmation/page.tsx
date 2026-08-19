@@ -43,55 +43,55 @@ export default async function CheckoutConfirmationPage({
 
   return (
     <CheckoutShell currentStep={3} cart={emptyCart} hideSummary>
-      <div className="mx-auto max-w-lg py-8 text-center">
+      <div className="mx-auto w-full min-w-0 max-w-lg py-6 text-center sm:py-8">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-none bg-[#e8f8ef] text-[#1f9d55]">
           <CheckCircle2 size={36} strokeWidth={1.75} />
         </div>
 
         <h1
-          className={`${anton.className} mt-6 text-4xl uppercase tracking-wide text-[#121212]`}
+          className={`${anton.className} mt-6 text-3xl uppercase tracking-wide text-[#121212] sm:text-4xl`}
         >
           Order confirmed
         </h1>
 
-        <p className={`${inter.className} mt-3 text-sm text-[#666666]`}>
+        <p className={`${inter.className} mt-3 px-1 text-sm text-[#666666]`}>
           Thanks for your order. This is a mock payment — nothing was charged.
         </p>
 
         <div
-          className={`${inter.className} mt-8 rounded-none border border-black/10 bg-[#f4f4f2] px-6 py-5 text-left`}
+          className={`${inter.className} mt-8 rounded-none border border-black/10 bg-[#f4f4f2] px-4 py-5 text-left sm:px-6`}
         >
-          <div className="flex items-center justify-between gap-4 text-sm">
-            <span className="text-[#666666]">Order number</span>
-            <span className="font-semibold text-[#121212]">#{orderNumber}</span>
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="min-w-0 text-[#666666]">Order number</span>
+            <span className="shrink-0 font-semibold text-[#121212]">#{orderNumber}</span>
           </div>
           {methodLabel && (
-            <div className="mt-3 flex items-center justify-between gap-4 border-t border-black/10 pt-3 text-sm">
-              <span className="text-[#666666]">Payment method</span>
-              <span className="font-semibold text-[#121212]">{methodLabel}</span>
+            <div className="mt-3 flex items-center justify-between gap-3 border-t border-black/10 pt-3 text-sm">
+              <span className="min-w-0 text-[#666666]">Payment method</span>
+              <span className="shrink-0 font-semibold text-[#121212]">{methodLabel}</span>
             </div>
           )}
-          <div className="mt-3 flex items-center justify-between gap-4 border-t border-black/10 pt-3 text-sm">
-            <span className="text-[#666666]">Status</span>
-            <span className="font-bold uppercase tracking-wide text-[#1f9d55]">
+          <div className="mt-3 flex items-center justify-between gap-3 border-t border-black/10 pt-3 text-sm">
+            <span className="min-w-0 text-[#666666]">Status</span>
+            <span className="shrink-0 font-bold uppercase tracking-wide text-[#1f9d55]">
               Paid
             </span>
           </div>
         </div>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link href="/browse-all">
+          <Link href="/browse-all" className="w-full sm:w-auto">
             <Button
               variant="accent"
-              className="h-12 w-full cursor-pointer rounded-none px-8 text-sm font-semibold uppercase tracking-[0.12em] sm:w-auto"
+              className="h-12 w-full cursor-pointer rounded-none px-8 text-sm font-semibold uppercase tracking-[0.12em]"
             >
               Continue shopping
             </Button>
           </Link>
-          <Link href="/account/orders">
+          <Link href="/account/orders" className="w-full sm:w-auto">
             <Button
               variant="outline"
-              className="h-12 w-full cursor-pointer rounded-none px-8 text-sm font-semibold uppercase tracking-[0.12em] sm:w-auto"
+              className="h-12 w-full cursor-pointer rounded-none px-8 text-sm font-semibold uppercase tracking-[0.12em]"
             >
               View orders
             </Button>

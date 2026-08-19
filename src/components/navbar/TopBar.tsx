@@ -53,18 +53,18 @@ export default function TopBar() {
         <div
           className={`${inter.className} border-b border-black/10 bg-[#6b6b6b] text-[11px] text-white/85 md:text-xs`}
         >
-          <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-2 md:px-6 lg:px-10">
-            <ul className="flex w-full min-w-0 items-center justify-between gap-y-1 md:w-auto md:justify-start md:gap-x-5 lg:gap-x-5">
+          <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-4 py-2 md:gap-4 md:px-6 lg:px-10">
+            <ul className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-1 md:w-auto md:flex-nowrap md:justify-start md:gap-x-5 lg:gap-x-5">
               {promoItems.map((item) => (
                 <li
                   key={item.label}
-                  className={`flex items-center gap-3 sm:gap-5${
+                  className={`flex min-w-0 items-center gap-3 sm:gap-5${
                     item.visibleFrom === "lg" ? " hidden lg:flex" : ""
                   }`}
                 >
-                  <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-flex min-w-0 items-center gap-1.5">
                     {item.icon}
-                    <span>{item.label}</span>
+                    <span className="truncate">{item.label}</span>
                   </span>
                   <span
                     aria-hidden="true"
@@ -74,7 +74,7 @@ export default function TopBar() {
                   </span>
                 </li>
               ))}
-              <li>
+              <li className="min-w-0">
                 <Link
                   href="/#newsletter"
                   scroll={false}
@@ -88,10 +88,10 @@ export default function TopBar() {
                       .getElementById("newsletter")
                       ?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
-                  className="inline-flex items-center gap-1.5 font-medium text-white/85 transition-colors hover:text-[#e85d2a]"
+                  className="inline-flex max-w-full items-center gap-1.5 font-medium text-white/85 transition-colors hover:text-[#e85d2a]"
                 >
                   <Mail className={iconClassName} strokeWidth={1.75} aria-hidden />
-                  Newsletter — 10%
+                  <span className="truncate">Newsletter — 10%</span>
                 </Link>
               </li>
             </ul>

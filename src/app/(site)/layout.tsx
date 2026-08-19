@@ -16,7 +16,7 @@ export default function SiteLayout({
   return (
     <StoreBagProvider>
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className="min-w-0 flex-1">{children}</main>
       <ContactBar />
       <Footer />
       <PaymentShippingBar />

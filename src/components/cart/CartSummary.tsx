@@ -64,7 +64,7 @@ export default function CartSummary({
   }
 
   return (
-    <div className="rounded-none bg-[#f4f4f2] p-6 md:p-7">
+    <div className="min-w-0 rounded-none bg-[#f4f4f2] p-4 sm:p-6 md:p-7">
       <h2
         className={`${inter.className} text-xs font-bold uppercase tracking-[0.16em] text-[#121212]`}
       >
@@ -72,27 +72,27 @@ export default function CartSummary({
       </h2>
 
       <dl className={`${inter.className} mt-5 space-y-3 text-sm`}>
-        <div className="flex items-center justify-between">
-          <dt className="text-[#666666]">Subtotal</dt>
-          <dd className="font-semibold text-[#121212]">
+        <div className="flex items-center justify-between gap-3">
+          <dt className="min-w-0 text-[#666666]">Subtotal</dt>
+          <dd className="shrink-0 font-semibold text-[#121212]">
             {formatPrice(subtotal, currency)}
           </dd>
         </div>
         {discount > 0 && (
-          <div className="flex items-center justify-between">
-            <dt className="text-[#1f9d55]">Discount ({promoCode})</dt>
-            <dd className="font-semibold text-[#1f9d55]">
+          <div className="flex items-center justify-between gap-3">
+            <dt className="min-w-0 text-[#1f9d55]">Discount ({promoCode})</dt>
+            <dd className="shrink-0 font-semibold text-[#1f9d55]">
               −{formatPrice(discount, currency)}
             </dd>
           </div>
         )}
-        <div className="flex items-center justify-between">
-          <dt className="text-[#666666]">Shipping</dt>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="min-w-0 text-[#666666]">Shipping</dt>
           <dd
             className={
               shipping === 0
-                ? "font-bold uppercase tracking-wide text-[#1f9d55]"
-                : "font-semibold text-[#121212]"
+                ? "shrink-0 font-bold uppercase tracking-wide text-[#1f9d55]"
+                : "shrink-0 font-semibold text-[#121212]"
             }
           >
             {shipping === 0 ? "Free" : formatPrice(shipping, currency)}
@@ -100,21 +100,21 @@ export default function CartSummary({
         </div>
       </dl>
 
-      <div className="mt-5 flex items-center justify-between border-t border-black/10 pt-5">
+      <div className="mt-5 flex items-center justify-between gap-3 border-t border-black/10 pt-5">
         <span
-          className={`${inter.className} text-base font-bold text-[#121212]`}
+          className={`${inter.className} min-w-0 text-base font-bold text-[#121212]`}
         >
           Total
         </span>
         <span
-          className={`${inter.className} text-2xl font-bold text-[#121212]`}
+          className={`${inter.className} shrink-0 text-xl font-bold text-[#121212] sm:text-2xl`}
         >
           {formatPrice(total, currency)}
         </span>
       </div>
 
-      <div className="mt-5">
-        <div className="flex gap-2">
+      <div className="mt-5 min-w-0">
+        <div className="flex min-w-0 gap-2">
           <input
             type="text"
             value={code}

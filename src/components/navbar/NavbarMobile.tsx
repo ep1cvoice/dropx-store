@@ -94,8 +94,8 @@ export default function NavbarMobile() {
 
   return (
     <>
-      <div className="flex h-14 items-center justify-between px-6 md:h-[68px]">
-        <div className="flex items-center gap-3">
+      <div className="flex h-14 min-w-0 items-center justify-between gap-3 px-4 md:h-[68px] md:px-6">
+        <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
             aria-label="Open menu"

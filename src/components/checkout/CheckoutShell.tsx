@@ -22,8 +22,8 @@ export default function CheckoutShell({
   paymentEnabled = false,
 }: CheckoutShellProps) {
   return (
-    <div className="bg-white">
-      <div className="border-b border-black/5 bg-[#f4f4f2] px-4 py-5">
+    <div className="min-w-0 bg-white">
+      <div className="border-b border-black/5 bg-[#f4f4f2] px-3 py-4 sm:px-4 sm:py-5">
         <CheckoutSteps
           current={currentStep}
           paymentEnabled={paymentEnabled}
@@ -31,15 +31,15 @@ export default function CheckoutShell({
       </div>
 
       <div
-        className={`mx-auto w-full max-w-[1120px] px-4 py-10 md:px-6 ${
+        className={`mx-auto w-full min-w-0 max-w-[1120px] px-4 py-8 md:px-6 md:py-10 ${
           hideSummary
             ? ""
-            : "grid gap-10 lg:grid-cols-[1fr_360px] lg:gap-12"
+            : "grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-12"
         }`}
       >
         {/* Summary first on mobile; form first (left) on desktop */}
         {!hideSummary && (
-          <aside className="order-1 lg:order-2 lg:sticky lg:top-6 lg:self-start">
+          <aside className="order-1 min-w-0 lg:order-2 lg:sticky lg:top-6 lg:self-start">
             <CheckoutSummary
               items={cart.items}
               subtotal={cart.subtotal}
@@ -52,7 +52,7 @@ export default function CheckoutShell({
           </aside>
         )}
 
-        <div className={hideSummary ? undefined : "order-2 lg:order-1"}>
+        <div className={hideSummary ? "min-w-0" : "order-2 min-w-0 lg:order-1"}>
           {children}
         </div>
       </div>

@@ -37,7 +37,7 @@ export default function CheckoutSteps({
 
   return (
     <ol
-      className={`${inter.className} mx-auto flex w-full max-w-[560px] items-center`}
+      className={`${inter.className} mx-auto flex w-full min-w-0 max-w-[560px] items-center`}
     >
       {STEPS.map((step, index) => {
         const isComplete = step.id < current;
@@ -51,7 +51,7 @@ export default function CheckoutSteps({
             (step.id === 2 && paymentEnabled));
 
         const content = (
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
             <span
               className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-none text-xs font-semibold ${
                 isActive || isComplete
@@ -62,7 +62,7 @@ export default function CheckoutSteps({
               {isComplete ? <Check size={13} /> : step.id}
             </span>
             <span
-              className={`text-sm ${
+              className={`truncate text-[11px] sm:text-sm ${
                 isActive
                   ? "font-semibold text-[#121212]"
                   : canNavigate
@@ -70,7 +70,10 @@ export default function CheckoutSteps({
                     : "text-[#999999]"
               }`}
             >
-              {step.label}
+              <span className="sm:hidden">
+                {step.id === 1 ? "Info" : step.id === 2 ? "Pay" : "Done"}
+              </span>
+              <span className="hidden sm:inline">{step.label}</span>
             </span>
           </div>
         );
@@ -78,12 +81,12 @@ export default function CheckoutSteps({
         return (
           <li
             key={step.id}
-            className={`flex items-center ${isLast ? "" : "flex-1"}`}
+            className={`flex min-w-0 items-center ${isLast ? "shrink-0" : "min-w-0 flex-1"}`}
           >
             {canNavigate && step.href ? (
               <Link
                 href={step.href}
-                className="rounded-none transition-colors hover:opacity-80"
+                className="min-w-0 rounded-none transition-colors hover:opacity-80"
               >
                 {content}
               </Link>
@@ -94,7 +97,7 @@ export default function CheckoutSteps({
             {!isLast && (
               <span
                 aria-hidden="true"
-                className="mx-3 h-px flex-1 bg-black/15"
+                className="mx-1.5 h-px min-w-3 flex-1 bg-black/15 sm:mx-3"
               />
             )}
           </li>
