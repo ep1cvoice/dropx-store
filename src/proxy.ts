@@ -39,7 +39,7 @@ export async function proxy(req: NextRequest) {
   }
 
   const isLoggedIn =
-    Boolean(token) && !isSessionExpired(token.loginAt, token.remember);
+    token != null && !isSessionExpired(token.loginAt, token.remember);
   const isAdmin = token?.role === "ADMIN";
 
   const isGuestOnlyRoute = guestOnlyRoutes.some((route) =>

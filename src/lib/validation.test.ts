@@ -15,6 +15,7 @@ describe("loginSchema", () => {
     const result = loginSchema.safeParse({
       email: "user@example.com",
       password: "secret",
+      remember: true,
     });
     expect(result.success).toBe(true);
     if (result.success) {
