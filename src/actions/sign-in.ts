@@ -16,6 +16,7 @@ export async function signInAction(
     await signIn('credentials', {
       email: parsed.data.email,
       password: parsed.data.password,
+      remember: parsed.data.remember ? 'true' : 'false',
       redirectTo: '/',
     });
   } catch (error) {

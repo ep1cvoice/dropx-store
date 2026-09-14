@@ -2,6 +2,11 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
+import {
+  SESSION_MAX_AGE_SECONDS,
+  isSessionExpired,
+  parseRememberFlag,
+} from "@/auth/session";
 import { verifyPassword } from "@/utils/password";
 import type { UserRole } from "@/generated/prisma/client";
 
@@ -11,16 +16,18 @@ const authSecret =
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   secret: authSecret,
-  // Needed in local/dev so /api/auth/session returns JSON instead of an HTML error page.
   trustHost: true,
   session: {
     strategy: "jwt",
+    maxAge: SESSION_MAX_AGE_SECONDS.remember,
+    updateAge: SESSION_MAX_AGE_SECONDS.session,
   },
   providers: [
     Credentials({
       credentials: {
         email: {},
         password: {},
+        remember: {},
       },
       authorize: async (credentials) => {
         const email =
@@ -50,6 +57,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.email,
           name: `${user.name} ${user.lastName}`.trim(),
           role: user.role,
+          remember: parseRememberFlag(credentials.remember),
         };
       },
     }),
@@ -61,6 +69,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.email = user.email;
         token.name = user.name;
         token.role = user.role as UserRole | undefined;
+        token.loginAt = Date.now();
+        token.remember = Boolean(user.remember);
+      }
+      if (isSessionExpired(token.loginAt, token.remember)) {
+        return null;
       }
       // Keep id stable across refreshes (Auth.js uses `sub` as the subject).
       if (!token.id && typeof token.sub === "string") {

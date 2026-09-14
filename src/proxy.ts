@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { isSessionExpired } from "@/auth/session";
 
 const guestOnlyRoutes = ["/login", "/register", "/forgot-password"];
 const protectedRoutes = [
@@ -15,10 +16,6 @@ function matchesRoute(pathname: string, route: string): boolean {
   return pathname === route || pathname.startsWith(`${route}/`);
 }
 
-/**
- * Lightweight JWT check only — do NOT import `@/auth/auth` here.
- * That pulls Prisma into the proxy graph and can balloon Turbopack RAM in `next dev`.
- */
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const secret = process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET;
@@ -41,7 +38,8 @@ export async function proxy(req: NextRequest) {
     token = null;
   }
 
-  const isLoggedIn = Boolean(token);
+  const isLoggedIn =
+    Boolean(token) && !isSessionExpired(token.loginAt, token.remember);
   const isAdmin = token?.role === "ADMIN";
 
   const isGuestOnlyRoute = guestOnlyRoutes.some((route) =>

@@ -42,6 +42,7 @@ export default function LoginForm({
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: { remember: true },
   });
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -56,6 +57,7 @@ export default function LoginForm({
     const result = await signIn('credentials', {
       email: data.email,
       password: data.password,
+      remember: data.remember ? 'true' : 'false',
       redirect: false,
       callbackUrl,
     });
@@ -118,9 +120,8 @@ export default function LoginForm({
           <label className={`${inter.className} flex cursor-pointer items-center gap-2.5 text-sm text-gray-500`}>
             <input
               type='checkbox'
-              name='remember'
-              defaultChecked
               className='size-4 rounded-none border-gray-300 accent-gray-900'
+              {...register('remember')}
             />
             Remember me
           </label>

@@ -17,6 +17,21 @@ describe("loginSchema", () => {
       password: "secret",
     });
     expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.remember).toBe(true);
+    }
+  });
+
+  it("keeps remember me off when unchecked", () => {
+    const result = loginSchema.safeParse({
+      email: "user@example.com",
+      password: "secret",
+      remember: false,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.remember).toBe(false);
+    }
   });
 
   it("rejects an invalid email", () => {
